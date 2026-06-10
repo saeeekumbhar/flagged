@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-const COLORS = ['#3a8f3a', '#c4d9bc', '#f5d990', '#1e1a16'];
+const COLORS = ['#7BA87A', '#C4D9BC', '#F5D990', '#E8856A', '#7EB3CC'];
 
 export function Confetti({ duration = 1500 }: { duration?: number }) {
   const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
-    const newParticles = Array.from({ length: 40 }).map((_, i) => ({
+    const newParticles = Array.from({ length: 30 }).map((_, i) => ({
       id: i,
       left: Math.random() * 100 + '%',
       backgroundColor: COLORS[Math.floor(Math.random() * COLORS.length)],
-      animationDuration: 0.5 + Math.random() * 1 + 's',
-      animationDelay: Math.random() * 0.2 + 's',
+      animationDuration: 2.5 + Math.random() * 2 + 's',
+      animationDelay: Math.random() * 0.5 + 's',
+      opacity: 0.5 + Math.random() * 0.4,
+      width: 6 + Math.random() * 6 + 'px',
+      height: 6 + Math.random() * 6 + 'px',
+      borderRadius: Math.random() > 0.5 ? '50%' : '2px'
     }));
     setParticles(newParticles);
   }, []);
@@ -29,6 +33,10 @@ export function Confetti({ duration = 1500 }: { duration?: number }) {
             backgroundColor: p.backgroundColor,
             animationDuration: p.animationDuration,
             animationDelay: p.animationDelay,
+            opacity: p.opacity,
+            width: p.width,
+            height: p.height,
+            borderRadius: p.borderRadius
           }}
         />
       ))}
