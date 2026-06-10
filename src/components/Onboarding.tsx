@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile } from '../types';
 import { AVATARS } from '../avatars';
+import { AvatarDisplay } from './AvatarDisplay';
 
 interface OnboardingProps {
   onComplete: (profile: Partial<UserProfile>) => void;
@@ -268,7 +269,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   className="flex flex-col items-center gap-2"
                 >
                   <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-3xl transition-all"
+                    className="w-14 h-14 rounded-full flex items-center justify-center text-3xl transition-all overflow-hidden"
                     style={{
                       background: selectedAvatar === av.id
                         ? 'linear-gradient(135deg, #C4D9BC, #E4EDE0)'
@@ -281,7 +282,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         : '0 2px 8px rgba(30,26,22,0.06)',
                     }}
                   >
-                    {av.emoji}
+                    <AvatarDisplay avatar={av} size={56} />
                   </div>
                   <span className="text-[10px] font-semibold text-[#5A8070] text-center leading-tight">
                     {av.tag}
@@ -292,7 +293,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
             {/* Preview */}
             <div className="soft-card p-4 flex items-center gap-3">
-              <span className="text-4xl">{chosenAvatar.emoji}</span>
+              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                <AvatarDisplay avatar={chosenAvatar} size={48} />
+              </div>
               <div>
                 <p className="font-bold text-[#1E1A16]">{profile.name?.split(' ')[0] || 'You'}</p>
                 <p className="text-xs text-[#8A8070]">{chosenAvatar.tag} · {chosenAvatar.label}</p>
@@ -316,9 +319,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             >
               <div className="absolute inset-0 rounded-full glow-pulse"
                 style={{ background: 'radial-gradient(circle, rgba(90,143,90,0.3) 0%, transparent 70%)' }} />
-              <div className="w-40 h-40 rounded-full flex items-center justify-center relative"
+              <div className="w-40 h-40 rounded-full overflow-hidden relative"
                 style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #FDF6EC 100%)', boxShadow: '0 12px 40px rgba(90,143,90,0.25)', border: '3px solid rgba(196,217,188,0.6)' }}>
-                <span className="text-7xl plant-float">{chosenAvatar.emoji}</span>
+                <AvatarDisplay avatar={chosenAvatar} size={160} />
               </div>
             </motion.div>
 

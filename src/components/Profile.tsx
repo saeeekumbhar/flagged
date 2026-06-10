@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra } from '../types';
 import { AVATARS, getAvatar, getAvatarAura } from '../avatars';
+import { AvatarDisplay } from './AvatarDisplay';
 
 interface ProfileProps {
   profile: UserProfile;
@@ -61,8 +62,9 @@ export function Profile({ profile, onBack, onAvatarChange }: ProfileProps) {
               background: aura.bg,
               boxShadow: `0 6px 28px ${aura.glow}`,
               border: `3px solid ${aura.ring}`,
+              overflow: 'hidden',
             }}>
-            {avatar.emoji}
+            <AvatarDisplay avatar={avatar} size={112} />
           </div>
           {/* Change avatar button */}
           <button
@@ -93,8 +95,9 @@ export function Profile({ profile, onBack, onAvatarChange }: ProfileProps) {
                       background: pendingAvatar === av.id ? 'linear-gradient(135deg, #C4D9BC, #E4EDE0)' : 'rgba(253,250,245,0.9)',
                       border: pendingAvatar === av.id ? '2.5px solid #5A8F5A' : '2px solid rgba(196,217,188,0.4)',
                       boxShadow: pendingAvatar === av.id ? '0 4px 14px rgba(90,143,90,0.25)' : undefined,
+                      overflow: 'hidden',
                     }}>
-                    {av.emoji}
+                    <AvatarDisplay avatar={av} size={48} />
                   </div>
                   <span className="text-[9px] font-semibold text-[#5A8070] text-center">{av.tag}</span>
                 </button>

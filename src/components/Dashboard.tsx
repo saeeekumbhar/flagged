@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { UserProfile, calculateEra, Era } from '../types';
 import { getAvatar, getAvatarAura } from '../avatars';
 import { GreenFlagIcon } from './GreenFlagIcon';
+import { AvatarDisplay } from './AvatarDisplay';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -125,8 +126,9 @@ export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRe
               background: aura.bg,
               boxShadow: `0 2px 12px ${aura.glow}`,
               border: `2px solid ${aura.ring}`,
+              overflow: 'hidden',
             }}>
-            {avatar.emoji}
+            <AvatarDisplay avatar={avatar} size={44} />
           </motion.div>
         </button>
       </motion.div>
@@ -161,8 +163,9 @@ export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRe
                   background: aura.bg,
                   boxShadow: `0 6px 28px ${aura.glow}, 0 2px 8px rgba(30,26,22,0.06)`,
                   border: `3px solid ${aura.ring}`,
+                overflow: 'hidden',
                 }}>
-                {avatar.emoji}
+                <AvatarDisplay avatar={avatar} size={96} />
               </div>
             </div>
             <div className="text-center">

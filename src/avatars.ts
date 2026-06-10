@@ -2,17 +2,20 @@
 
 export interface AvatarOption {
   id: string;
-  emoji: string;
+  emoji?: string;       // emoji fallback (for small sizes)
+  image?: string;       // path to illustrated image asset
   label: string;
   tag: string;
 }
 
 export const AVATARS: AvatarOption[] = [
-  { id: 'av1', emoji: '👩‍🎓', label: 'Scholar', tag: 'She/Her' },
-  { id: 'av2', emoji: '🧕', label: 'Aisha', tag: 'She/Her' },
-  { id: 'av3', emoji: '👧', label: 'Maya', tag: 'She/Her' },
-  { id: 'av4', emoji: '👨‍🎓', label: 'Scholar', tag: 'He/Him' },
-  { id: 'av5', emoji: '🧔', label: 'Raj', tag: 'He/Him' },
+  // Illustrated avatars (anime-style, FLAGGED-themed)
+  { id: 'av_f1', image: '/avatar_female.png', emoji: '🎧', label: 'Zara',    tag: 'She/Her' },
+  { id: 'av_m1', image: '/avatar_male.png',   emoji: '🎧', label: 'Arjun',   tag: 'He/Him'  },
+  // Emoji fallback avatars
+  { id: 'av2',   emoji: '👩‍🎓',                               label: 'Scholar', tag: 'She/Her' },
+  { id: 'av3',   emoji: '🧕',                                label: 'Aisha',   tag: 'She/Her' },
+  { id: 'av4',   emoji: '👨‍🎓',                               label: 'Scholar', tag: 'He/Him'  },
 ];
 
 export const getAvatar = (id: string): AvatarOption =>

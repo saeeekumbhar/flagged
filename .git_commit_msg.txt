@@ -1,31 +1,11 @@
-feat: avatar system, era rename, dashboard and profile overhaul
+feat: add illustrated avatars with FLAGGED-themed styling
 
-Avatar system:
-- New avatars.ts with 5 options (3F/2M) and score-based aura config
-- Avatar ring and glow change color based on score (coral/amber/green)
-- Same avatar shown in dashboard hero, header, and profile
-
-Dashboard:
-- Replace plant emoji hero with chosen avatar + animated aura ring
-- GreenFlagIcon SVG logo in header (replaces leaf emoji)
-- Avatar aura label replaces "Young Plant" text
-- Insight copy updated to reference footprint not garden
-
-Onboarding:
-- Replaced seed selection step with avatar picker (5 options grid)
-- Live preview card shows chosen avatar before confirming
-- Reveal screen shows chosen avatar, "Glow Up Era" badge
-- Welcome and name step copy updated to match flag/footprint theme
-
-Profile:
-- Shows chosen avatar with same score-based aura as dashboard
-- Inline avatar change drawer (pencil button on avatar)
-- onAvatarChange callback persists to localStorage
-
-Types:
-- avatar string path replaced with avatarId string field
-- "Mixed Flags Era" renamed to "Glow Up Era"
-
-New files:
-- src/avatars.ts (shared avatar definitions + aura helper)
-- src/components/GreenFlagIcon.tsx (shared flag SVG component)
+- Generated two anime-style illustrated avatars adapted to app theme:
+  Zara (She/Her) - curly hair, sage green headphones + hoodie
+  Arjun (He/Him) - messy hair, forest green headphones + hoodie
+- Added to public/ as avatar_female.png and avatar_male.png
+- New AvatarDisplay component: renders img for illustrated avatars,
+  emoji span as fallback for emoji-only options
+- AvatarOption type now supports optional image and emoji fields
+- Dashboard, Profile, and Onboarding all use AvatarDisplay consistently
+- Illustrated avatars appear first in the avatar picker grid
