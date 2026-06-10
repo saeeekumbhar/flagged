@@ -1,9 +1,1 @@
-feat: replace check-in with calendar-based logging system
-
-- Replaced `CheckIn.tsx` with `ActivityLogger.tsx`, a calendar-driven modal to log daily events.
-- Created `activities.ts` representing a "Hidden Carbon Engine" that tracks both visible Flag Impact and hidden Carbon Impact per activity.
-- Replaced the Dashboard's "Streak Calendar" and "Weekly Check-In" CTA with a full `MonthlyCalendar` component.
-- The `MonthlyCalendar` displays indicator dots on dates based on logged activities (Green/Red/Amber).
-- Dashboard "Flag Cards" replaced with Monthly Insights showing the total green and red choices logged this month.
-- Extended `types.ts` with `DailyLog` and `LoggedActivity` interfaces.
-- `App.tsx` now stores `calendarLogs` mapped by date in a separate `flagged_logs` localStorage entry to ensure backward compatibility and prevent profile bloat.
+cleanup gitignore
