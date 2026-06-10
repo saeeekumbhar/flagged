@@ -12,6 +12,7 @@ export interface UserProfile {
   completedOnboarding: boolean;
   avatarId: string; // ID from AVATARS list
   streak: number;
+  bestStreak: number;
 }
 
 export type Era = 'Red Flag Era' | 'Glow Up Era' | 'Green Flag Era';

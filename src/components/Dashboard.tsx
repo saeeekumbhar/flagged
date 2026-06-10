@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { motion } from 'motion/react';
+import React, { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, Era, DailyLog } from '../types';
 import { getAvatar, getAvatarAura } from '../avatars';
 import { GreenFlagIcon } from './GreenFlagIcon';
@@ -30,7 +30,7 @@ function getEraConfig(era: Era, score: number) {
         emoji: '🔥',
         gradientFrom: '#FDF6EC',
         gradientTo: '#F4F7F2',
-        nextGoal: `${needed} more points to Green Flag Era 🚩`,
+        nextGoal: `${needed} pt to Green Flag Era →`,
       };
     }
     case 'Red Flag Era': {
@@ -40,19 +40,19 @@ function getEraConfig(era: Era, score: number) {
         emoji: '🔴',
         gradientFrom: '#FDEEED',
         gradientTo: '#FDF9F3',
-        nextGoal: `${needed} more points to Glow Up Era 🔥`,
+        nextGoal: `${needed} pt to Glow Up Era →`,
       };
     }
   }
 }
 
 function GrowthRing({ score }: { score: number }) {
-  const radius = 54;
+  const radius = 34;
   const circ = 2 * Math.PI * radius;
   const fill = (score / 100) * circ;
 
   return (
-    <svg width="140" height="140" viewBox="0 0 140 140">
+    <svg width="80" height="80" viewBox="0 0 80 80">
       <defs>
         <linearGradient id="growthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#5A8F5A" />
@@ -63,37 +63,25 @@ function GrowthRing({ score }: { score: number }) {
           <stop offset="0%" stopColor="#D4614A" />
           <stop offset="100%" stopColor="#E8856A" />
         </linearGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-          <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
       </defs>
-      <circle cx="70" cy="70" r={radius} className="growth-ring-track" strokeWidth="10" />
-      <motion.circle cx="70" cy="70" r={radius}
+      <circle cx="40" cy="40" r={radius} className="growth-ring-track" strokeWidth="8" />
+      <motion.circle cx="40" cy="40" r={radius}
         stroke={score > 40 ? 'url(#growthGradient)' : 'url(#coralGradient)'}
-        strokeWidth="10" strokeDasharray={circ} fill="none" strokeLinecap="round"
+        strokeWidth="8" strokeDasharray={circ} fill="none" strokeLinecap="round"
         initial={{ strokeDashoffset: circ }}
         animate={{ strokeDashoffset: circ - fill }}
         transition={{ duration: 1.4, ease: [0.34, 1.56, 0.64, 1], delay: 0.3 }}
-        style={{ transform: 'rotate(-90deg)', transformOrigin: '70px 70px' }}
-        filter="url(#glow)"
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '40px 40px' }}
       />
     </svg>
   );
 }
 
-function getGreeting(name: string): string {
-  const hour = new Date().getHours();
-  const first = name.split(' ')[0];
-  if (hour < 12) return `Good morning, ${first} 🌅`;
-  if (hour < 17) return `Good afternoon, ${first} ☀️`;
-  return `Good evening, ${first} 🌙`;
-}
-
 function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, onLogDate: (date: string) => void }) {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sunday
@@ -109,16 +97,30 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
 
   const blanks = Array.from({ length: startOffset });
   
+  const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+  const realToday = new Date();
+  
   return (
-    <motion.div className="soft-card p-5 mb-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-sm font-bold text-[#1E1A16]">{today.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-        <span className="text-xs text-[#8A8070]">Activity Log</span>
+    <motion.div className="soft-card p-5 mb-5 bg-white shadow-sm border border-[rgba(235,229,218,0.5)]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+      
+      {/* Segmented Control */}
+      <div className="flex bg-[#F4F1EC] rounded-full p-1 mb-5">
+        <button className="flex-1 bg-white rounded-full py-1.5 text-xs font-bold text-[#1E1A16] shadow-sm">Calendar</button>
+        <button className="flex-1 rounded-full py-1.5 text-xs font-bold text-[#8A8070]">Activity Log</button>
+        <button className="flex-1 rounded-full py-1.5 text-xs font-bold text-[#8A8070]">Trends</button>
+      </div>
+
+      <div className="flex justify-end gap-2 items-center mb-4">
+        <span className="text-xs font-bold text-[#1E1A16] mr-auto">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+        <button onClick={handlePrevMonth} className="w-8 h-8 rounded-lg border border-[#EBE5DA] flex items-center justify-center text-[#8A8070] text-xs">{'<'}</button>
+        <button onClick={handleNextMonth} className="w-8 h-8 rounded-lg border border-[#EBE5DA] flex items-center justify-center text-[#8A8070] text-xs">{'>'}</button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 text-center mb-2">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-          <div key={i} className="text-[10px] font-bold text-[#8A8070]">{d}</div>
+          <div key={i} className="text-[10px] font-bold text-[#8A8070] mb-2">{d}</div>
         ))}
       </div>
       
@@ -126,13 +128,20 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
         {blanks.map((_, i) => <div key={`blank-${i}`} />)}
         
         {days.map(({ day, dateStr, log }) => {
-          const isToday = dateStr === `${year}-${String(month + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+          const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
           
-          let dotColor = 'transparent';
-          if (log) {
-            if (log.totalFlagImpact > 0) dotColor = '#5A8F5A'; // Green
-            else if (log.totalFlagImpact < 0) dotColor = '#D4614A'; // Red
-            else dotColor = '#D4A574'; // Neutral/Mixed
+          let bgColor = 'transparent';
+          let textColor = '#8A8070';
+          let fontWeight = '600';
+
+          if (isToday) {
+            bgColor = '#3D6B3D'; // Dark green
+            textColor = '#FFFFFF';
+            fontWeight = 'bold';
+          } else if (log) {
+            if (log.totalFlagImpact > 0) { bgColor = '#E4EDE0'; textColor = '#3D6B3D'; } // Light Green
+            else if (log.totalFlagImpact < 0) { bgColor = '#FDEEED'; textColor = '#D4614A'; } // Light Red
+            else { bgColor = '#F4F1EC'; textColor = '#1E1A16'; } // Neutral
           }
 
           return (
@@ -142,26 +151,29 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
               onClick={() => onLogDate(dateStr)}
               className="relative aspect-square flex items-center justify-center rounded-xl transition-colors"
               style={{
-                background: isToday ? 'rgba(196,217,188,0.25)' : 'transparent',
-                border: isToday ? '1px solid rgba(196,217,188,0.6)' : '1px solid transparent',
+                background: bgColor,
+                color: textColor,
+                fontWeight: fontWeight as any,
               }}
             >
-              <span className="text-xs font-semibold" style={{ color: isToday ? '#1F3D20' : '#4A433A' }}>
-                {day}
-              </span>
-              
-              {log && (
-                <div className="absolute bottom-1 w-1 h-1 rounded-full" style={{ background: dotColor }} />
-              )}
+              <span className="text-[13px]">{day}</span>
             </motion.button>
           );
         })}
+      </div>
+
+      <div className="flex gap-4 mt-5 text-[10px] font-bold text-[#8A8070] items-center px-1">
+        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#E4EDE0] border border-[rgba(90,143,90,0.2)]" /> Green day</div>
+        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#FDEEED] border border-[rgba(212,97,74,0.2)]" /> Red day</div>
+        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#3D6B3D]" /> Today</div>
       </div>
     </motion.div>
   );
 }
 
 export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: DashboardProps) {
+  const [toast, setToast] = useState<string | null>(null);
+
   const era = calculateEra(profile.flagScore);
   const eraConfig = getEraConfig(era, profile.flagScore);
   const aura = getAvatarAura(profile.flagScore);
@@ -172,6 +184,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
   const currentMonth = new Date().getMonth();
   let monthlyGreenFlags = 0;
   let monthlyRedFlags = 0;
+  let totalFlagsInMonth = 0;
   const activityCounts: Record<string, number> = {};
   
   Object.values(logs).forEach(log => {
@@ -179,192 +192,190 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
     if (logMonth === currentMonth) {
       log.activities.forEach(a => {
         activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + 1;
+        totalFlagsInMonth++;
         if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home')) monthlyGreenFlags++;
         if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major')) monthlyRedFlags++;
       });
     }
   });
 
-  // Generate automated insight
-  let insightText = "Every journey starts somewhere. One green choice today can shift your whole week. 🌱";
-  let insightTitle = "Weekly Insight";
-  let insightIcon = "🚩";
+  const greenRate = totalFlagsInMonth > 0 ? Math.round((monthlyGreenFlags / totalFlagsInMonth) * 100) : 0;
+  const daysLogged = Object.keys(logs).length;
 
   const sortedActivities = Object.entries(activityCounts).sort((a, b) => b[1] - a[1]);
+  let topHabitText = "Start logging to discover your best habits!";
   if (sortedActivities.length > 0) {
-    const topActivityId = sortedActivities[0][0];
-    const topCount = sortedActivities[0][1];
-    const topDef = ACTIVITIES.find(a => a.id === topActivityId);
-
+    const topDef = ACTIVITIES.find(a => a.id === sortedActivities[0][0]);
     if (topDef) {
-      if (topDef.flagValue < 0) {
-        insightTitle = "Biggest Red Flag";
-        insightIcon = "🚨";
-        insightText = `You’ve logged "${topDef.label}" ${topCount} times recently. Cutting this down is the easiest way to boost your score. 📉`;
-      } else {
-        insightTitle = "Best Habit";
-        insightIcon = "🌟";
-        insightText = `You're crushing it with "${topDef.label}"! You've done this ${topCount} times. This is carrying your score. 🔥`;
-      }
+      topHabitText = `Crushing it with ${topDef.label} — ${sortedActivities[0][1]} days logged!`;
     }
   }
 
-  // Check if today is logged
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const isLoggedToday = !!logs[todayStr];
+
+  const showToastMsg = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   return (
-    <div className="pb-28 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative">
+    <div className="pb-8 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative">
+
+      {/* ── Toast ── */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
+            className="fixed top-6 left-4 right-4 bg-[#3A2A1E] text-white px-4 py-3 rounded-xl shadow-lg z-50 text-sm font-bold text-center"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Header ── */}
-      <motion.div className="flex items-center justify-between"
+      <motion.div className="flex items-center justify-between pl-1"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <GreenFlagIcon size={26} />
-            <span className="font-bold text-[#1F3D20] text-lg tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-              FLAGGED
-            </span>
-          </div>
-          <p className="text-sm text-[#8A8070] font-medium">{greeting}</p>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xl">⚑</span>
+          <span className="font-bold text-[#5A8F5A] text-xl tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            Flagged
+          </span>
         </div>
 
-        <button onClick={onOpenProfile} className="flex items-center gap-2 group">
-          <div className="text-right">
-            <p className="text-xs text-[#8A8070] font-medium capitalize">{profile.userType?.replace('_', ' ')}</p>
-            <p className="text-sm font-bold text-[#1E1A16]">{profile.name}</p>
+        <button onClick={onOpenProfile} className="flex items-center gap-2 bg-white rounded-full pl-1.5 pr-4 py-1.5 shadow-sm border border-[#EBE5DA] transition-transform active:scale-95">
+          <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center text-lg" style={{ background: aura.bg, border: `1px solid ${aura.ring}` }}>
+             <AvatarDisplay avatar={avatar} size={28} />
           </div>
-          <motion.div whileTap={{ scale: 0.92 }}
-            className="w-11 h-11 rounded-full flex items-center justify-center text-2xl overflow-hidden"
-            style={{
-              background: aura.bg,
-              boxShadow: `0 2px 12px ${aura.glow}`,
-              border: `2px solid ${aura.ring}`,
-              overflow: 'hidden',
-            }}>
-            <AvatarDisplay avatar={avatar} size={44} />
-          </motion.div>
+          <span className="text-[11px] font-bold text-[#8A8070]">{profile.userType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} - {profile.name}</span>
         </button>
       </motion.div>
 
       {/* ── Hero Card ── */}
-      <motion.div className="garden-card p-6"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-        style={{ background: `linear-gradient(160deg, ${eraConfig.gradientFrom} 0%, ${eraConfig.gradientTo} 100%)` }}>
+      <motion.div className="bg-white rounded-3xl p-5 shadow-sm border border-[#EBE5DA] relative overflow-hidden"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+        
+        {/* Background gradient hint */}
+        <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none" style={{ background: `linear-gradient(180deg, ${eraConfig.gradientFrom} 0%, transparent 100%)` }} />
 
-        <div className="flex items-center justify-between mb-5">
-          <span className={eraConfig.badgeClass}>
-            <span>{eraConfig.emoji}</span>{era}
+        <div className="flex items-center justify-between mb-6 relative z-10">
+          <span className="px-3 py-1 rounded-full text-xs font-bold border" style={{ background: 'rgba(196,217,188,0.2)', color: '#3D6B3D', borderColor: 'rgba(90,143,90,0.2)' }}>
+            💧 {era}
           </span>
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-[#5A8070]">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4614A]">
             <span>🔥</span>
             <span>{profile.streak} week streak</span>
           </div>
         </div>
 
         {/* Avatar + Ring */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col items-center gap-3">
-            <div className="relative">
-              <motion.div className="absolute inset-[-14px] rounded-full"
-                animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.06, 1] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ background: `radial-gradient(circle, ${aura.glow.replace('0.22', '0.5')} 0%, transparent 70%)` }}
-              />
-              <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl"
-                style={{
-                  background: aura.bg,
-                  boxShadow: `0 6px 28px ${aura.glow}, 0 2px 8px rgba(30,26,22,0.06)`,
-                  border: `3px solid ${aura.ring}`,
-                  overflow: 'hidden',
-                }}>
-                <AvatarDisplay avatar={avatar} size={96} />
-              </div>
+        <div className="flex items-center justify-between relative z-10 mb-5">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
+              style={{
+                background: aura.bg,
+                boxShadow: `0 4px 16px ${aura.glow}`,
+                border: `2px solid ${aura.ring}`,
+              }}>
+              <AvatarDisplay avatar={avatar} size={56} />
             </div>
-            <div className="text-center">
-              <p className="text-xs font-bold text-[#5A8070] uppercase tracking-wider">{profile.name.split(' ')[0]}</p>
-              <p className="text-[11px] text-[#8A8070] mt-0.5 max-w-[110px] leading-tight">{aura.label}</p>
+            <div>
+              <p className="text-sm font-bold text-[#1E1A16]">{profile.name.split(' ')[0]}</p>
+              <p className="text-xs font-bold text-[#5A8F5A] mt-0.5">You're glowing up 🔥</p>
             </div>
           </div>
 
           <div className="relative">
             <GrowthRing score={profile.flagScore} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-mono text-2xl font-bold text-[#1F3D20]">{profile.flagScore}</span>
-              <span className="text-[10px] text-[#8A8070] uppercase tracking-wider font-semibold">Score</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pt-0.5">
+              <span className="text-xl font-bold text-[#1E1A16]" style={{ letterSpacing: '-0.5px' }}>{profile.flagScore}</span>
+              <span className="text-[8px] text-[#8A8070] uppercase font-bold tracking-wider -mt-1">Score</span>
             </div>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(196,217,188,0.4)' }}>
+        <div className="pt-2 relative z-10">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-[#5A8070]">Progress</span>
-            <span className="text-xs text-[#8A8070]">{eraConfig.nextGoal}</span>
+            <span className="text-xs font-bold text-[#8A8070]">Progress</span>
+            <span className="text-xs font-bold text-[#5A8F5A] flex items-center gap-1">{eraConfig.nextGoal}</span>
           </div>
-          <div className="progress-track">
-            <motion.div className="progress-fill" initial={{ width: 0 }}
+          <div className="h-2 rounded-full bg-[#F4F1EC] overflow-hidden">
+            <motion.div className="h-full rounded-full bg-[#5A8F5A]" initial={{ width: 0 }}
               animate={{ width: `${profile.flagScore}%` }}
               transition={{ duration: 1.2, ease: [0.34, 1.56, 0.64, 1], delay: 0.5 }} />
           </div>
         </div>
       </motion.div>
 
+      {/* ── Quick Insights ── */}
+      <div className="grid grid-cols-3 gap-2 mb-2">
+        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
+          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{greenRate}%</span>
+          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Green rate</span>
+        </div>
+        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
+          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{daysLogged}</span>
+          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Days logged</span>
+        </div>
+        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
+          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{profile.bestStreak || 0}</span>
+          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Best streak</span>
+        </div>
+      </div>
+
       {/* ── Monthly Calendar ── */}
       <MonthlyCalendar logs={logs} onLogDate={onLogDate} />
 
-      {/* ── Monthly Insights ── */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        <motion.div className="soft-card-sage p-4" initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-base">🟢</span>
-            <span className="text-[11px] font-bold text-[#3D6B3D] uppercase tracking-wider">Green Choices</span>
+      {/* ── Action Cards ── */}
+      <div className="grid grid-cols-2 gap-3 mb-2">
+        <button 
+          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Green Choices"); }} 
+          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(90,143,90,0.3)] shadow-sm active:scale-95 transition-transform" 
+          style={{ background: 'linear-gradient(145deg, #F4F7F2, #E4EDE0)' }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#5A8F5A] border border-[rgba(90,143,90,0.3)]">✓</span>
+            <span className="text-[10px] font-bold text-[#3D6B3D] uppercase tracking-wider">Green Choices</span>
           </div>
-          <p className="text-2xl font-bold text-[#1F3D20]">{monthlyGreenFlags}</p>
-        </motion.div>
+          <p className="text-3xl font-bold text-[#1F3D20] mb-2">{monthlyGreenFlags}</p>
+          <span className="text-[10px] font-bold text-[#5A8F5A] opacity-70">Tap to log a green</span>
+        </button>
         
-        <motion.div className="soft-card-coral p-4" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-base">🔴</span>
-            <span className="text-[11px] font-bold text-[#D4614A] uppercase tracking-wider">Red Choices</span>
+        <button 
+          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Red Choices"); }} 
+          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(212,97,74,0.3)] shadow-sm active:scale-95 transition-transform" 
+          style={{ background: 'linear-gradient(145deg, #FDF9F3, #FDEEED)' }}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#D4614A] border border-[rgba(212,97,74,0.3)]">✕</span>
+            <span className="text-[10px] font-bold text-[#D4614A] uppercase tracking-wider">Red Choices</span>
           </div>
-          <p className="text-2xl font-bold text-[#4A1F1A]">{monthlyRedFlags}</p>
-        </motion.div>
+          <p className="text-3xl font-bold text-[#4A1F1A] mb-2">{monthlyRedFlags}</p>
+          <span className="text-[10px] font-bold text-[#D4614A] opacity-70">Tap to log a red</span>
+        </button>
       </div>
 
-      {/* ── Automated Insight Engine ── */}
-      <motion.div className="soft-card-earth p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-base">{insightIcon}</span>
-          <span className="text-xs font-bold text-[#5A4030] uppercase tracking-wider">{insightTitle}</span>
+      {/* ── Best Habit Card ── */}
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-[#EBE5DA] relative">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFF5D1] to-[#FFE898] flex items-center justify-center text-2xl shadow-inner border border-[#FFE898]">
+            ⭐
+          </div>
+          <div className="flex-1">
+            <h4 className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wider mb-1">Best Habit</h4>
+            <p className="text-sm font-bold text-[#1E1A16] leading-snug pr-4">
+              {topHabitText}
+            </p>
+          </div>
         </div>
-        <p className="text-sm text-[#3A2A1E] leading-relaxed font-medium italic">
-          "{insightText}"
-        </p>
-        <button className="mt-3 text-xs font-bold text-[#B8835A] flex items-center gap-1 hover:text-[#8B6240] transition-colors">
-          Share this insight →
-        </button>
-      </motion.div>
-
-      {/* ── Fixed Bottom CTA ── */}
-      <div className="fixed bottom-6 left-0 right-0 px-4 max-w-[420px] mx-auto z-40">
-        <motion.button 
-          className="btn-primary text-base py-4 w-full flex items-center justify-center gap-2" 
-          onClick={() => onLogDate(todayStr)}
-          whileTap={{ scale: 0.97 }} 
-          initial={{ opacity: 0, y: 24 }} 
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          style={{ 
-            boxShadow: '0 8px 32px rgba(90,143,90,0.4), 0 2px 8px rgba(90,143,90,0.2)',
-            background: isLoggedToday ? '#E4EDE0' : undefined,
-            color: isLoggedToday ? '#3D6B3D' : undefined,
-            borderColor: isLoggedToday ? '#5A8F5A' : undefined
-          }}
-        >
-          <span>{isLoggedToday ? '✏️ Edit Today' : '🚩 Log Today'}</span>
-        </motion.button>
+        <div className="flex gap-2 mt-5">
+          <button className="flex-1 py-2.5 rounded-xl border border-[#EBE5DA] text-xs font-bold text-[#8A8070] bg-[#FDFAF5] active:bg-[#EBE5DA] transition-colors" onClick={() => onLogDate(todayStr)}>
+            ✏️ Edit today
+          </button>
+          <button className="flex-1 py-2.5 rounded-xl border border-[#EBE5DA] text-xs font-bold text-[#8A8070] bg-[#FDFAF5] active:bg-[#EBE5DA] transition-colors" onClick={() => showToastMsg("Sending habit to Claude for personalized tips... 🤖")}>
+            ✨ Tips ↗
+          </button>
+        </div>
       </div>
 
     </div>

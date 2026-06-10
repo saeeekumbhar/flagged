@@ -73,7 +73,7 @@ export default function App() {
       }
 
       if (needsUpdate) {
-        const updatedProfile = { ...p, flagScore: newScore, streak: newStreak };
+        const updatedProfile = { ...p, flagScore: newScore, streak: newStreak, bestStreak: p.bestStreak || 0 };
         setProfile(updatedProfile);
         localStorage.setItem('flagged_profile', JSON.stringify(updatedProfile));
       } else {
@@ -102,6 +102,7 @@ export default function App() {
       completedOnboarding: true,
       avatarId: 'av1',
       streak: 0,
+      bestStreak: 0,
       ...partialProfile,
     };
     saveProfile(fullProfile);
@@ -129,14 +130,15 @@ export default function App() {
       const newScore = Math.max(0, Math.min(100, profile.flagScore + delta));
 
       // Streak logic: only increment if this is a new date being logged and it's today or yesterday
-      // (The useEffect handles breaking streaks if days are missed)
       let newStreak = profile.streak;
       if (!logs[log.date]) {
         // It's a new log entry
         newStreak += 1;
       }
+      
+      const newBestStreak = Math.max(profile.bestStreak || 0, newStreak);
 
-      saveProfile({ ...profile, flagScore: newScore, streak: newStreak });
+      saveProfile({ ...profile, flagScore: newScore, streak: newStreak, bestStreak: newBestStreak });
     }
     setLoggingDate(null);
   };
