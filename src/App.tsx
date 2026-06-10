@@ -81,6 +81,37 @@ export default function App() {
       }
     }
     
+    // Auto-seed mock data if empty or just 1 day so the calendar looks populated like the mockup
+    if (Object.keys(l).length <= 1) {
+      const today = new Date();
+      const mockPattern = [1, 1, 1, -1, 1, 1, 1]; // Sequence of green/red days
+      
+      for(let i = 6; i >= 0; i--) {
+         const d = new Date(today);
+         d.setDate(today.getDate() - i);
+         const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+         
+         const isGreen = mockPattern[6 - i] > 0;
+         l[dateStr] = {
+           date: dateStr,
+           activities: isGreen ? [{ activityId: 'commute_walk', count: 1 }] : [{ activityId: 'car_short', count: 1 }],
+           totalFlagImpact: isGreen ? 10 : -10,
+           totalCarbonEstimate: isGreen ? -0.5 : 2.5,
+           notes: 'Mock entry'
+         };
+      }
+      localStorage.setItem('flagged_logs', JSON.stringify(l));
+      
+      // Update profile streak to match the seeded data
+      if (p) {
+        p.streak = 7;
+        p.bestStreak = 7;
+        p.flagScore = 75; // Glow up / Green flag era
+        setProfile({...p});
+        localStorage.setItem('flagged_profile', JSON.stringify(p));
+      }
+    }
+
     setLogs(l);
   }, []);
 
@@ -101,8 +132,8 @@ export default function App() {
       flagScore: 50,
       completedOnboarding: true,
       avatarId: 'av1',
-      streak: 0,
-      bestStreak: 0,
+      streak: 7, // Start with a seeded streak
+      bestStreak: 7,
       ...partialProfile,
     };
     saveProfile(fullProfile);

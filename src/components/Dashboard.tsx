@@ -272,7 +272,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
           </span>
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4614A]">
             <span>🔥</span>
-            <span>{profile.streak} week streak</span>
+            <span>{profile.streak} day streak</span>
           </div>
         </div>
 
