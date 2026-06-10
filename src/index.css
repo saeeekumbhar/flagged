@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-pixel: "Silkscreen", "VT323", monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  
+  --color-green-flag-dark: #2D6A4F;
+  --color-green-flag: #52B788;
+  --color-red-flag-dark: #D62828;
+  --color-red-flag: #E76F51;
+  --color-neutral-bg: #121212;
+  --color-text-primary: #FEFAE0;
+
+  --color-background: var(--color-neutral-bg);
+}
+
+@layer base {
+  body {
+    @apply bg-[#121212] text-[#FEFAE0] font-sans antialiased overflow-x-hidden;
+  }
+}
+
+.brutal-shadow {
+  box-shadow: 4px 4px 0px 0px #000;
+}
+.brutal-shadow-lg {
+  box-shadow: 8px 8px 0px 0px #000;
+}
+.brutal-shadow-green {
+  box-shadow: 6px 6px 0px 0px #2D6A4F;
+}
+.brutal-shadow-inset {
+  box-shadow: inset 0px 0px 40px rgba(82,183,136,0.1), 8px 8px 0px 0px #000;
+}

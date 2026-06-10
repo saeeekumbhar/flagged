@@ -1,0 +1,6 @@
+{
+  "name": "FLAGGED",
+  "description": "A mobile-first web application designed for college students that transforms sustainability tracking into a fun, identity-driven experience using Green Flags and Red Flags.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
