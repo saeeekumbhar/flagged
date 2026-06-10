@@ -1,7 +1,11 @@
-splash: update logo, CTA copy, and tagline
+splash: redesign flag icon with tilt, ground, and depth
 
-- Replace plant emoji with custom inline SVG green flag icon
-- Flag animates through red -> amber -> green tinting across 3 stages
-- Progress dots now use each stage's own color (red/amber/green)
-- CTA: "Begin Your Journey" -> "Are you a green flag? Let's find out."
-- Tagline: "Build better habits." -> "Track your footprint. Lower your impact. Live greener."
+- Tilted pole ~8 degrees for a natural planted look
+- Waving flag shape using bezier curves instead of flat triangle
+- Gradient flag body (light-to-dark sage) with drop shadow filter
+- White highlight on top flag edge for depth
+- Shadow crease line across flag for wave effect
+- 3-stop gradient on pole with subtle inner highlight
+- Grass mound ellipse + warm soil arc beneath the pole
+- 5 organic grass tufts growing around the base
+- Small sparkle dots scattered for energy and life
