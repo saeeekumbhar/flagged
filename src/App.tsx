@@ -19,15 +19,11 @@ export default function App() {
   const [biggestRedFlag, setBiggestRedFlag] = useState<string | null>(null);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
 
-  // Simple local storage persistence
   useEffect(() => {
     const saved = localStorage.getItem('flagged_profile');
     if (saved) {
-      try {
-        setProfile(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse profile", e);
-      }
+      try { setProfile(JSON.parse(saved)); }
+      catch (e) { console.error('Failed to parse profile', e); }
     }
   }, []);
 
@@ -38,16 +34,16 @@ export default function App() {
 
   const handleOnboardingComplete = (partialProfile: Partial<UserProfile>) => {
     const fullProfile: UserProfile = {
-      name: "Player 1",
-      userType: "day_scholar", // default fallback
-      commuteMethod: "walk",
-      foodPreferences: "mess",
-      acPreference: "none",
+      name: 'Player 1',
+      userType: 'day_scholar',
+      commuteMethod: 'walk',
+      foodPreferences: 'mess',
+      acPreference: 'none',
       deliveryFrequency: 0,
       chargerHabit: false,
       flagScore: 50,
       completedOnboarding: true,
-      avatar: "/avatar.png",
+      avatarId: 'av1',
       streak: 0,
       ...partialProfile,
     };
@@ -64,38 +60,33 @@ export default function App() {
     setIsCheckingIn(false);
   };
 
-  if (!hasSeenSplash) {
-    return <Splash onStart={() => setHasSeenSplash(true)} />;
-  }
+  const handleAvatarChange = (avatarId: string) => {
+    if (profile) saveProfile({ ...profile, avatarId });
+  };
 
-  if (!profile || !profile.completedOnboarding) {
-    return <Onboarding onComplete={handleOnboardingComplete} />;
-  }
+  if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
+  if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
   if (viewingProfile) {
     return (
       <div className="min-h-screen font-sans">
-        <Profile profile={profile} onBack={() => setViewingProfile(false)} />
+        <Profile profile={profile} onBack={() => setViewingProfile(false)} onAvatarChange={handleAvatarChange} />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen font-sans">
-      <Dashboard 
-        profile={profile} 
-        onCheckInStart={() => setIsCheckingIn(true)} 
+      <Dashboard
+        profile={profile}
+        onCheckInStart={() => setIsCheckingIn(true)}
         onOpenProfile={() => setViewingProfile(true)}
         biggestGreenFlag={biggestGreenFlag}
         biggestRedFlag={biggestRedFlag}
       />
-      
       <AnimatePresence>
         {isCheckingIn && (
-          <CheckIn 
-            onComplete={handleCheckInComplete} 
-            onCancel={() => setIsCheckingIn(false)} 
-          />
+          <CheckIn onComplete={handleCheckInComplete} onCancel={() => setIsCheckingIn(false)} />
         )}
       </AnimatePresence>
     </div>

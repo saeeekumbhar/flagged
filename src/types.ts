@@ -10,11 +10,11 @@ export interface UserProfile {
   chargerHabit: boolean | null;
   flagScore: number;
   completedOnboarding: boolean;
-  avatar: string; // URL or ID of avatar
+  avatarId: string; // ID from AVATARS list
   streak: number;
 }
 
-export type Era = 'Red Flag Era' | 'Mixed Flags Era' | 'Green Flag Era';
+export type Era = 'Red Flag Era' | 'Glow Up Era' | 'Green Flag Era';
 
 export interface WeeklyCheckIn {
   date: string; // ISO string
@@ -25,6 +25,6 @@ export interface WeeklyCheckIn {
 
 export const calculateEra = (score: number): Era => {
   if (score <= 40) return 'Red Flag Era';
-  if (score <= 70) return 'Mixed Flags Era';
+  if (score <= 70) return 'Glow Up Era';
   return 'Green Flag Era';
 };
