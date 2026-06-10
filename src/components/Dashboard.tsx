@@ -87,8 +87,9 @@ function getGreeting(name: string): string {
   return `Good evening, ${first} 🌙`;
 }
 
-function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, onLogDate: (date: string) => void }) {
+function MonthlyCalendar({ logs, onLogDate, profile }: { logs: Record<string, DailyLog>, onLogDate: (date: string) => void, profile: UserProfile }) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<'calendar' | 'activity' | 'trends'>('calendar');
   
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -117,65 +118,133 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
       
       {/* Segmented Control */}
       <div className="flex bg-[#F4F1EC] rounded-[20px] p-1.5 mb-6">
-        <button className="flex-1 bg-white rounded-[14px] py-2.5 text-xs font-bold text-[#1E1A16] shadow-sm">Calendar</button>
-        <button className="flex-1 rounded-[14px] py-2.5 text-xs font-bold text-[#A0988A]">Activity Log</button>
-        <button className="flex-1 rounded-[14px] py-2.5 text-xs font-bold text-[#A0988A]">Trends</button>
+        <button 
+          onClick={() => setActiveTab('calendar')}
+          className={`flex-1 rounded-[14px] py-2.5 text-xs font-bold transition-all shadow-sm ${activeTab === 'calendar' ? 'bg-white text-[#1E1A16]' : 'text-[#A0988A] shadow-none bg-transparent hover:text-[#1E1A16]'}`}>Calendar</button>
+        <button 
+          onClick={() => setActiveTab('activity')}
+          className={`flex-1 rounded-[14px] py-2.5 text-xs font-bold transition-all shadow-sm ${activeTab === 'activity' ? 'bg-white text-[#1E1A16]' : 'text-[#A0988A] shadow-none bg-transparent hover:text-[#1E1A16]'}`}>Activity Log</button>
+        <button 
+          onClick={() => setActiveTab('trends')}
+          className={`flex-1 rounded-[14px] py-2.5 text-xs font-bold transition-all shadow-sm ${activeTab === 'trends' ? 'bg-white text-[#1E1A16]' : 'text-[#A0988A] shadow-none bg-transparent hover:text-[#1E1A16]'}`}>Trends</button>
       </div>
 
-      <div className="flex justify-end gap-2 mb-6">
-        <button onClick={handlePrevMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'<'}</button>
-        <button onClick={handleNextMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'>'}</button>
-      </div>
-      
-      <div className="grid grid-cols-7 gap-1 text-center mb-3">
-        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-          <div key={i} className="text-[11px] font-bold text-[#A0988A] mb-1">{d}</div>
-        ))}
-      </div>
-      
-      <div className="grid grid-cols-7 gap-y-3 gap-x-2">
-        {blanks.map((_, i) => <div key={`blank-${i}`} />)}
-        
-        {days.map(({ day, dateStr, log }) => {
-          const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
+      {activeTab === 'calendar' && (
+        <>
+          <div className="flex justify-end gap-2 mb-6">
+            <button onClick={handlePrevMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'<'}</button>
+            <button onClick={handleNextMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'>'}</button>
+          </div>
           
-          let bgColor = 'transparent';
-          let textColor = '#B8B0A5';
-          let fontWeight = '600';
+          <div className="grid grid-cols-7 gap-1 text-center mb-3">
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+              <div key={i} className="text-[11px] font-bold text-[#A0988A] mb-1">{d}</div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-7 gap-y-3 gap-x-2">
+            {blanks.map((_, i) => <div key={`blank-${i}`} />)}
+            
+            {days.map(({ day, dateStr, log }) => {
+              const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
+              
+              let bgColor = 'transparent';
+              let textColor = '#B8B0A5';
+              let fontWeight = '600';
 
-          if (isToday) {
-            bgColor = '#347346'; // Dark green
-            textColor = '#FFFFFF';
-            fontWeight = 'bold';
-          } else if (log) {
-            if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#2D5D2D'; fontWeight = 'bold'; } // Light Green
-            else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; } // Light Red
-            else { bgColor = '#F4F1EC'; textColor = '#1E1A16'; fontWeight = 'bold'; } // Neutral
-          }
+              if (isToday) {
+                bgColor = '#347346';
+                textColor = '#FFFFFF';
+                fontWeight = 'bold';
+              } else if (log) {
+                if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#2D5D2D'; fontWeight = 'bold'; }
+                else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
+                else { bgColor = '#F4F1EC'; textColor = '#1E1A16'; fontWeight = 'bold'; }
+              }
 
-          return (
-            <motion.button
-              key={day}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onLogDate(dateStr)}
-              className="relative aspect-square flex items-center justify-center rounded-[14px] transition-colors pointer-events-auto"
-              style={{
-                background: bgColor,
-                color: textColor,
-                fontWeight: fontWeight as any,
-              }}
-            >
-              <span className="text-[13px]">{day}</span>
-            </motion.button>
-          );
-        })}
-      </div>
+              return (
+                <motion.button
+                  key={day}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onLogDate(dateStr)}
+                  className="relative aspect-square flex items-center justify-center rounded-[14px] transition-colors pointer-events-auto"
+                  style={{
+                    background: bgColor,
+                    color: textColor,
+                    fontWeight: fontWeight as any,
+                  }}
+                >
+                  <span className="text-[13px]">{day}</span>
+                </motion.button>
+              );
+            })}
+          </div>
 
-      <div className="flex gap-4 mt-8 text-[11px] font-semibold text-[#A0988A] items-center">
-        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#EAF3EA] border border-[#BEE0BE]" /> Green day</div>
-        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#FDECEE] border border-[#F4B2B8]" /> Red day</div>
-        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#347346]" /> Today</div>
-      </div>
+          <div className="flex gap-4 mt-8 text-[11px] font-semibold text-[#A0988A] items-center">
+            <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#EAF3EA] border border-[#BEE0BE]" /> Green day</div>
+            <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#FDECEE] border border-[#F4B2B8]" /> Red day</div>
+            <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#347346]" /> Today</div>
+          </div>
+        </>
+      )}
+
+      {activeTab === 'activity' && (
+        <div className="flex flex-col gap-3 min-h-[200px] max-h-[300px] overflow-y-auto no-scrollbar pb-4">
+          {Object.values(logs)
+            .filter(l => l.activities.length > 0 || l.notes)
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .map(log => (
+              <div key={log.date} className="bg-[#FDF9F3] rounded-[16px] p-4 flex flex-col gap-2 relative pointer-events-auto" onClick={() => onLogDate(log.date)}>
+                <div className="text-sm font-bold text-[#1F3D20]">{new Date(log.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div className="flex flex-wrap gap-2">
+                  {log.activities.map((act, i) => {
+                    const isRed = act.activityId.includes('red') || act.activityId.includes('car') || act.activityId.includes('ac') || act.activityId.includes('delivery') || act.activityId.includes('major');
+                    return (
+                      <div key={i} className={`text-xs px-2 py-1 rounded-md flex items-center gap-1 ${isRed ? 'bg-[#FDECEE] text-[#A03030]' : 'bg-[#EAF3EA] text-[#2D5D2D]'}`}>
+                        {isRed ? '🔴' : '🟢'} {act.activityId.replace('quick_', '').replace('_', ' ')} x{act.count}
+                      </div>
+                    );
+                  })}
+                </div>
+                {log.notes && <div className="text-xs italic text-[#8A8070] mt-1">"{log.notes}"</div>}
+              </div>
+          ))}
+          {Object.values(logs).filter(l => l.activities.length > 0 || l.notes).length === 0 && (
+            <div className="text-center text-[#A0988A] text-sm py-10 font-medium">No activities logged yet.</div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'trends' && (
+        <div className="flex flex-col gap-4 py-2 min-h-[200px]">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#EAF3EA] rounded-[16px] p-4 flex flex-col items-center justify-center text-center">
+              <div className="text-2xl mb-1">🌱</div>
+              <div className="text-lg font-bold text-[#2D5D2D]">
+                {Object.values(logs).reduce((acc, log) => acc + log.activities.filter(a => !(a.activityId.includes('red') || a.activityId.includes('car') || a.activityId.includes('ac') || a.activityId.includes('delivery') || a.activityId.includes('major'))).reduce((sum, a) => sum + a.count, 0), 0)}
+              </div>
+              <div className="text-[10px] uppercase tracking-widest text-[#5A8F5A] font-semibold mt-1">Green Flags</div>
+            </div>
+            <div className="bg-[#FDECEE] rounded-[16px] p-4 flex flex-col items-center justify-center text-center">
+              <div className="text-2xl mb-1">⚠️</div>
+              <div className="text-lg font-bold text-[#A03030]">
+                {Object.values(logs).reduce((acc, log) => acc + log.activities.filter(a => a.activityId.includes('red') || a.activityId.includes('car') || a.activityId.includes('ac') || a.activityId.includes('delivery') || a.activityId.includes('major')).reduce((sum, a) => sum + a.count, 0), 0)}
+              </div>
+              <div className="text-[10px] uppercase tracking-widest text-[#D4614A] font-semibold mt-1">Red Flags</div>
+            </div>
+          </div>
+          
+          <div className="bg-[#FDF9F3] rounded-[16px] p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">🔥</div>
+              <div>
+                <div className="text-[11px] uppercase tracking-widest text-[#A0988A] font-semibold">Longest Streak</div>
+                <div className="text-sm font-bold text-[#1E1A16]">{profile.bestStreak} Days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -473,7 +542,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
       </div>
 
       {/* ── Monthly Calendar ── */}
-      <MonthlyCalendar logs={logs} onLogDate={onLogDate} />
+      <MonthlyCalendar logs={logs} onLogDate={onLogDate} profile={profile} />
 
       {/* ── Best Habit Card ── */}
       <div className="bg-white rounded-3xl p-5 shadow-sm border border-[#EBE5DA] relative">
