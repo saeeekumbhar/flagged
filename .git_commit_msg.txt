@@ -1,0 +1,7 @@
+splash: update logo, CTA copy, and tagline
+
+- Replace plant emoji with custom inline SVG green flag icon
+- Flag animates through red -> amber -> green tinting across 3 stages
+- Progress dots now use each stage's own color (red/amber/green)
+- CTA: "Begin Your Journey" -> "Are you a green flag? Let's find out."
+- Tagline: "Build better habits." -> "Track your footprint. Lower your impact. Live greener."
