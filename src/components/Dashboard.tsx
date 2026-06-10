@@ -371,7 +371,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
       {/* ── Action Cards ── */}
       <div className="grid grid-cols-2 gap-2 mb-2">
         <button 
-          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Green Choices"); }} 
+          onClick={() => onLogDate(todayStr)} 
           className="bg-[#E8F4E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#B2D9B2] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
           <div className="text-[26px]">🟢</div>
           <div className="text-[11px] font-medium text-[#3A6E3A]">Green choice</div>
@@ -379,7 +379,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
         </button>
         
         <button 
-          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Red Choices"); }} 
+          onClick={() => onLogDate(todayStr)} 
           className="bg-[#FDE8E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#F5B8B8] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
           <div className="text-[26px]">🔴</div>
           <div className="text-[11px] font-medium text-[#C04A4A]">Red choice</div>
