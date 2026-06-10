@@ -5,93 +5,65 @@ interface SplashProps {
   onStart: () => void;
 }
 
-// Green flag SVG icon — tilted, grounded, detailed
+// Green flag SVG — bold, minimal, impressive
 function GreenFlagIcon({ size = 80 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        {/* Flag gradient — rich sage green */}
         <linearGradient id="flagGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#7BC47A" />
-          <stop offset="100%" stopColor="#3D7A3E" />
+          <stop offset="0%" stopColor="#8FD08E" />
+          <stop offset="100%" stopColor="#3A7A3B" />
         </linearGradient>
-        {/* Pole gradient */}
         <linearGradient id="poleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#2E5A2F" />
-          <stop offset="60%" stopColor="#4A8A4B" />
+          <stop offset="0%" stopColor="#2A5230" />
+          <stop offset="100%" stopColor="#4A8A4C" />
+        </linearGradient>
+        <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#72B874" />
           <stop offset="100%" stopColor="#3D7A3E" />
         </linearGradient>
-        {/* Ground gradient */}
-        <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#6BAF6C" />
-          <stop offset="100%" stopColor="#4A8A4B" />
-        </linearGradient>
-        {/* Soil gradient */}
-        <linearGradient id="soilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#A0704A" />
-          <stop offset="100%" stopColor="#7A5235" />
-        </linearGradient>
-        {/* Drop shadow filter */}
-        <filter id="flagShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#1F3D20" floodOpacity="0.25" />
+        <filter id="flagShadow">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#1A3D1A" floodOpacity="0.22" />
+        </filter>
+        <filter id="groundShadow">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#1A3D1A" floodOpacity="0.18" />
         </filter>
       </defs>
 
-      {/* ── Ground soil arc ── */}
-      <ellipse cx="36" cy="74" rx="22" ry="6" fill="url(#soilGrad)" opacity="0.55" />
+      {/* ── Ground ── */}
+      <ellipse cx="38" cy="73" rx="24" ry="6.5" fill="url(#groundGrad)" filter="url(#groundShadow)" />
 
-      {/* ── Grass mound ── */}
-      <ellipse cx="36" cy="71" rx="20" ry="5.5" fill="url(#groundGrad)" />
+      {/* ── Everything tilted slightly ── */}
+      <g transform="rotate(-6, 38, 73)">
 
-      {/* ── Grass tufts ── */}
-      {/* left tuft */}
-      <path d="M18 71 Q16 65 19 63 Q20 67 21 71Z" fill="#5A9F5B" />
-      <path d="M21 71 Q20 64 23 62 Q23 67 24 71Z" fill="#6BAF6C" />
-      {/* right tuft */}
-      <path d="M48 71 Q50 65 48 63 Q47 67 46 71Z" fill="#5A9F5B" />
-      <path d="M51 71 Q53 66 51 63 Q50 68 49 71Z" fill="#6BAF6C" />
-      {/* centre tuft */}
-      <path d="M33 69 Q32 64 35 62 Q35 66 36 70Z" fill="#7BC47A" />
+        {/* Pole — tall, bold, rounded */}
+        <rect x="35.5" y="10" width="5" height="63" rx="2.5" fill="url(#poleGrad)" />
+        {/* Pole inner highlight */}
+        <rect x="36" y="12" width="1.8" height="55" rx="0.9" fill="white" opacity="0.15" />
 
-      {/* ── Pole — tilted ~8° ── */}
-      <g transform="rotate(-8, 36, 70)">
-        <rect x="34" y="12" width="4.5" height="58" rx="2.25" fill="url(#poleGrad)" />
-        {/* Pole highlight */}
-        <rect x="34.5" y="14" width="1.5" height="50" rx="0.75" fill="white" opacity="0.18" />
-
-        {/* ── Flag body — waving shape ── */}
+        {/* ── Flag — large, waving, prominent ── */}
         <path
-          d="M38.5 13 C50 14, 64 17, 65 22 C64 27, 52 28, 42 32 C50 29, 62 26, 61 22 C62 18, 50 16, 38.5 15Z"
+          d="M40.5 10
+             C54 11, 72 15, 72 23
+             C72 31, 56 34, 44 38
+             C54 33, 68 29, 68 23
+             C68 17, 54 14, 40.5 13 Z"
           fill="url(#flagGrad)"
           filter="url(#flagShadow)"
         />
-        {/* Flag wave shadow crease */}
+        {/* Flag highlight — top lit edge */}
         <path
-          d="M38.5 15 C50 16, 61 19, 61 22 C60 25, 50 27, 42 30"
-          stroke="#2E5A2F"
-          strokeWidth="0.6"
-          strokeOpacity="0.3"
-          fill="none"
+          d="M40.5 10 C54 11, 71 14.5, 72 23"
+          stroke="white" strokeWidth="1.4" strokeOpacity="0.5"
+          fill="none" strokeLinecap="round"
         />
-        {/* Flag highlight top edge */}
+        {/* Flag inner wave crease */}
         <path
-          d="M38.5 13 C50 14, 63 16.5, 65 22"
-          stroke="white"
-          strokeWidth="1"
-          strokeOpacity="0.45"
-          fill="none"
-          strokeLinecap="round"
+          d="M40.5 13 C54 14, 67 17.5, 68 23 C67 28, 55 31, 44 35"
+          stroke="#2A5230" strokeWidth="0.8" strokeOpacity="0.25"
+          fill="none" strokeLinecap="round"
         />
       </g>
-
-      {/* ── Sparkle dots ── */}
-      <circle cx="68" cy="14" r="1.8" fill="#7BC47A" opacity="0.7" />
-      <circle cx="72" cy="22" r="1.2" fill="#5A8F5A" opacity="0.5" />
-      <circle cx="10" cy="30" r="1.4" fill="#7BC47A" opacity="0.45" />
-      <circle cx="14" cy="20" r="1" fill="#A8D5A8" opacity="0.6" />
-
-      {/* ── Star sparkle top-right ── */}
-      <path d="M70 10 L70.6 12 L72 10 L70.6 8Z" fill="#B8E0B8" opacity="0.8" />
     </svg>
   );
 }
