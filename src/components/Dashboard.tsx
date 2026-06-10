@@ -268,12 +268,14 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
       {/* ── Toast ── */}
       <AnimatePresence>
         {toast && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-            className="fixed top-6 left-4 right-4 bg-[#3A2A1E] text-white px-4 py-3 rounded-xl shadow-lg z-50 text-sm font-bold text-center"
-          >
-            {toast}
-          </motion.div>
+          <div className="fixed top-6 inset-x-0 z-50 flex justify-center pointer-events-none px-4">
+            <motion.div 
+              initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
+              className="bg-[#3A8F3A] text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full"
+            >
+              {toast}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -422,22 +424,6 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
             <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch2'] || 0) / 1) * 100)}%` }} />
           </div>
           <div className="text-[9px] text-[#A0988A]">{Math.min(1, challengeProgress['ch2'] || 0)} / 1</div>
-        </div>
-
-        {/* Challenge 3 */}
-        <div className="mb-2.5 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => handleChallengeClick('ch3', 8, 10)}>
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">💧</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-[#1E1A16] truncate">Drink 8 glasses</div>
-              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Hydration check</div>
-            </div>
-            <div className="text-[10px] font-bold text-[#854F0B]">+10 XP</div>
-          </div>
-          <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
-            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch3'] || 0) / 8) * 100)}%` }} />
-          </div>
-          <div className="text-[9px] text-[#A0988A]">{Math.min(8, challengeProgress['ch3'] || 0)} / 8</div>
         </div>
       </div>
 
