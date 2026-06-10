@@ -20,16 +20,68 @@ export default function App() {
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('flagged_profile');
+    const savedLogs = localStorage.getItem('flagged_logs');
+
+    let p: UserProfile | null = null;
+    let l: Record<string, DailyLog> = {};
+
     if (savedProfile) {
-      try { setProfile(JSON.parse(savedProfile)); }
+      try { p = JSON.parse(savedProfile); }
       catch (e) { console.error('Failed to parse profile', e); }
     }
     
-    const savedLogs = localStorage.getItem('flagged_logs');
     if (savedLogs) {
-      try { setLogs(JSON.parse(savedLogs)); }
+      try { l = JSON.parse(savedLogs); }
       catch (e) { console.error('Failed to parse logs', e); }
     }
+
+    if (p) {
+      // Calculate missing days for Score Decay and Streak tracking
+      const today = new Date();
+      // Use local date string YYYY-MM-DD
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const loggedDates = Object.keys(l).sort();
+      const lastLoggedDate = loggedDates.length > 0 ? loggedDates[loggedDates.length - 1] : null;
+
+      let needsUpdate = false;
+      let newScore = p.flagScore;
+      let newStreak = p.streak;
+
+      if (lastLoggedDate) {
+        // Calculate diff in calendar days (ignore time)
+        const d1 = new Date(todayStr);
+        const d2 = new Date(lastLoggedDate);
+        const daysDiff = Math.floor((d1.getTime() - d2.getTime()) / (1000 * 3600 * 24));
+
+        if (daysDiff > 1 && newStreak > 0) {
+          // Missed a full day, reset streak
+          newStreak = 0;
+          needsUpdate = true;
+        }
+
+        if (daysDiff > 3) {
+          // Decay towards 50 by 1 point per missed day past 3
+          const decay = daysDiff - 3;
+          if (newScore > 50) {
+            newScore = Math.max(50, newScore - decay);
+            needsUpdate = true;
+          } else if (newScore < 50) {
+            newScore = Math.min(50, newScore + decay);
+            needsUpdate = true;
+          }
+        }
+      }
+
+      if (needsUpdate) {
+        const updatedProfile = { ...p, flagScore: newScore, streak: newStreak };
+        setProfile(updatedProfile);
+        localStorage.setItem('flagged_profile', JSON.stringify(updatedProfile));
+      } else {
+        setProfile(p);
+      }
+    }
+    
+    setLogs(l);
   }, []);
 
   const saveProfile = (p: UserProfile) => {
@@ -67,10 +119,24 @@ export default function App() {
       // Just applying the delta of this specific log to current score for now,
       // but ideally we derive score from all logs if we want true sync.
       const previousLogImpact = logs[log.date]?.totalFlagImpact || 0;
-      const delta = log.totalFlagImpact - previousLogImpact;
+      let delta = log.totalFlagImpact - previousLogImpact;
+      
+      // Comeback Multiplier: 1.5x points for positive actions if in Red Flag Era
+      if (profile.flagScore <= 40 && delta > 0) {
+        delta = Math.ceil(delta * 1.5);
+      }
       
       const newScore = Math.max(0, Math.min(100, profile.flagScore + delta));
-      saveProfile({ ...profile, flagScore: newScore, streak: profile.streak + 1 });
+
+      // Streak logic: only increment if this is a new date being logged and it's today or yesterday
+      // (The useEffect handles breaking streaks if days are missed)
+      let newStreak = profile.streak;
+      if (!logs[log.date]) {
+        // It's a new log entry
+        newStreak += 1;
+      }
+
+      saveProfile({ ...profile, flagScore: newScore, streak: newStreak });
     }
     setLoggingDate(null);
   };

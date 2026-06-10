@@ -4,6 +4,7 @@ import { UserProfile, calculateEra, Era, DailyLog } from '../types';
 import { getAvatar, getAvatarAura } from '../avatars';
 import { GreenFlagIcon } from './GreenFlagIcon';
 import { AvatarDisplay } from './AvatarDisplay';
+import { ACTIVITIES } from '../activities';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -172,16 +173,44 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
   let monthlyGreenFlags = 0;
   let monthlyRedFlags = 0;
   
+  const activityCounts: Record<string, number> = {};
+  
   Object.values(logs).forEach(log => {
     const logMonth = new Date(log.date).getMonth();
     if (logMonth === currentMonth) {
       log.activities.forEach(a => {
+        activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + 1;
         // Simple heuristic based on definition flags
-        if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful')) monthlyGreenFlags++;
+        if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home')) monthlyGreenFlags++;
         if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major')) monthlyRedFlags++;
       });
     }
   });
+
+  // Generate automated insight
+  let insightText = "Every journey starts somewhere. One green choice today can shift your whole week. 🌱";
+  let insightTitle = "Weekly Insight";
+  let insightIcon = "🚩";
+
+  const sortedActivities = Object.entries(activityCounts).sort((a, b) => b[1] - a[1]);
+  
+  if (sortedActivities.length > 0) {
+    const topActivityId = sortedActivities[0][0];
+    const topCount = sortedActivities[0][1];
+    const topDef = ACTIVITIES.find(a => a.id === topActivityId);
+
+    if (topDef) {
+      if (topDef.flagValue < 0) {
+        insightTitle = "Biggest Red Flag";
+        insightIcon = "🚨";
+        insightText = `You’ve logged "${topDef.label}" ${topCount} times recently. Cutting this down is the easiest way to boost your score. 📉`;
+      } else {
+        insightTitle = "Best Habit";
+        insightIcon = "🌟";
+        insightText = `You're crushing it with "${topDef.label}"! You've done this ${topCount} times. This is carrying your score. 🔥`;
+      }
+    }
+  }
 
   return (
     <div className="pb-10 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5">
@@ -301,6 +330,20 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
           <p className="text-2xl font-bold text-[#4A1F1A]">{monthlyRedFlags}</p>
         </motion.div>
       </div>
+
+      {/* ── Automated Insight Engine ── */}
+      <motion.div className="soft-card-earth p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-base">{insightIcon}</span>
+          <span className="text-xs font-bold text-[#5A4030] uppercase tracking-wider">{insightTitle}</span>
+        </div>
+        <p className="text-sm text-[#3A2A1E] leading-relaxed font-medium italic">
+          "{insightText}"
+        </p>
+        <button className="mt-3 text-xs font-bold text-[#B8835A] flex items-center gap-1 hover:text-[#8B6240] transition-colors">
+          Share this insight →
+        </button>
+      </motion.div>
 
     </div>
   );
