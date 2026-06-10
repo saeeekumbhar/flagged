@@ -296,7 +296,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
       <motion.div className="flex items-center justify-between pl-1 mb-2"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <div className="flex items-center gap-1.5 font-bold text-[#3A8F3A] text-[15px]">
-          <span className="text-lg">⚑</span> Flagged
+          <span className="text-lg">⚑</span> FLAGGED
         </div>
         <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-[#F5D990] text-xs font-semibold text-[#854F0B] shadow-sm">
           <span>🟡</span> {profile.coins || 0} pts
