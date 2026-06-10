@@ -180,6 +180,7 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
 
 export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: DashboardProps) {
   const [toast, setToast] = useState<string | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<{id: string, icon: string, label: string, isUnlocked: boolean, msg: string} | null>(null);
 
   const era = calculateEra(profile.flagScore);
   const eraConfig = getEraConfig(era, profile.flagScore);
@@ -406,22 +407,19 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
           <span className="text-[10px] text-[#A0988A] font-medium">swipe →</span>
         </div>
         <div className="flex gap-2 pb-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
-            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.bestStreak >= 7 ? 'bg-[#FFF8E8] border-[#F5D990]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🔥</div>
-            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">Streak 7</div>
-          </div>
-          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
-            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${monthlyGreenFlags >= 10 ? 'bg-[#E8F4E8] border-[#B2D9B2]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🌱</div>
-            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">10 Greens</div>
-          </div>
-          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
-            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.level > 1 ? 'bg-[#E8F4E8] border-[#B2D9B2]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🏆</div>
-            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">Era up</div>
-          </div>
-          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
-            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.bestStreak >= 30 ? 'bg-[#FFF8E8] border-[#F5D990]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>💎</div>
-            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">30 days</div>
-          </div>
+          {[
+            { id: 'streak7', icon: '🔥', label: 'Streak 7', isUnlocked: profile.bestStreak >= 7, lockedMsg: 'Keep logging every day to unlock this.', unlockedMsg: 'Great work earning this achievement!' },
+            { id: 'busRider', icon: '🚌', label: 'Bus rider', isUnlocked: (activityCounts['commute_public'] || 0) > 0, lockedMsg: 'Use public transport to unlock this.', unlockedMsg: 'Great work earning this achievement!' },
+            { id: 'greenWeek', icon: '🌱', label: 'Green week', isUnlocked: monthlyGreenFlags >= 7, lockedMsg: 'Log 7 green choices this month to unlock.', unlockedMsg: 'Great work earning this achievement!' },
+            { id: '30days', icon: '💎', label: '30 days', isUnlocked: profile.bestStreak >= 30, lockedMsg: 'Keep logging green choices to unlock this.', unlockedMsg: 'Great work earning this achievement!' }
+          ].map(badge => (
+            <button key={badge.id} onClick={() => setSelectedBadge({ ...badge, msg: badge.isUnlocked ? badge.unlockedMsg : badge.lockedMsg })} className="shrink-0 w-16 flex flex-col items-center gap-1 active:scale-95 transition-transform">
+              <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${badge.isUnlocked ? 'bg-[#FFF8E8] border-[#F5D990]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>
+                {badge.icon}
+              </div>
+              <div className="text-[9px] text-[#A0988A] text-center leading-[1.2] whitespace-nowrap">{badge.label}</div>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -450,6 +448,34 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
           </button>
         </div>
       </div>
+
+      {/* ── Badge Modal ── */}
+      <AnimatePresence>
+        {selectedBadge && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/40" onClick={() => setSelectedBadge(null)}
+            />
+            <motion.div 
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white w-full max-w-[420px] rounded-t-[24px] pb-8 pt-6 px-6 relative shadow-2xl flex flex-col items-center"
+            >
+              <button onClick={() => setSelectedBadge(null)} className="absolute top-6 right-6 text-[#1E1A16] font-bold text-lg active:scale-90 transition-transform">×</button>
+              <div className="w-full flex items-center gap-2 mb-1">
+                <span className="text-xl">{selectedBadge.icon}</span>
+                <h3 className="text-[17px] font-bold text-[#1E1A16]">{selectedBadge.label}</h3>
+              </div>
+              <p className="w-full text-[13px] text-[#1E1A16] mb-8">{selectedBadge.isUnlocked ? "You earned this badge!" : "Not unlocked yet — keep going!"}</p>
+              
+              <div className={`w-24 h-24 rounded-2xl flex items-center justify-center text-[50px] mb-6 shadow-sm border border-[#EBE5DA] ${selectedBadge.isUnlocked ? 'bg-[#FDF9F3] opacity-100' : 'bg-[#F0EDE4] opacity-50 grayscale'}`}>
+                {selectedBadge.icon}
+              </div>
+              <p className="text-[13px] text-[#1E1A16] font-medium text-center">{selectedBadge.msg}</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
