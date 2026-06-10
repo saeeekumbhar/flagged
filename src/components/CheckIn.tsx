@@ -140,7 +140,7 @@ export function CheckIn({ onComplete, onCancel }: CheckInProps) {
                     background: lastAnswer === 'no' ? '#E4EDE0' : undefined,
                   }}
                 >
-                  <span className="text-2xl">✅</span>
+                  <span className="text-2xl">🙅</span>
                   <span>No</span>
                 </motion.button>
                 <motion.button
@@ -152,7 +152,7 @@ export function CheckIn({ onComplete, onCancel }: CheckInProps) {
                     background: lastAnswer === 'yes' ? '#FDEEED' : undefined,
                   }}
                 >
-                  <span className="text-2xl">😅</span>
+                  <span className="text-2xl">🙋</span>
                   <span>Yeah</span>
                 </motion.button>
               </div>

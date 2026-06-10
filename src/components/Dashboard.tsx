@@ -13,7 +13,7 @@ interface DashboardProps {
   onOpenProfile?: () => void;
 }
 
-function getEraConfig(era: Era) {
+function getEraConfig(era: Era, score: number) {
   switch (era) {
     case 'Green Flag Era':
       return {
@@ -23,22 +23,26 @@ function getEraConfig(era: Era) {
         gradientTo: '#F4F7F2',
         nextGoal: "You're living the green life 🌸",
       };
-    case 'Glow Up Era':
+    case 'Glow Up Era': {
+      const needed = 71 - score;
       return {
         badgeClass: 'era-badge-mixed',
         emoji: '🔥',
         gradientFrom: '#FDF6EC',
         gradientTo: '#F4F7F2',
-        nextGoal: '12 more points to reach Green Flag Era 🚩',
+        nextGoal: `${needed} more points to Green Flag Era 🚩`,
       };
-    case 'Red Flag Era':
+    }
+    case 'Red Flag Era': {
+      const needed = 41 - score;
       return {
         badgeClass: 'era-badge-red',
         emoji: '🔴',
         gradientFrom: '#FDEEED',
         gradientTo: '#FDF9F3',
-        nextGoal: 'One green flag this week changes everything 🌱',
+        nextGoal: `${needed} more points to Glow Up Era 🔥`,
       };
+    }
   }
 }
 
@@ -88,7 +92,7 @@ function getGreeting(name: string): string {
 
 export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRedFlag, onOpenProfile }: DashboardProps) {
   const era = calculateEra(profile.flagScore);
-  const eraConfig = getEraConfig(era);
+  const eraConfig = getEraConfig(era, profile.flagScore);
   const aura = getAvatarAura(profile.flagScore);
   const avatar = getAvatar(profile.avatarId ?? 'av1');
   const greeting = useMemo(() => getGreeting(profile.name), [profile.name]);

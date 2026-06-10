@@ -1,11 +1,6 @@
-feat: add illustrated avatars with FLAGGED-themed styling
+fix: checkin emojis, dynamic era points, remove emoji avatars
 
-- Generated two anime-style illustrated avatars adapted to app theme:
-  Zara (She/Her) - curly hair, sage green headphones + hoodie
-  Arjun (He/Him) - messy hair, forest green headphones + hoodie
-- Added to public/ as avatar_female.png and avatar_male.png
-- New AvatarDisplay component: renders img for illustrated avatars,
-  emoji span as fallback for emoji-only options
-- AvatarOption type now supports optional image and emoji fields
-- Dashboard, Profile, and Onboarding all use AvatarDisplay consistently
-- Illustrated avatars appear first in the avatar picker grid
+- CheckIn: replace confusing tick+smiley with 🙅 (No) and 🙋 (Yeah)
+- Dashboard: points-to-next-era now calculated from actual score
+  e.g. score 55 correctly shows 16 points, not hardcoded 12
+- avatars.ts: removed 3 emoji-only avatars, keep only Zara + Arjun

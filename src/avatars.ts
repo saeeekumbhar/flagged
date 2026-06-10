@@ -9,13 +9,8 @@ export interface AvatarOption {
 }
 
 export const AVATARS: AvatarOption[] = [
-  // Illustrated avatars (anime-style, FLAGGED-themed)
-  { id: 'av_f1', image: '/avatar_female.png', emoji: '🎧', label: 'Zara',    tag: 'She/Her' },
-  { id: 'av_m1', image: '/avatar_male.png',   emoji: '🎧', label: 'Arjun',   tag: 'He/Him'  },
-  // Emoji fallback avatars
-  { id: 'av2',   emoji: '👩‍🎓',                               label: 'Scholar', tag: 'She/Her' },
-  { id: 'av3',   emoji: '🧕',                                label: 'Aisha',   tag: 'She/Her' },
-  { id: 'av4',   emoji: '👨‍🎓',                               label: 'Scholar', tag: 'He/Him'  },
+  { id: 'av_f1', image: '/avatar_female.png', emoji: '🎧', label: 'Zara',  tag: 'She/Her' },
+  { id: 'av_m1', image: '/avatar_male.png',   emoji: '🎧', label: 'Arjun', tag: 'He/Him'  },
 ];
 
 export const getAvatar = (id: string): AvatarOption =>
