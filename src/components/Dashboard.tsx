@@ -11,6 +11,7 @@ interface DashboardProps {
   logs: Record<string, DailyLog>;
   onLogDate: (date: string) => void;
   onOpenProfile?: () => void;
+  onAwardXP: (xpAmount: number, coinsAmount: number, reason: string) => void;
 }
 
 function getEraConfig(era: Era, score: number) {
@@ -178,7 +179,7 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
   );
 }
 
-export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: DashboardProps) {
+export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }: DashboardProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{id: string, icon: string, label: string, isUnlocked: boolean, msg: string} | null>(null);
 
@@ -235,6 +236,30 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
   const showToastMsg = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const [challengeProgress, setChallengeProgress] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem(`flagged_challenges_${todayStr}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleChallengeClick = (id: string, max: number, xp: number) => {
+    const current = challengeProgress[id] || 0;
+    if (current >= max) return;
+    
+    const next = current + 1;
+    const newProgress = { ...challengeProgress, [id]: next };
+    setChallengeProgress(newProgress);
+    localStorage.setItem(`flagged_challenges_${todayStr}`, JSON.stringify(newProgress));
+    
+    if (next === max) {
+      onAwardXP(xp, Math.round(xp / 2), 'Challenge done!');
+      showToastMsg(`Challenge done! +${xp} XP`);
+    }
   };
 
   return (
@@ -368,7 +393,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
         </div>
         
         {/* Challenge 1 */}
-        <div className="mb-2.5">
+        <div className="mb-2.5 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => handleChallengeClick('ch1', 1, 20)}>
           <div className="flex items-center gap-2.5 mb-2">
             <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🚌</div>
             <div className="flex-1 min-w-0">
@@ -378,25 +403,41 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
             <div className="text-[10px] font-bold text-[#854F0B]">+20 XP</div>
           </div>
           <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
-            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((activityCounts['commute_public'] || 0) / 1) * 100)}%` }} />
+            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch1'] || 0) / 1) * 100)}%` }} />
           </div>
-          <div className="text-[9px] text-[#A0988A]">{Math.min(1, activityCounts['commute_public'] || 0)} / 1</div>
+          <div className="text-[9px] text-[#A0988A]">{Math.min(1, challengeProgress['ch1'] || 0)} / 1</div>
         </div>
 
         {/* Challenge 2 */}
-        <div className="mb-2.5">
+        <div className="mb-2.5 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => handleChallengeClick('ch2', 1, 15)}>
           <div className="flex items-center gap-2.5 mb-2">
             <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🥗</div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[#1E1A16] truncate">Eat a green meal</div>
-              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Mess or home cooked</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">No processed food</div>
             </div>
             <div className="text-[10px] font-bold text-[#854F0B]">+15 XP</div>
           </div>
           <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
-            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((activityCounts['food_home'] || 0) / 1) * 100)}%` }} />
+            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch2'] || 0) / 1) * 100)}%` }} />
           </div>
-          <div className="text-[9px] text-[#A0988A]">{Math.min(1, activityCounts['food_home'] || 0)} / 1</div>
+          <div className="text-[9px] text-[#A0988A]">{Math.min(1, challengeProgress['ch2'] || 0)} / 1</div>
+        </div>
+
+        {/* Challenge 3 */}
+        <div className="mb-2.5 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => handleChallengeClick('ch3', 8, 10)}>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">💧</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-[#1E1A16] truncate">Drink 8 glasses</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Hydration check</div>
+            </div>
+            <div className="text-[10px] font-bold text-[#854F0B]">+10 XP</div>
+          </div>
+          <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
+            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch3'] || 0) / 8) * 100)}%` }} />
+          </div>
+          <div className="text-[9px] text-[#A0988A]">{Math.min(8, challengeProgress['ch3'] || 0)} / 8</div>
         </div>
       </div>
 

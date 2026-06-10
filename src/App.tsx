@@ -227,6 +227,29 @@ export default function App() {
     if (profile) saveProfile({ ...profile, avatarId });
   };
 
+  const handleAwardXP = (xpAmount: number, coinsAmount: number, reason: string) => {
+    if (!profile) return;
+    
+    let newXp = (profile.xp || 0) + xpAmount;
+    let newCoins = (profile.coins || 0) + coinsAmount;
+    let newLevel = profile.level || 1;
+    
+    while (newXp >= 1000) {
+      newLevel++;
+      newXp -= 1000;
+    }
+    
+    saveProfile({
+      ...profile,
+      xp: newXp,
+      level: newLevel,
+      coins: newCoins
+    });
+    
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 2000);
+  };
+
   if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
   if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
@@ -245,6 +268,7 @@ export default function App() {
         logs={logs}
         onLogDate={(date) => setLoggingDate(date)}
         onOpenProfile={() => setViewingProfile(true)}
+        onAwardXP={handleAwardXP}
       />
       <AnimatePresence>
         {loggingDate && (
