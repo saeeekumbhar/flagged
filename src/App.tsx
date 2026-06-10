@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'motion/react';
 import { UserProfile } from './types';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
@@ -73,14 +74,14 @@ export default function App() {
 
   if (viewingProfile) {
     return (
-      <div className="min-h-screen bg-[var(--color-neutral-bg)] font-sans">
+      <div className="min-h-screen font-sans">
         <Profile profile={profile} onBack={() => setViewingProfile(false)} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-neutral-bg)] font-sans">
+    <div className="min-h-screen font-sans">
       <Dashboard 
         profile={profile} 
         onCheckInStart={() => setIsCheckingIn(true)} 
@@ -89,12 +90,14 @@ export default function App() {
         biggestRedFlag={biggestRedFlag}
       />
       
-      {isCheckingIn && (
-        <CheckIn 
-          onComplete={handleCheckInComplete} 
-          onCancel={() => setIsCheckingIn(false)} 
-        />
-      )}
+      <AnimatePresence>
+        {isCheckingIn && (
+          <CheckIn 
+            onComplete={handleCheckInComplete} 
+            onCancel={() => setIsCheckingIn(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
