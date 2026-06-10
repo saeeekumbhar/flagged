@@ -10,6 +10,7 @@ import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
 import { ActivityLogger } from './components/ActivityLogger';
 import { Profile } from './components/Profile';
+import { Confetti } from './components/Confetti';
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -17,6 +18,7 @@ export default function App() {
   const [loggingDate, setLoggingDate] = useState<string | null>(null);
   const [viewingProfile, setViewingProfile] = useState(false);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('flagged_profile');
@@ -191,6 +193,10 @@ export default function App() {
       if (delta > 0) {
         newXp += 15; // Base XP for positive actions
         newCoins += 5;
+        
+        // Trigger confetti!
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 2000);
       } else if (delta < 0) {
         newXp = Math.max(0, newXp - 5); // Small penalty for negative actions
       } else if (!logs[log.date]) {
@@ -251,6 +257,7 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+      {showConfetti && <Confetti duration={1500} />}
     </div>
   );
 }
