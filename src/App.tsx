@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from './types';
+import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
 import { CheckIn } from './components/CheckIn';
@@ -15,6 +16,7 @@ export default function App() {
   const [viewingProfile, setViewingProfile] = useState(false);
   const [biggestGreenFlag, setBiggestGreenFlag] = useState<string | null>(null);
   const [biggestRedFlag, setBiggestRedFlag] = useState<string | null>(null);
+  const [hasSeenSplash, setHasSeenSplash] = useState(false);
 
   // Simple local storage persistence
   useEffect(() => {
@@ -39,9 +41,12 @@ export default function App() {
       userType: "day_scholar", // default fallback
       commuteMethod: "walk",
       foodPreferences: "mess",
+      acPreference: "none",
+      deliveryFrequency: 0,
+      chargerHabit: false,
       flagScore: 50,
       completedOnboarding: true,
-      avatar: "😎",
+      avatar: "/avatar.png",
       streak: 0,
       ...partialProfile,
     };
@@ -57,6 +62,10 @@ export default function App() {
     }
     setIsCheckingIn(false);
   };
+
+  if (!hasSeenSplash) {
+    return <Splash onStart={() => setHasSeenSplash(true)} />;
+  }
 
   if (!profile || !profile.completedOnboarding) {
     return <Onboarding onComplete={handleOnboardingComplete} />;

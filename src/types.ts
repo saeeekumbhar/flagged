@@ -5,6 +5,9 @@ export interface UserProfile {
   userType: UserType | null;
   commuteMethod: string | null;
   foodPreferences: string | null;
+  acPreference: string | null;
+  deliveryFrequency: number;
+  chargerHabit: boolean | null;
   flagScore: number;
   completedOnboarding: boolean;
   avatar: string; // URL or ID of avatar

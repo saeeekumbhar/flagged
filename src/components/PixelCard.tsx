@@ -10,16 +10,16 @@ export function PixelCard({ variant = 'neutral', children, className = '', ...pr
   let variantClasses = "";
   switch (variant) {
     case 'neutral':
-      variantClasses = "bg-[#F4F1DE] border-4 border-[#121212] text-[#121212] brutal-shadow";
+      variantClasses = "bg-[#FDFBF7] border-4 border-[#4A423D] text-[#3A3532] brutal-shadow";
       break;
     case 'dark':
-      variantClasses = "bg-[#FFFFFF] border-4 border-[#52B788] text-[#121212] brutal-shadow-inset relative overflow-hidden";
+      variantClasses = "bg-[#FFFFFF] border-4 border-[#8BA888] text-[#3A3532] brutal-shadow-inset relative overflow-hidden";
       break;
     case 'green':
-      variantClasses = "bg-[#52B788] border-4 border-[#121212] text-[#121212] brutal-shadow";
+      variantClasses = "bg-[#8BA888] border-4 border-[#4A423D] text-[#3A3532] brutal-shadow";
       break;
     case 'red':
-      variantClasses = "bg-[#E76F51] border-4 border-[#121212] text-[#FEFAE0] brutal-shadow";
+      variantClasses = "bg-[#D98A7A] border-4 border-[#4A423D] text-[#FDFBF7] brutal-shadow";
       break;
   }
 
