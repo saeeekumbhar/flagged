@@ -39,12 +39,7 @@ export function Profile({ profile, onBack, onAvatarChange }: ProfileProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5">
 
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <button onClick={onBack}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-[#5A8F5A] transition-colors"
-          style={{ background: 'rgba(196,217,188,0.3)' }}>
-          ←
-        </button>
+      <div className="flex items-center justify-center mb-2">
         <h1 className="text-display text-2xl font-bold text-[#1F3D20]">My Profile</h1>
       </div>
 
