@@ -4,26 +4,31 @@
  */
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { UserProfile } from './types';
+import { UserProfile, DailyLog } from './types';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
-import { CheckIn } from './components/CheckIn';
+import { ActivityLogger } from './components/ActivityLogger';
 import { Profile } from './components/Profile';
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [logs, setLogs] = useState<Record<string, DailyLog>>({});
+  const [loggingDate, setLoggingDate] = useState<string | null>(null);
   const [viewingProfile, setViewingProfile] = useState(false);
-  const [biggestGreenFlag, setBiggestGreenFlag] = useState<string | null>(null);
-  const [biggestRedFlag, setBiggestRedFlag] = useState<string | null>(null);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('flagged_profile');
-    if (saved) {
-      try { setProfile(JSON.parse(saved)); }
+    const savedProfile = localStorage.getItem('flagged_profile');
+    if (savedProfile) {
+      try { setProfile(JSON.parse(savedProfile)); }
       catch (e) { console.error('Failed to parse profile', e); }
+    }
+    
+    const savedLogs = localStorage.getItem('flagged_logs');
+    if (savedLogs) {
+      try { setLogs(JSON.parse(savedLogs)); }
+      catch (e) { console.error('Failed to parse logs', e); }
     }
   }, []);
 
@@ -50,14 +55,24 @@ export default function App() {
     saveProfile(fullProfile);
   };
 
-  const handleCheckInComplete = (scoreDelta: number, green: string, red: string) => {
+  const handleLogSave = (log: DailyLog) => {
+    setLogs(prev => {
+      const updated = { ...prev, [log.date]: log };
+      localStorage.setItem('flagged_logs', JSON.stringify(updated));
+      return updated;
+    });
+
     if (profile) {
-      const newScore = Math.max(0, Math.min(100, profile.flagScore + scoreDelta));
+      // Recalculate flag score based on new log
+      // Just applying the delta of this specific log to current score for now,
+      // but ideally we derive score from all logs if we want true sync.
+      const previousLogImpact = logs[log.date]?.totalFlagImpact || 0;
+      const delta = log.totalFlagImpact - previousLogImpact;
+      
+      const newScore = Math.max(0, Math.min(100, profile.flagScore + delta));
       saveProfile({ ...profile, flagScore: newScore, streak: profile.streak + 1 });
-      setBiggestGreenFlag(green);
-      setBiggestRedFlag(red);
     }
-    setIsCheckingIn(false);
+    setLoggingDate(null);
   };
 
   const handleAvatarChange = (avatarId: string) => {
@@ -79,14 +94,18 @@ export default function App() {
     <div className="min-h-screen font-sans">
       <Dashboard
         profile={profile}
-        onCheckInStart={() => setIsCheckingIn(true)}
+        logs={logs}
+        onLogDate={(date) => setLoggingDate(date)}
         onOpenProfile={() => setViewingProfile(true)}
-        biggestGreenFlag={biggestGreenFlag}
-        biggestRedFlag={biggestRedFlag}
       />
       <AnimatePresence>
-        {isCheckingIn && (
-          <CheckIn onComplete={handleCheckInComplete} onCancel={() => setIsCheckingIn(false)} />
+        {loggingDate && (
+          <ActivityLogger
+            date={loggingDate}
+            existingLog={logs[loggingDate]}
+            onSave={handleLogSave}
+            onCancel={() => setLoggingDate(null)}
+          />
         )}
       </AnimatePresence>
     </div>

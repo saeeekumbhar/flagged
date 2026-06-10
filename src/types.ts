@@ -16,11 +16,27 @@ export interface UserProfile {
 
 export type Era = 'Red Flag Era' | 'Glow Up Era' | 'Green Flag Era';
 
-export interface WeeklyCheckIn {
-  date: string; // ISO string
-  scoreDelta: number;
-  biggestGreenFlag: string | null;
-  biggestRedFlag: string | null;
+export interface ActivityDefinition {
+  id: string;
+  label: string;
+  emoji: string;
+  carbonImpact: 'Very Low' | 'Low' | 'Medium' | 'High';
+  carbonValue: number;
+  flagImpact: 'Strong Positive' | 'Positive' | 'Negative' | 'Strong Negative';
+  flagValue: number;
+}
+
+export interface LoggedActivity {
+  activityId: string;
+  count: number;
+}
+
+export interface DailyLog {
+  date: string; // ISO string 'YYYY-MM-DD'
+  activities: LoggedActivity[];
+  totalFlagImpact: number;
+  totalCarbonEstimate: number;
+  notes: string;
 }
 
 export const calculateEra = (score: number): Era => {
