@@ -111,45 +111,44 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
   const realToday = new Date();
   
   return (
-    <motion.div className="soft-card p-5 mb-5 bg-white shadow-sm border border-[rgba(235,229,218,0.5)]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+    <motion.div className="bg-white rounded-[24px] p-6 mb-5 shadow-[0_4px_20px_rgba(30,26,22,0.03)]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
       
       {/* Segmented Control */}
-      <div className="flex bg-[#F4F1EC] rounded-full p-1 mb-5">
-        <button className="flex-1 bg-white rounded-full py-1.5 text-xs font-bold text-[#1E1A16] shadow-sm">Calendar</button>
-        <button className="flex-1 rounded-full py-1.5 text-xs font-bold text-[#8A8070]">Activity Log</button>
-        <button className="flex-1 rounded-full py-1.5 text-xs font-bold text-[#8A8070]">Trends</button>
+      <div className="flex bg-[#F4F1EC] rounded-[20px] p-1.5 mb-6">
+        <button className="flex-1 bg-white rounded-[14px] py-2.5 text-xs font-bold text-[#1E1A16] shadow-sm">Calendar</button>
+        <button className="flex-1 rounded-[14px] py-2.5 text-xs font-bold text-[#A0988A]">Activity Log</button>
+        <button className="flex-1 rounded-[14px] py-2.5 text-xs font-bold text-[#A0988A]">Trends</button>
       </div>
 
-      <div className="flex justify-end gap-2 items-center mb-4">
-        <span className="text-xs font-bold text-[#1E1A16] mr-auto">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-        <button onClick={handlePrevMonth} className="w-8 h-8 rounded-lg border border-[#EBE5DA] flex items-center justify-center text-[#8A8070] text-xs">{'<'}</button>
-        <button onClick={handleNextMonth} className="w-8 h-8 rounded-lg border border-[#EBE5DA] flex items-center justify-center text-[#8A8070] text-xs">{'>'}</button>
+      <div className="flex justify-end gap-2 mb-6">
+        <button onClick={handlePrevMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'<'}</button>
+        <button onClick={handleNextMonth} className="w-10 h-10 rounded-2xl border border-[#F4F1EC] flex items-center justify-center text-[#C8C0B0] text-sm active:bg-[#F4F1EC] transition-colors pointer-events-auto">{'>'}</button>
       </div>
       
-      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+      <div className="grid grid-cols-7 gap-1 text-center mb-3">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-          <div key={i} className="text-[10px] font-bold text-[#8A8070] mb-2">{d}</div>
+          <div key={i} className="text-[11px] font-bold text-[#A0988A] mb-1">{d}</div>
         ))}
       </div>
       
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-y-3 gap-x-2">
         {blanks.map((_, i) => <div key={`blank-${i}`} />)}
         
         {days.map(({ day, dateStr, log }) => {
           const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
           
           let bgColor = 'transparent';
-          let textColor = '#8A8070';
+          let textColor = '#B8B0A5';
           let fontWeight = '600';
 
           if (isToday) {
-            bgColor = '#3D6B3D'; // Dark green
+            bgColor = '#347346'; // Dark green
             textColor = '#FFFFFF';
             fontWeight = 'bold';
           } else if (log) {
-            if (log.totalFlagImpact > 0) { bgColor = '#E4EDE0'; textColor = '#3D6B3D'; } // Light Green
-            else if (log.totalFlagImpact < 0) { bgColor = '#FDEEED'; textColor = '#D4614A'; } // Light Red
-            else { bgColor = '#F4F1EC'; textColor = '#1E1A16'; } // Neutral
+            if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#2D5D2D'; fontWeight = 'bold'; } // Light Green
+            else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; } // Light Red
+            else { bgColor = '#F4F1EC'; textColor = '#1E1A16'; fontWeight = 'bold'; } // Neutral
           }
 
           return (
@@ -157,7 +156,7 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
               key={day}
               whileTap={{ scale: 0.9 }}
               onClick={() => onLogDate(dateStr)}
-              className="relative aspect-square flex items-center justify-center rounded-xl transition-colors pointer-events-auto"
+              className="relative aspect-square flex items-center justify-center rounded-[14px] transition-colors pointer-events-auto"
               style={{
                 background: bgColor,
                 color: textColor,
@@ -170,10 +169,10 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
         })}
       </div>
 
-      <div className="flex gap-4 mt-5 text-[10px] font-bold text-[#8A8070] items-center px-1">
-        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#E4EDE0] border border-[rgba(90,143,90,0.2)]" /> Green day</div>
-        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#FDEEED] border border-[rgba(212,97,74,0.2)]" /> Red day</div>
-        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-[#3D6B3D]" /> Today</div>
+      <div className="flex gap-4 mt-8 text-[11px] font-semibold text-[#A0988A] items-center">
+        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#EAF3EA] border border-[#BEE0BE]" /> Green day</div>
+        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#FDECEE] border border-[#F4B2B8]" /> Red day</div>
+        <div className="flex items-center gap-1.5"><div className="w-3.5 h-3.5 rounded-[4px] bg-[#347346]" /> Today</div>
       </div>
     </motion.div>
   );
