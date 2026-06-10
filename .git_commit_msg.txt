@@ -1,1 +1,1 @@
-tab based architecture
+revert dashboard

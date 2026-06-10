@@ -7,18 +7,15 @@ import { AnimatePresence } from 'motion/react';
 import { UserProfile, DailyLog } from './types';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
-import { Home } from './components/Home';
-import { Journey } from './components/Journey';
+import { Dashboard } from './components/Dashboard';
 import { ActivityLogger } from './components/ActivityLogger';
 import { Profile } from './components/Profile';
-
-type Tab = 'home' | 'journey' | 'profile';
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [logs, setLogs] = useState<Record<string, DailyLog>>({});
   const [loggingDate, setLoggingDate] = useState<string | null>(null);
-  const [currentTab, setCurrentTab] = useState<Tab>('home');
+  const [viewingProfile, setViewingProfile] = useState(false);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
 
   useEffect(() => {
@@ -151,75 +148,22 @@ export default function App() {
   if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
   if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
-  const todayStr = () => {
-    const today = new Date();
-    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  };
+  if (viewingProfile) {
+    return (
+      <div className="min-h-screen font-sans">
+        <Profile profile={profile} onBack={() => setViewingProfile(false)} onAvatarChange={handleAvatarChange} />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen font-sans bg-[#FAF8F5] relative">
-      
-      {/* ── Main Tab Content ── */}
-      <div className="pb-24">
-        {currentTab === 'home' && (
-          <Home 
-            profile={profile} 
-            logs={logs} 
-            onLogToday={() => setLoggingDate(todayStr())} 
-          />
-        )}
-        
-        {currentTab === 'journey' && (
-          <Journey 
-            logs={logs} 
-            onLogDate={(date) => setLoggingDate(date)} 
-          />
-        )}
-
-        {currentTab === 'profile' && (
-          <Profile 
-            profile={profile} 
-            onBack={() => setCurrentTab('home')} 
-            onAvatarChange={handleAvatarChange} 
-          />
-        )}
-      </div>
-
-      {/* ── Bottom Navigation ── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#FDFAF5] border-t border-[rgba(196,217,188,0.3)] px-6 py-4 pb-safe z-40" style={{ boxShadow: '0 -4px 24px rgba(30,26,22,0.03)' }}>
-        <div className="max-w-[420px] mx-auto flex justify-between items-center">
-          
-          <button 
-            onClick={() => setCurrentTab('home')}
-            className="flex flex-col items-center gap-1 transition-colors"
-            style={{ color: currentTab === 'home' ? '#3D6B3D' : '#A39C93' }}
-          >
-            <span className="text-xl">🏠</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Home</span>
-          </button>
-
-          <button 
-            onClick={() => setCurrentTab('journey')}
-            className="flex flex-col items-center gap-1 transition-colors"
-            style={{ color: currentTab === 'journey' ? '#3D6B3D' : '#A39C93' }}
-          >
-            <span className="text-xl">🗺️</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Journey</span>
-          </button>
-
-          <button 
-            onClick={() => setCurrentTab('profile')}
-            className="flex flex-col items-center gap-1 transition-colors"
-            style={{ color: currentTab === 'profile' ? '#3D6B3D' : '#A39C93' }}
-          >
-            <span className="text-xl">👤</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Profile</span>
-          </button>
-
-        </div>
-      </div>
-
-      {/* ── Modals ── */}
+    <div className="min-h-screen font-sans">
+      <Dashboard
+        profile={profile}
+        logs={logs}
+        onLogDate={(date) => setLoggingDate(date)}
+        onOpenProfile={() => setViewingProfile(true)}
+      />
       <AnimatePresence>
         {loggingDate && (
           <ActivityLogger
