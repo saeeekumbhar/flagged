@@ -94,9 +94,9 @@ export default function App() {
          const isGreen = mockPattern[6 - i] > 0;
          l[dateStr] = {
            date: dateStr,
-           activities: isGreen ? [{ activityId: 'commute_walk', count: 1 }] : [{ activityId: 'car_short', count: 1 }],
-           totalFlagImpact: isGreen ? 10 : -10,
-           totalCarbonEstimate: isGreen ? -0.5 : 2.5,
+           activities: isGreen ? [{ activityId: 'commute_walk_bike', count: 1 }] : [{ activityId: 'commute_car', count: 1 }],
+           totalFlagImpact: isGreen ? 10 : -5,
+           totalCarbonEstimate: isGreen ? 0.5 : 12,
            notes: 'Mock entry'
          };
       }
@@ -200,6 +200,7 @@ export default function App() {
       <AnimatePresence>
         {loggingDate && (
           <ActivityLogger
+            key={loggingDate}
             date={loggingDate}
             existingLog={logs[loggingDate]}
             onSave={handleLogSave}
