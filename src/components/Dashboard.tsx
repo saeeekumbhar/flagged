@@ -157,7 +157,7 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
               key={day}
               whileTap={{ scale: 0.9 }}
               onClick={() => onLogDate(dateStr)}
-              className="relative aspect-square flex items-center justify-center rounded-xl transition-colors"
+              className="relative aspect-square flex items-center justify-center rounded-xl transition-colors pointer-events-auto"
               style={{
                 background: bgColor,
                 color: textColor,
@@ -228,7 +228,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
   };
 
   return (
-    <div className="pb-8 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative">
+    <div className="pb-8 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
 
       {/* ── Toast ── */}
       <AnimatePresence>
@@ -294,9 +294,9 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative pointer-events-auto">
             <GrowthRing score={profile.flagScore} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-0.5">
+            <div className="absolute inset-0 flex flex-col items-center justify-center pt-0.5 pointer-events-none">
               <span className="text-xl font-bold text-[#1E1A16]" style={{ letterSpacing: '-0.5px' }}>{profile.flagScore}</span>
               <span className="text-[8px] text-[#8A8070] uppercase font-bold tracking-wider -mt-1">Score</span>
             </div>
@@ -340,7 +340,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
       <div className="grid grid-cols-2 gap-3 mb-2">
         <button 
           onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Green Choices"); }} 
-          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(90,143,90,0.3)] shadow-sm active:scale-95 transition-transform" 
+          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(90,143,90,0.3)] shadow-sm active:scale-95 transition-transform pointer-events-auto" 
           style={{ background: 'linear-gradient(145deg, #F4F7F2, #E4EDE0)' }}>
           <div className="flex items-center gap-1.5 mb-2">
             <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#5A8F5A] border border-[rgba(90,143,90,0.3)]">✓</span>
@@ -352,7 +352,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
         
         <button 
           onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Red Choices"); }} 
-          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(212,97,74,0.3)] shadow-sm active:scale-95 transition-transform" 
+          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(212,97,74,0.3)] shadow-sm active:scale-95 transition-transform pointer-events-auto" 
           style={{ background: 'linear-gradient(145deg, #FDF9F3, #FDEEED)' }}>
           <div className="flex items-center gap-1.5 mb-2">
             <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#D4614A] border border-[rgba(212,97,74,0.3)]">✕</span>
