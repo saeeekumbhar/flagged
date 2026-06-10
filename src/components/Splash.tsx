@@ -140,7 +140,7 @@ export function Splash({ onStart }: SplashProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.7 }}
         >
-          <h1 className="text-display text-5xl font-bold text-[#1F3D20] mb-2 tracking-tight">
+          <h1 className="font-logo text-5xl text-[#1F3D20] mb-2 tracking-tight">
             FLAGGED
           </h1>
           <p className="text-[#5A8070] text-base font-medium">

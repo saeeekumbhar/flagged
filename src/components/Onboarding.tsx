@@ -328,7 +328,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             <div>
               <motion.p className="text-sm font-semibold text-[#7BA87A] uppercase tracking-widest mb-2"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                Welcome to FLAGGED,
+                Welcome to <span className="font-logo text-[15px]">FLAGGED</span>,
               </motion.p>
               <motion.h1 className="text-display text-4xl font-bold text-[#1F3D20] mb-4"
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
@@ -347,7 +347,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             <motion.button className="btn-primary text-lg py-5 w-full" onClick={handleFinish}
               whileTap={{ scale: 0.97 }} initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
-              <span>{chosenAvatar.emoji}</span> Enter FLAGGED
+              <span>{chosenAvatar.emoji}</span> Enter <span className="font-logo ml-1">FLAGGED</span>
             </motion.button>
           </div>
         );
