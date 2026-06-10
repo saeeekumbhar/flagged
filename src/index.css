@@ -9,15 +9,15 @@
   --color-green-flag: #52B788;
   --color-red-flag-dark: #D62828;
   --color-red-flag: #E76F51;
-  --color-neutral-bg: #121212;
-  --color-text-primary: #FEFAE0;
+  --color-neutral-bg: #FEFAE0;
+  --color-text-primary: #121212;
 
   --color-background: var(--color-neutral-bg);
 }
 
 @layer base {
   body {
-    @apply bg-[#121212] text-[#FEFAE0] font-sans antialiased overflow-x-hidden;
+    @apply bg-[#FEFAE0] text-[#121212] font-sans antialiased overflow-x-hidden;
   }
 }
 

@@ -37,7 +37,7 @@ export function CheckIn({ onComplete, onCancel }: CheckInProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-black/80 fixed inset-0 z-50 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#FEFAE0]/90 fixed inset-0 z-50 backdrop-blur-sm">
       <div className="w-full max-w-md">
         <AnimatePresence mode="wait">
           <motion.div
@@ -49,9 +49,9 @@ export function CheckIn({ onComplete, onCancel }: CheckInProps) {
             <PixelCard className="py-10">
               <div className="flex justify-between items-center mb-6">
                  <span className="font-pixel text-sm text-[#52B788]">Q {currentQ + 1}/{questions.length}</span>
-                 <button onClick={onCancel} className="text-white/50 hover:text-white font-pixel transition-colors">X</button>
+                 <button onClick={onCancel} className="text-[#121212]/50 hover:text-[#121212] font-pixel transition-colors">X</button>
               </div>
-              <h2 className="font-sans font-black text-2xl mb-8 leading-relaxed text-center text-[#FEFAE0] underline decoration-[#52B788] decoration-4 underline-offset-8">{questions[currentQ].text}</h2>
+              <h2 className="font-sans font-black text-2xl mb-8 leading-relaxed text-center text-[#121212] underline decoration-[#52B788] decoration-4 underline-offset-8">{questions[currentQ].text}</h2>
               <div className="grid grid-cols-2 gap-4">
                 <PixelButton variant="secondary" onClick={() => handleAnswer('no')}>No</PixelButton>
                 <PixelButton variant="primary" onClick={() => handleAnswer('yes')}>Yeah</PixelButton>

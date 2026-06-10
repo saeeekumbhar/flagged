@@ -12,13 +12,13 @@ export function PixelButton({ variant = 'primary', children, className = '', ...
   let variantClasses = "";
   switch (variant) {
     case 'primary':
-      variantClasses = "bg-[#52B788] text-black border-black brutal-shadow hover:shadow-[6px_6px_0px_0px_#000] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
+      variantClasses = "bg-[#52B788] text-[#121212] border-[#121212] brutal-shadow hover:shadow-[6px_6px_0px_0px_#121212] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
       break;
     case 'secondary':
-      variantClasses = "bg-[#1E1E1E] text-[#FEFAE0] border-[#2D2D2D] brutal-shadow hover:shadow-[6px_6px_0px_0px_#000] hover:border-[#FEFAE0] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
+      variantClasses = "bg-[#FFFFFF] text-[#121212] border-[#121212] brutal-shadow hover:shadow-[6px_6px_0px_0px_#121212] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
       break;
     case 'danger':
-      variantClasses = "bg-[#E76F51] text-white border-black brutal-shadow hover:shadow-[6px_6px_0px_0px_#000] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
+      variantClasses = "bg-[#E76F51] text-[#FEFAE0] border-[#121212] brutal-shadow hover:shadow-[6px_6px_0px_0px_#121212] hover:-translate-y-[2px] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none";
       break;
   }
 

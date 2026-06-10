@@ -15,9 +15,9 @@ interface DashboardProps {
 export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRedFlag, onOpenProfile }: DashboardProps) {
   const era: Era = calculateEra(profile.flagScore);
 
-  let eraColor = "text-[#FEFAE0]";
-  let eraTextBg = "bg-[#2D2D2D]";
-  let eraShadow = "shadow-[6px_6px_0px_0px_#000]";
+  let eraColor = "text-[#121212]";
+  let eraTextBg = "bg-[#F4F1DE]";
+  let eraShadow = "shadow-[6px_6px_0px_0px_#121212]";
   
   if (era === 'Green Flag Era') {
     eraColor = "text-black";
@@ -32,7 +32,7 @@ export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRe
   return (
     <div className="space-y-6 pb-24 max-w-md mx-auto p-4 pt-8">
       {/* Header */}
-      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex justify-between items-center mb-6 pb-4 border-b-4 border-[#2D2D2D]">
+      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex justify-between items-center mb-6 pb-4 border-b-4 border-[#121212]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#52B788] border-2 border-[#2D6A4F] brutal-shadow flex items-center justify-center font-bold text-black font-sans">F</div>
           <div>
@@ -43,9 +43,9 @@ export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRe
         <button onClick={onOpenProfile} className="flex gap-2 items-center font-mono active:translate-y-1 transition-transform outline-none group text-left">
           <div className="text-right">
             <p className="text-[10px] opacity-60 uppercase">{profile.userType?.replace('_', ' ')}</p>
-            <p className="text-xs font-bold text-[#FEFAE0]">{profile.name}</p>
+            <p className="text-xs font-bold text-[#121212]">{profile.name}</p>
           </div>
-          <div className="w-10 h-10 bg-[#1E1E1E] flex flex-col items-center justify-center border-2 border-[#2D2D2D] brutal-shadow text-lg group-hover:border-[#FEFAE0] group-hover:shadow-[4px_4px_0px_0px_#000] transition-colors">
+          <div className="w-10 h-10 bg-[#FFFFFF] flex flex-col items-center justify-center border-2 border-[#121212] brutal-shadow text-lg group-hover:border-[#52B788] group-hover:shadow-[4px_4px_0px_0px_#121212] transition-colors">
              {profile.avatar}
           </div>
         </button>
@@ -81,8 +81,8 @@ export function Dashboard({ profile, onCheckInStart, biggestGreenFlag, biggestRe
 
       <PixelCard variant="green" className="!bg-[#2D6A4F] !border-[#52B788] !text-white !brutal-shadow-lg">
         <h4 className="text-xs font-black uppercase mb-3 font-sans opacity-90">Weekly Insight</h4>
-        <p className="text-sm leading-tight italic mb-4 font-mono text-[#FEFAE0]">"Clean. Passing on the personal car is a huge green flag. Your era is showing."</p>
-        <button className="w-full bg-[#FEFAE0] text-[#2D6A4F] font-black text-xs py-2 border-b-4 border-[#D1CCB0] active:translate-y-1 active:border-b-0 uppercase transition-all">Share Card</button>
+        <p className="text-sm leading-tight italic mb-4 font-mono text-white/90">"Clean. Passing on the personal car is a huge green flag. Your era is showing."</p>
+        <button className="w-full bg-white text-[#2D6A4F] font-black text-xs py-2 border-b-4 border-[#121212] active:translate-y-1 active:border-b-0 uppercase transition-all">Share Card</button>
       </PixelCard>
 
       <div className="fixed bottom-6 left-0 right-0 px-4 max-w-md mx-auto z-40">
