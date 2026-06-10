@@ -72,8 +72,16 @@ export default function App() {
         }
       }
 
-      if (needsUpdate) {
-        const updatedProfile = { ...p, flagScore: newScore, streak: newStreak, bestStreak: p.bestStreak || 0 };
+      if (needsUpdate || p.xp === undefined) {
+        const updatedProfile = { 
+          ...p, 
+          flagScore: newScore, 
+          streak: newStreak, 
+          bestStreak: p.bestStreak || 0,
+          xp: p.xp || 0,
+          level: p.level || 1,
+          coins: p.coins || 0
+        };
         setProfile(updatedProfile);
         localStorage.setItem('flagged_profile', JSON.stringify(updatedProfile));
       } else {
@@ -107,6 +115,9 @@ export default function App() {
         p.streak = 7;
         p.bestStreak = 7;
         p.flagScore = 75; // Glow up / Green flag era
+        p.xp = p.xp || 700;
+        p.level = p.level || 7;
+        p.coins = p.coins || 240;
         setProfile({...p});
         localStorage.setItem('flagged_profile', JSON.stringify(p));
       }
@@ -134,6 +145,9 @@ export default function App() {
       avatarId: 'av1',
       streak: 7, // Start with a seeded streak
       bestStreak: 7,
+      xp: 700,
+      level: 7,
+      coins: 240,
       ...partialProfile,
     };
     saveProfile(fullProfile);
@@ -169,7 +183,36 @@ export default function App() {
       
       const newBestStreak = Math.max(profile.bestStreak || 0, newStreak);
 
-      saveProfile({ ...profile, flagScore: newScore, streak: newStreak, bestStreak: newBestStreak });
+      let newXp = profile.xp || 0;
+      let newCoins = profile.coins || 0;
+      let newLevel = profile.level || 1;
+      
+      // Award XP and coins based on the net impact of the log
+      if (delta > 0) {
+        newXp += 15; // Base XP for positive actions
+        newCoins += 5;
+      } else if (delta < 0) {
+        newXp = Math.max(0, newXp - 5); // Small penalty for negative actions
+      } else if (!logs[log.date]) {
+        // Just logging neutral still gives small XP
+        newXp += 5;
+      }
+      
+      // Level up logic (1000 XP per level)
+      while (newXp >= 1000) {
+        newLevel++;
+        newXp -= 1000;
+      }
+
+      saveProfile({ 
+        ...profile, 
+        flagScore: newScore, 
+        streak: newStreak, 
+        bestStreak: newBestStreak,
+        xp: newXp,
+        level: newLevel,
+        coins: newCoins
+      });
     }
     setLoggingDate(null);
   };

@@ -209,6 +209,18 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
   const greenRate = totalFlagsInMonth > 0 ? Math.round((monthlyGreenFlags / totalFlagsInMonth) * 100) : 0;
   const daysLogged = Object.keys(logs).length;
 
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  let greenToday = 0;
+  let redToday = 0;
+  if (logs[todayStr]) {
+    logs[todayStr].activities.forEach(a => {
+      if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home')) greenToday += a.count;
+      if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major')) redToday += a.count;
+    });
+  }
+
   const sortedActivities = Object.entries(activityCounts).sort((a, b) => b[1] - a[1]);
   let topHabitText = "Start logging to discover your best habits!";
   if (sortedActivities.length > 0) {
@@ -241,126 +253,182 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile }: Dashboard
         )}
       </AnimatePresence>
 
-      {/* ── Header ── */}
-      <motion.div className="flex items-center justify-between pl-1"
+      {/* ── Header (HUD) ── */}
+      <motion.div className="flex items-center justify-between pl-1 mb-2"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xl">⚑</span>
-          <span className="font-bold text-[#5A8F5A] text-xl tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            Flagged
-          </span>
+        <div className="flex items-center gap-1.5 font-bold text-[#3A8F3A] text-[15px]">
+          <span className="text-lg">⚑</span> Flagged
         </div>
-
-        <button onClick={onOpenProfile} className="flex items-center gap-2 bg-white rounded-full pl-1.5 pr-4 py-1.5 shadow-sm border border-[#EBE5DA] transition-transform active:scale-95">
-          <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center text-lg" style={{ background: aura.bg, border: `1px solid ${aura.ring}` }}>
-             <AvatarDisplay avatar={avatar} size={28} />
-          </div>
-          <span className="text-[11px] font-bold text-[#8A8070]">{profile.userType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} - {profile.name}</span>
-        </button>
+        <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-[#F5D990] text-xs font-semibold text-[#854F0B] shadow-sm">
+          <span>🟡</span> {profile.coins || 0} pts
+        </div>
       </motion.div>
 
-      {/* ── Hero Card ── */}
-      <motion.div className="bg-white rounded-3xl p-5 shadow-sm border border-[#EBE5DA] relative overflow-hidden"
+      {/* ── Era & Level Card ── */}
+      <motion.div className="bg-white rounded-[16px] p-[13px] shadow-sm border border-[#EBE5DA] relative overflow-hidden"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}>
+        <div className="flex justify-between items-center mb-2.5">
+          <div>
+            <div className="text-[13px] font-bold text-[#1E1A16]">{era}</div>
+            <div className="text-[10px] text-[#A0988A] mt-0.5">Keep logging to level up</div>
+          </div>
+          <div className="bg-[#3A8F3A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
+            Lv {profile.level || 1}
+          </div>
+        </div>
+        <div className="h-2.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-1">
+          <div className="h-full bg-[#3A8F3A] rounded-full transition-all duration-1000 ease-out" style={{ width: `${((profile.xp || 0) / 1000) * 100}%` }} />
+        </div>
+        <div className="flex justify-between text-[10px] text-[#A0988A] font-medium">
+          <span>{profile.xp || 0} XP</span>
+          <span>1000 XP</span>
+        </div>
+      </motion.div>
+
+      {/* ── Avatar Profile Card ── */}
+      <motion.button 
+        onClick={onOpenProfile}
+        className="w-full text-left bg-white rounded-[16px] p-[13px] shadow-sm border border-[#EBE5DA] relative overflow-hidden active:scale-[0.98] transition-transform"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-        
-        {/* Background gradient hint */}
-        <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none" style={{ background: `linear-gradient(180deg, ${eraConfig.gradientFrom} 0%, transparent 100%)` }} />
-
-        <div className="flex items-center justify-between mb-6 relative z-10">
-          <span className="px-3 py-1 rounded-full text-xs font-bold border" style={{ background: 'rgba(196,217,188,0.2)', color: '#3D6B3D', borderColor: 'rgba(90,143,90,0.2)' }}>
-            💧 {era}
-          </span>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4614A]">
-            <span>🔥</span>
-            <span>{profile.streak} day streak</span>
-          </div>
-        </div>
-
-        {/* Avatar + Ring */}
-        <div className="flex items-center justify-between relative z-10 mb-5">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
+        <div className="flex items-center gap-3 relative z-10 w-full">
+          {/* Avatar Area */}
+          <div className="relative">
+            <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl bg-[#E8F4E8] border-[3px] border-[#3A8F3A]"
               style={{
-                background: aura.bg,
                 boxShadow: `0 4px 16px ${aura.glow}`,
-                border: `2px solid ${aura.ring}`,
               }}>
-              <AvatarDisplay avatar={avatar} size={56} />
+              <AvatarDisplay avatar={avatar} size={44} />
             </div>
-            <div>
-              <p className="text-sm font-bold text-[#1E1A16]">{profile.name.split(' ')[0]}</p>
-              <p className="text-xs font-bold text-[#5A8F5A] mt-0.5">You're glowing up 🔥</p>
-            </div>
-          </div>
-
-          <div className="relative pointer-events-auto">
-            <GrowthRing score={profile.flagScore} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-0.5 pointer-events-none">
-              <span className="text-xl font-bold text-[#1E1A16]" style={{ letterSpacing: '-0.5px' }}>{profile.flagScore}</span>
-              <span className="text-[8px] text-[#8A8070] uppercase font-bold tracking-wider -mt-1">Score</span>
+            <div className="absolute -bottom-1 -right-1 bg-[#3A8F3A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[10px] border-[1.5px] border-white">
+              {profile.level || 1}
             </div>
           </div>
+          
+          {/* Player Info */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-bold text-[#1E1A16] truncate">{profile.name.split(' ')[0]}</p>
+            <p className="text-[11px] font-bold text-[#3A8F3A] mt-0.5 truncate">You're glowing up 🔥</p>
+          </div>
+
+          {/* Streak Badge */}
+          <div className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0">
+            <div className="text-[20px] font-medium text-[#854F0B] leading-none">{profile.streak}</div>
+            <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
+          </div>
+
+          {/* Score Ring */}
+          <div className="relative w-[50px] h-[50px] pointer-events-auto shrink-0 -mr-1">
+            <svg width="50" height="50" viewBox="0 0 58 58" className="-rotate-90">
+              <circle cx="29" cy="29" r="23" fill="none" stroke="#EAF3DE" strokeWidth="6" />
+              <circle cx="29" cy="29" r="23" fill="none" stroke="#3A8F3A" strokeWidth="6" strokeDasharray="144.5" strokeDashoffset={144.5 * (1 - profile.flagScore / 100)} className="transition-all duration-1000" />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[15px] font-bold text-[#1E1A16] leading-none">{profile.flagScore}</span>
+              <span className="text-[9px] text-[#A0988A] leading-none mt-0.5">score</span>
+            </div>
+          </div>
+        </div>
+      </motion.button>
+
+      {/* ── Daily Stats ── */}
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5">
+          <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{greenToday}</span>
+          <span className="text-[10px] text-[#A0988A] mt-0.5">green today</span>
+        </div>
+        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5">
+          <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{redToday}</span>
+          <span className="text-[10px] text-[#A0988A] mt-0.5">red today</span>
+        </div>
+      </div>
+
+      {/* ── Action Cards ── */}
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <button 
+          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Green Choices"); }} 
+          className="bg-[#E8F4E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#B2D9B2] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
+          <div className="text-[26px]">🟢</div>
+          <div className="text-[11px] font-medium text-[#3A6E3A]">Green choice</div>
+          <div className="text-[10px] text-[#3A6E3A]">+10 XP · +5 pts</div>
+        </button>
+        
+        <button 
+          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Red Choices"); }} 
+          className="bg-[#FDE8E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#F5B8B8] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
+          <div className="text-[26px]">🔴</div>
+          <div className="text-[11px] font-medium text-[#C04A4A]">Red choice</div>
+          <div className="text-[10px] text-[#C04A4A]">-5 XP · reflect</div>
+        </button>
+      </div>
+
+      {/* ── Daily Challenges ── */}
+      <div className="bg-white rounded-[16px] p-3 shadow-sm border border-[#EBE5DA] mb-2">
+        <div className="flex justify-between items-center mb-2.5">
+          <span className="text-[10px] font-bold text-[#A0988A] uppercase tracking-[0.5px]">Daily challenges</span>
+          <span className="text-[10px] text-[#3A8F3A] cursor-pointer">new ↗</span>
+        </div>
+        
+        {/* Challenge 1 */}
+        <div className="mb-2.5">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🚌</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-[#1E1A16] truncate">Use public transport</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Log transport today</div>
+            </div>
+            <div className="text-[10px] font-bold text-[#854F0B]">+20 XP</div>
+          </div>
+          <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
+            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((activityCounts['commute_public'] || 0) / 1) * 100)}%` }} />
+          </div>
+          <div className="text-[9px] text-[#A0988A]">{Math.min(1, activityCounts['commute_public'] || 0)} / 1</div>
         </div>
 
-        {/* Progress bar */}
-        <div className="pt-2 relative z-10">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-[#8A8070]">Progress</span>
-            <span className="text-xs font-bold text-[#5A8F5A] flex items-center gap-1">{eraConfig.nextGoal}</span>
+        {/* Challenge 2 */}
+        <div className="mb-2.5">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🥗</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-[#1E1A16] truncate">Eat a green meal</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Mess or home cooked</div>
+            </div>
+            <div className="text-[10px] font-bold text-[#854F0B]">+15 XP</div>
           </div>
-          <div className="h-2 rounded-full bg-[#F4F1EC] overflow-hidden">
-            <motion.div className="h-full rounded-full bg-[#5A8F5A]" initial={{ width: 0 }}
-              animate={{ width: `${profile.flagScore}%` }}
-              transition={{ duration: 1.2, ease: [0.34, 1.56, 0.64, 1], delay: 0.5 }} />
+          <div className="h-1.5 bg-[#EAF3DE] rounded-full overflow-hidden mb-0.5">
+            <div className="h-full bg-[#3A8F3A] transition-all" style={{ width: `${Math.min(100, ((activityCounts['food_home'] || 0) / 1) * 100)}%` }} />
           </div>
+          <div className="text-[9px] text-[#A0988A]">{Math.min(1, activityCounts['food_home'] || 0)} / 1</div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* ── Quick Insights ── */}
-      <div className="grid grid-cols-3 gap-2 mb-2">
-        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
-          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{greenRate}%</span>
-          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Green rate</span>
+      {/* ── Badges ── */}
+      <div className="bg-white rounded-[16px] p-3 shadow-sm border border-[#EBE5DA] mb-4 overflow-hidden">
+        <div className="flex justify-between items-center mb-2.5">
+          <span className="text-[10px] font-bold text-[#A0988A] uppercase tracking-[0.5px]">Badges</span>
+          <span className="text-[10px] text-[#A0988A] font-medium">swipe →</span>
         </div>
-        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
-          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{daysLogged}</span>
-          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Days logged</span>
-        </div>
-        <div className="bg-white rounded-2xl flex flex-col items-center justify-center py-5 shadow-sm border border-[#EBE5DA]">
-          <span className="text-2xl font-bold text-[#EBE5DA] mb-0.5">{profile.bestStreak || 0}</span>
-          <span className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wide">Best streak</span>
+        <div className="flex gap-2 pb-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
+            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.bestStreak >= 7 ? 'bg-[#FFF8E8] border-[#F5D990]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🔥</div>
+            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">Streak 7</div>
+          </div>
+          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
+            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${monthlyGreenFlags >= 10 ? 'bg-[#E8F4E8] border-[#B2D9B2]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🌱</div>
+            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">10 Greens</div>
+          </div>
+          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
+            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.level > 1 ? 'bg-[#E8F4E8] border-[#B2D9B2]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>🏆</div>
+            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">Era up</div>
+          </div>
+          <div className="shrink-0 w-16 flex flex-col items-center gap-1">
+            <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center text-xl border-[0.5px] ${profile.bestStreak >= 30 ? 'bg-[#FFF8E8] border-[#F5D990]' : 'bg-[#F0EDE4] border-[#EBE5DA] opacity-50 grayscale'}`}>💎</div>
+            <div className="text-[9px] text-[#A0988A] text-center leading-[1.2]">30 days</div>
+          </div>
         </div>
       </div>
 
       {/* ── Monthly Calendar ── */}
       <MonthlyCalendar logs={logs} onLogDate={onLogDate} />
-
-      {/* ── Action Cards ── */}
-      <div className="grid grid-cols-2 gap-3 mb-2">
-        <button 
-          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Green Choices"); }} 
-          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(90,143,90,0.3)] shadow-sm active:scale-95 transition-transform pointer-events-auto" 
-          style={{ background: 'linear-gradient(145deg, #F4F7F2, #E4EDE0)' }}>
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#5A8F5A] border border-[rgba(90,143,90,0.3)]">✓</span>
-            <span className="text-[10px] font-bold text-[#3D6B3D] uppercase tracking-wider">Green Choices</span>
-          </div>
-          <p className="text-3xl font-bold text-[#1F3D20] mb-2">{monthlyGreenFlags}</p>
-          <span className="text-[10px] font-bold text-[#5A8F5A] opacity-70">Tap to log a green</span>
-        </button>
-        
-        <button 
-          onClick={() => { onLogDate(todayStr); showToastMsg("Opened logger for Red Choices"); }} 
-          className="bg-white rounded-2xl flex flex-col p-4 text-left border border-[rgba(212,97,74,0.3)] shadow-sm active:scale-95 transition-transform pointer-events-auto" 
-          style={{ background: 'linear-gradient(145deg, #FDF9F3, #FDEEED)' }}>
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] text-[#D4614A] border border-[rgba(212,97,74,0.3)]">✕</span>
-            <span className="text-[10px] font-bold text-[#D4614A] uppercase tracking-wider">Red Choices</span>
-          </div>
-          <p className="text-3xl font-bold text-[#4A1F1A] mb-2">{monthlyRedFlags}</p>
-          <span className="text-[10px] font-bold text-[#D4614A] opacity-70">Tap to log a red</span>
-        </button>
-      </div>
 
       {/* ── Best Habit Card ── */}
       <div className="bg-white rounded-3xl p-5 shadow-sm border border-[#EBE5DA] relative">
