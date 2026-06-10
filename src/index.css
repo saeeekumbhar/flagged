@@ -450,3 +450,6 @@ input[type="range"]::-webkit-slider-thumb {
 .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }  
 .confetti-particle { position: absolute; top: -10px; width: 8px; height: 8px; border-radius: 2px; animation: confettiFall linear forwards; }  
 @keyframes confettiFall { 0% { transform: translateY(0) rotate(0); } 100% { transform: translateY(100vh) rotate(720deg); } } 
+ 
+@keyframes shake { 0%%, 100%% { transform: translateX(0); } 20%% { transform: translateX(-5px); } 40%% { transform: translateX(5px); } 60%% { transform: translateX(-4px); } 80%% { transform: translateX(4px); } }  
+.shake-anim { animation: shake 0.4s ease-in-out; } 

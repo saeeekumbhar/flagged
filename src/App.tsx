@@ -17,6 +17,7 @@ export default function App() {
   const [logs, setLogs] = useState<Record<string, DailyLog>>({});
   const [loggingDate, setLoggingDate] = useState<string | null>(null);
   const [viewingProfile, setViewingProfile] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -250,6 +251,65 @@ export default function App() {
     setTimeout(() => setShowConfetti(false), 2000);
   };
 
+  const handleQuickLog = (type: 'green' | 'red') => {
+    if (!profile) return;
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    const prevLog = logs[dateStr] || { date: dateStr, activities: [], notes: '', totalFlagImpact: 0 };
+    
+    const impactDelta = type === 'green' ? 1 : -1;
+    const newLog = {
+      ...prevLog,
+      totalFlagImpact: prevLog.totalFlagImpact + impactDelta,
+      activities: [
+        ...prevLog.activities,
+        { activityId: `quick_${type}`, count: 1 }
+      ]
+    };
+    
+    setLogs(prev => {
+      const updated = { ...prev, [dateStr]: newLog };
+      localStorage.setItem('flagged_logs', JSON.stringify(updated));
+      return updated;
+    });
+
+    let newXp = profile.xp || 0;
+    let newCoins = profile.coins || 0;
+    let newLevel = profile.level || 1;
+    let newScore = profile.flagScore + impactDelta;
+    newScore = Math.max(0, Math.min(100, newScore));
+    
+    if (type === 'green') {
+      newXp += 10;
+      newCoins += 5;
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2000);
+    } else {
+      newXp = Math.max(0, newXp - 5);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 400);
+    }
+    
+    while (newXp >= 1000) {
+      newLevel++;
+      newXp -= 1000;
+    }
+    
+    let newStreak = profile.streak;
+    if (!logs[dateStr]) newStreak++;
+    
+    saveProfile({
+      ...profile,
+      flagScore: newScore,
+      xp: newXp,
+      coins: newCoins,
+      level: newLevel,
+      streak: newStreak,
+      bestStreak: Math.max(profile.bestStreak || 0, newStreak)
+    });
+  };
+
   if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
   if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
@@ -262,13 +322,14 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen font-sans">
+    <div className={`min-h-screen font-sans ${isShaking ? 'shake-anim' : ''}`}>
       <Dashboard
         profile={profile}
         logs={logs}
         onLogDate={(date) => setLoggingDate(date)}
         onOpenProfile={() => setViewingProfile(true)}
         onAwardXP={handleAwardXP}
+        onQuickLog={handleQuickLog}
       />
       <AnimatePresence>
         {loggingDate && (

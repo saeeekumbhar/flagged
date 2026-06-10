@@ -12,6 +12,7 @@ interface DashboardProps {
   onLogDate: (date: string) => void;
   onOpenProfile?: () => void;
   onAwardXP: (xpAmount: number, coinsAmount: number, reason: string) => void;
+  onQuickLog?: (type: 'green' | 'red') => void;
 }
 
 function getEraConfig(era: Era, score: number) {
@@ -179,8 +180,8 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
   );
 }
 
-export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }: DashboardProps) {
-  const [toast, setToast] = useState<string | null>(null);
+export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, onQuickLog }: DashboardProps) {
+  const [toast, setToast] = useState<{msg: string, type?: 'green'|'darkGreen'} | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{id: string, icon: string, label: string, isUnlocked: boolean, msg: string} | null>(null);
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
 
@@ -203,8 +204,8 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
       log.activities.forEach(a => {
         activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + 1;
         totalFlagsInMonth++;
-        if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home')) monthlyGreenFlags++;
-        if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major')) monthlyRedFlags++;
+        if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home') || a.activityId === 'quick_green') monthlyGreenFlags++;
+        if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major') || a.activityId === 'quick_red') monthlyRedFlags++;
       });
     }
   });
@@ -219,8 +220,8 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
   let redToday = 0;
   if (logs[todayStr]) {
     logs[todayStr].activities.forEach(a => {
-      if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home')) greenToday += a.count;
-      if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major')) redToday += a.count;
+      if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home') || a.activityId === 'quick_green') greenToday += a.count;
+      if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major') || a.activityId === 'quick_red') redToday += a.count;
     });
   }
 
@@ -234,8 +235,8 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
   }
 
 
-  const showToastMsg = (msg: string) => {
-    setToast(msg);
+  const showToastMsg = (msg: string, type?: 'green'|'darkGreen') => {
+    setToast({msg, type});
     setTimeout(() => setToast(null), 3000);
   };
 
@@ -283,9 +284,9 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
           <div className="fixed top-6 inset-x-0 z-50 flex justify-center pointer-events-none px-4">
             <motion.div 
               initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-              className="bg-[#3A8F3A] text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full"
+              className={`${toast.type === 'darkGreen' ? 'bg-[#3A6E3A]' : 'bg-[#3A8F3A]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
             >
-              {toast}
+              {toast.msg}
             </motion.div>
           </div>
         )}
@@ -386,7 +387,10 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
       {/* ── Action Cards ── */}
       <div className="grid grid-cols-2 gap-2 mb-2">
         <button 
-          onClick={() => onLogDate(todayStr)} 
+          onClick={() => {
+            if (onQuickLog) onQuickLog('green');
+            showToastMsg('Green logged! +10 XP +5 pts', 'darkGreen');
+          }} 
           className="bg-[#E8F4E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#B2D9B2] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
           <div className="text-[26px]">🟢</div>
           <div className="text-[11px] font-medium text-[#3A6E3A]">Green choice</div>
@@ -394,7 +398,10 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
         </button>
         
         <button 
-          onClick={() => onLogDate(todayStr)} 
+          onClick={() => {
+            if (onQuickLog) onQuickLog('red');
+            showToastMsg('Red logged — you got this!', 'darkGreen');
+          }} 
           className="bg-[#FDE8E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#F5B8B8] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
           <div className="text-[26px]">🔴</div>
           <div className="text-[11px] font-medium text-[#C04A4A]">Red choice</div>
