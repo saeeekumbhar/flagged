@@ -182,6 +182,7 @@ function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, 
 export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }: DashboardProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{id: string, icon: string, label: string, isUnlocked: boolean, msg: string} | null>(null);
+  const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
 
   const era = calculateEra(profile.flagScore);
   const eraConfig = getEraConfig(era, profile.flagScore);
@@ -262,6 +263,17 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
     }
   };
 
+  const handleStreakClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsStreakModalOpen(true);
+    
+    const claimedDate = localStorage.getItem('flagged_streak_claimed');
+    if (claimedDate !== todayStr) {
+      onAwardXP(30, 50, 'Streak bonus!');
+      localStorage.setItem('flagged_streak_claimed', todayStr);
+    }
+  };
+
   return (
     <div className="pb-8 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
 
@@ -337,10 +349,13 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
           </div>
 
           {/* Streak Badge */}
-          <div className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0">
+          <button 
+            onClick={handleStreakClick}
+            className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0 active:scale-95 transition-transform"
+          >
             <div className="text-[20px] font-medium text-[#854F0B] leading-none">{profile.streak}</div>
             <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
-          </div>
+          </button>
 
           {/* Score Ring */}
           <div className="relative w-[50px] h-[50px] pointer-events-auto shrink-0 -mr-1">
@@ -499,6 +514,37 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP }
                 {selectedBadge.icon}
               </div>
               <p className="text-[13px] text-[#1E1A16] font-medium text-center">{selectedBadge.msg}</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Streak Modal ── */}
+      <AnimatePresence>
+        {isStreakModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-auto">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/40" onClick={() => setIsStreakModalOpen(false)}
+            />
+            <motion.div 
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white w-full max-w-[420px] rounded-t-[24px] pb-8 pt-6 px-6 relative shadow-2xl flex flex-col items-center"
+            >
+              <button onClick={() => setIsStreakModalOpen(false)} className="absolute top-6 right-6 text-[#1E1A16] font-bold text-lg active:scale-90 transition-transform">×</button>
+              <div className="w-full flex items-center gap-2 mb-1">
+                <h3 className="text-[17px] font-bold text-[#1E1A16]">Streak reward!</h3>
+              </div>
+              <p className="w-full text-[13px] text-[#1E1A16] mb-8">You claimed your {profile.streak}-day streak bonus.</p>
+              
+              <div className="text-[50px] mb-6 drop-shadow-md">
+                🔥
+              </div>
+              
+              <div className="text-[20px] font-bold text-[#1E1A16] mb-1">
+                +50 pts <span className="text-[#A0988A] font-medium px-1">·</span> +30 XP
+              </div>
+              <p className="text-[13px] text-[#1E1A16] font-medium text-center">Keep going for the 30-day badge!</p>
             </motion.div>
           </div>
         )}
