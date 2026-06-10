@@ -77,6 +77,14 @@ function GrowthRing({ score }: { score: number }) {
   );
 }
 
+function getGreeting(name: string): string {
+  const hour = new Date().getHours();
+  const first = name.split(' ')[0];
+  if (hour < 12) return `Good morning, ${first} 🌅`;
+  if (hour < 17) return `Good afternoon, ${first} ☀️`;
+  return `Good evening, ${first} 🌙`;
+}
+
 function MonthlyCalendar({ logs, onLogDate }: { logs: Record<string, DailyLog>, onLogDate: (date: string) => void }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   
