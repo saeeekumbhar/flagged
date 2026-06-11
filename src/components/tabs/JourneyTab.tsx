@@ -32,12 +32,9 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
   const realToday = new Date();
   
   const recentLogs = Object.values(logs)
-    .filter(l => l.activities.length > 0 || l.notes)
+    .filter(l => l.transport || l.food || l.delivery || l.energyLaptop || l.energyAC || l.shopping)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5); // Just show the 5 most recent
-
-  const totalGreen = Object.values(logs).reduce((acc, log) => acc + log.activities.filter(a => !(a.activityId.includes('red') || a.activityId.includes('car') || a.activityId.includes('ac') || a.activityId.includes('delivery') || a.activityId.includes('major'))).reduce((sum, a) => sum + a.count, 0), 0);
-  const totalRed = Object.values(logs).reduce((acc, log) => acc + log.activities.filter(a => a.activityId.includes('red') || a.activityId.includes('car') || a.activityId.includes('ac') || a.activityId.includes('delivery') || a.activityId.includes('major')).reduce((sum, a) => sum + a.count, 0), 0);
 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
@@ -110,21 +107,21 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
               <div className="text-sm font-bold text-[#1A2315]">
                 {new Date(log.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {Object.values(log.activities.reduce((acc, a) => {
-                  acc[a.activityId] = acc[a.activityId] || { ...a, count: 0 };
-                  acc[a.activityId].count += a.count;
-                  return acc;
-                }, {} as Record<string, { activityId: string, count: number }>)).map((act, i) => {
-                  const isRed = act.activityId.includes('red') || act.activityId.includes('car') || act.activityId.includes('ac') || act.activityId.includes('delivery') || act.activityId.includes('major');
-                  return (
-                    <div key={i} className={`text-[11px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 ${isRed ? 'bg-[#FDECEE]/80 text-[#A03030]' : 'bg-[#EAF3EA]/80 text-[#1A2315]'}`}>
-                      <div className={`w-2 h-2 rounded-full ${isRed ? 'bg-[#D4614A]' : 'bg-[#889063]'}`} />
-                      <span className="capitalize">{act.activityId.replace('quick_', '').replace('_', ' ')}</span>
-                      <span className="opacity-60 ml-0.5">x{act.count}</span>
-                    </div>
-                  );
-                })}
+              <div className="flex flex-col gap-1.5 mt-1">
+                {log.transport && log.transport !== 'none' && <div className="text-xs text-[#1A2315]">🚶 Transport: <span className="capitalize font-bold">{log.transport}</span></div>}
+                {log.food && log.food !== 'none' && <div className="text-xs text-[#1A2315]">🍱 Food: <span className="capitalize font-bold">{log.food}</span></div>}
+                {log.delivery && <div className="text-xs text-[#1A2315]">🚚 Delivery: <span className="capitalize font-bold">{log.delivery}</span></div>}
+                {log.energyLaptop && log.energyLaptop !== 'none' && <div className="text-xs text-[#1A2315]">💻 Laptop: <span className="font-bold">{log.energyLaptop}</span></div>}
+                {log.energyAC && log.energyAC !== 'none' && <div className="text-xs text-[#1A2315]">❄️ AC: <span className="font-bold">{log.energyAC}</span></div>}
+                {log.shopping && log.shopping !== 'no' && <div className="text-xs text-[#1A2315]">🛍️ Shopping: <span className="capitalize font-bold">{log.shopping}</span></div>}
+                
+                {(!log.transport && !log.food && !log.delivery && !log.energyLaptop && !log.energyAC && !log.shopping) && (
+                  <div className="text-xs text-[#4C3D19] italic">No check-in recorded</div>
+                )}
+                
+                <div className="text-xs font-bold mt-2 text-[#354024] bg-black/5 self-start px-3 py-1 rounded-full">
+                  Flag Impact: {log.totalFlagImpact > 0 ? '+' : ''}{log.totalFlagImpact}
+                </div>
               </div>
               {log.notes && <div className="text-xs italic text-[#4C3D19] mt-1">"{log.notes}"</div>}
             </div>
@@ -138,16 +135,6 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
       {/* Trends Section */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <h3 className="text-sm font-bold drop-shadow-md mb-3 px-1" style={{ color: '#FFFFFF' }}>All-Time Trends</h3>
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="premium-glass rounded-[24px] p-5 flex flex-col justify-center border-l-4 border-l-[#889063]">
-            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-bold mb-1">Green Flags</div>
-            <div className="text-3xl font-bold text-[#1A2315] leading-none">{totalGreen}</div>
-          </div>
-          <div className="premium-glass rounded-[24px] p-5 flex flex-col justify-center border-l-4 border-l-[#D4614A]">
-            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-bold mb-1">Red Flags</div>
-            <div className="text-3xl font-bold text-[#D4614A] leading-none">{totalRed}</div>
-          </div>
-        </div>
         <div className="premium-glass rounded-[24px] p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-2xl drop-shadow-sm">🔥</div>

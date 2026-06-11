@@ -58,6 +58,11 @@ export default function App() {
           console.warn(`Migrated legacy multi-select in log ${date} for ${key}: "${val}" -> "${fixed}"`);
         }
       });
+      if (log.notes === 'Mock entry') {
+        migrated = true;
+        log.notes = '';
+        console.warn(`Cleared mock entry notes in log ${date}`);
+      }
     });
     if (migrated) {
       localStorage.setItem('flagged_logs', JSON.stringify(l));
