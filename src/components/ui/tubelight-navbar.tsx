@@ -1,0 +1,76 @@
+import React, { useEffect, useState } from "react"
+import { motion } from "motion/react"
+import { LucideIcon } from "lucide-react"
+import { cn } from "../../lib/utils"
+
+interface NavItem {
+  name: string
+  id: string
+  icon: LucideIcon
+}
+
+interface NavBarProps {
+  items: NavItem[]
+  activeTab: string
+  onTabChange: (id: any) => void
+  className?: string
+}
+
+export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  return (
+    <div className={cn("absolute bottom-0 left-0 right-0 h-16 premium-glass border-t border-white/60 flex justify-around items-center px-2 pb-1 z-50 shadow-[0_-8px_32px_rgba(0,0,0,0.05)] rounded-t-[32px]", className)}>
+      {items.map((item) => {
+        const Icon = item.icon
+        const isActive = activeTab === item.id
+
+        return (
+          <button
+            key={item.id}
+            onClick={() => onTabChange(item.id)}
+            className="relative flex flex-col items-center justify-center flex-1 h-full active:scale-95 transition-transform"
+          >
+            {/* The icon */}
+            <div className={cn("text-xl mb-0.5 transition-all z-10", isActive ? "scale-110 drop-shadow-sm opacity-100 text-[#354024]" : "opacity-40 scale-90 text-[#354024]")}>
+              <Icon size={20} strokeWidth={2.5} />
+            </div>
+            
+            {/* The text label */}
+            <div className={cn("text-[9px] font-bold transition-colors z-10", isActive ? "text-[#354024]" : "text-[#354024]/40")}>
+              {item.name}
+            </div>
+
+            {/* The Tubelight Animated Glow */}
+            {isActive && (
+              <motion.div
+                layoutId="lamp"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#889063] rounded-b-full shadow-[0_2px_8px_rgba(136,144,99,0.8)]"
+                initial={false}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                }}
+              >
+                <div className="absolute w-12 h-6 bg-[#889063]/30 rounded-full blur-md -top-2 -left-2 pointer-events-none" />
+                <div className="absolute w-8 h-6 bg-[#889063]/30 rounded-full blur-md -top-1 pointer-events-none" />
+                <div className="absolute w-4 h-4 bg-[#889063]/30 rounded-full blur-sm top-0 left-2 pointer-events-none" />
+              </motion.div>
+            )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}

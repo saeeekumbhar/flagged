@@ -25,31 +25,49 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
     let carbonEstimate = 0;
 
     // Scoring Logic
-    if (transport === 'walk' || transport === 'cycle') { flagImpact += 10; carbonEstimate += 0.5; }
-    if (transport === 'bus' || transport === 'metro') { flagImpact += 5; carbonEstimate += 2; }
-    if (transport === 'auto') { flagImpact -= 2; carbonEstimate += 5; }
-    if (transport === 'car' || transport === 'cab') { flagImpact -= 5; carbonEstimate += 12; }
+    transport.split(',').forEach(v => {
+      if (!v) return;
+      if (v === 'walk' || v === 'cycle') { flagImpact += 10; carbonEstimate += 0.5; }
+      if (v === 'bus' || v === 'metro') { flagImpact += 5; carbonEstimate += 2; }
+      if (v === 'auto') { flagImpact -= 2; carbonEstimate += 5; }
+      if (v === 'car' || v === 'cab') { flagImpact -= 5; carbonEstimate += 12; }
+    });
 
-    if (food === 'mess' || food === 'home') { flagImpact += 5; carbonEstimate += 1.5; }
-    if (food === 'mixed') { flagImpact += 2; carbonEstimate += 3; }
-    if (food === 'nonveg') { flagImpact -= 5; carbonEstimate += 8; }
+    food.split(',').forEach(v => {
+      if (!v) return;
+      if (v === 'mess' || v === 'home') { flagImpact += 5; carbonEstimate += 1.5; }
+      if (v === 'mixed') { flagImpact += 2; carbonEstimate += 3; }
+      if (v === 'nonveg') { flagImpact -= 5; carbonEstimate += 8; }
+    });
 
-    if (delivery === 'once') { flagImpact -= 3; carbonEstimate += 3; }
-    if (delivery === 'multiple') { flagImpact -= 8; carbonEstimate += 8; }
-    if (delivery === 'no') { flagImpact += 5; carbonEstimate += 0; }
+    delivery.split(',').forEach(v => {
+      if (!v) return;
+      if (v === 'once') { flagImpact -= 3; carbonEstimate += 3; }
+      if (v === 'multiple') { flagImpact -= 8; carbonEstimate += 8; }
+      if (v === 'no') { flagImpact += 5; carbonEstimate += 0; }
+    });
 
-    if (energyLaptop === '<2h') { flagImpact += 5; carbonEstimate += 0.2; }
-    if (energyLaptop === '8+h') { flagImpact -= 2; carbonEstimate += 1; }
-    
-    if (energyAC === 'none') { flagImpact += 10; carbonEstimate += 0; }
-    if (energyAC === '<2h') { flagImpact += 0; carbonEstimate += 2; }
-    if (energyAC === '2-6h') { flagImpact -= 5; carbonEstimate += 6; }
-    if (energyAC === '6+h') { flagImpact -= 10; carbonEstimate += 12; }
+    energyLaptop.split(',').forEach(v => {
+      if (!v) return;
+      if (v === '<2h') { flagImpact += 5; carbonEstimate += 0.2; }
+      if (v === '8+h') { flagImpact -= 2; carbonEstimate += 1; }
+    });
 
-    if (shopping === 'no') { flagImpact += 5; carbonEstimate += 0; }
-    if (shopping === 'small') { flagImpact += 0; carbonEstimate += 2; }
-    if (shopping === 'medium') { flagImpact -= 2; carbonEstimate += 5; }
-    if (shopping === 'large') { flagImpact -= 8; carbonEstimate += 15; }
+    energyAC.split(',').forEach(v => {
+      if (!v) return;
+      if (v === 'none') { flagImpact += 10; carbonEstimate += 0; }
+      if (v === '<2h') { flagImpact += 0; carbonEstimate += 2; }
+      if (v === '2-6h') { flagImpact -= 5; carbonEstimate += 6; }
+      if (v === '6+h') { flagImpact -= 10; carbonEstimate += 12; }
+    });
+
+    shopping.split(',').forEach(v => {
+      if (!v) return;
+      if (v === 'no') { flagImpact += 5; carbonEstimate += 0; }
+      if (v === 'small') { flagImpact += 0; carbonEstimate += 2; }
+      if (v === 'medium') { flagImpact -= 2; carbonEstimate += 5; }
+      if (v === 'large') { flagImpact -= 8; carbonEstimate += 15; }
+    });
 
     // Add back legacy logic score if any (to preserve previous arbitrary points)
     let legacyImpact = 0;
@@ -84,11 +102,25 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
 
   const isHostelier = profile.userType === 'hostelier';
 
+  const toggleSelection = (value: string, current: string, setter: (v: string) => void) => {
+    const list = current ? current.split(',').filter(Boolean) : [];
+    if (list.includes(value)) {
+      setter(list.filter(v => v !== value).join(','));
+    } else {
+      // If "no" is selected, clear everything else. If something else is selected, remove "no".
+      if (value === 'no' || value === 'none') {
+        setter(value);
+      } else {
+        setter([...list.filter(v => v !== 'no' && v !== 'none'), value].join(','));
+      }
+    }
+  };
+
   const SelectionChip = ({ label, value, current, onChange }: { label: string, value: string, current: string, onChange: (v: string) => void }) => {
-    const isSelected = current === value;
+    const isSelected = current.split(',').filter(Boolean).includes(value);
     return (
       <button
-        onClick={() => onChange(value)}
+        onClick={() => toggleSelection(value, current, onChange)}
         className={`px-4 py-3 rounded-[20px] text-sm font-bold transition-all ${
           isSelected 
             ? 'bg-[#354024] text-white shadow-md scale-[1.02]' 
@@ -205,10 +237,19 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
         {/* Optional Reflection */}
         <div className="mb-8 p-5 premium-glass rounded-[24px]">
           <h3 className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest text-center mb-4">How was your day?</h3>
-          <div className="flex justify-around">
-            <button onClick={() => setReflection('rough')} className={`text-3xl transition-transform ${reflection === 'rough' ? 'scale-125 drop-shadow-md' : 'opacity-50 grayscale'}`}>🚩</button>
-            <button onClick={() => setReflection('mixed')} className={`text-3xl transition-transform ${reflection === 'mixed' ? 'scale-125 drop-shadow-md' : 'opacity-50 grayscale'}`}>🟡</button>
-            <button onClick={() => setReflection('green')} className={`text-3xl transition-transform ${reflection === 'green' ? 'scale-125 drop-shadow-md' : 'opacity-50 grayscale'}`}>🟢</button>
+          <div className="flex justify-around items-end">
+            <div className="flex flex-col items-center gap-2">
+              <button onClick={() => setReflection('rough')} className={`text-3xl transition-transform ${reflection === 'rough' ? 'scale-125 drop-shadow-md' : 'opacity-40 scale-95'}`}>🚩</button>
+              <span className={`text-[10px] font-bold uppercase tracking-widest transition-opacity ${reflection === 'rough' ? 'text-[#D4614A] opacity-100' : 'text-[#4C3D19] opacity-40'}`}>Rough</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <button onClick={() => setReflection('mixed')} className={`text-3xl transition-transform ${reflection === 'mixed' ? 'scale-125 drop-shadow-md' : 'opacity-40 scale-95'}`}>🟡</button>
+              <span className={`text-[10px] font-bold uppercase tracking-widest transition-opacity ${reflection === 'mixed' ? 'text-[#D4A574] opacity-100' : 'text-[#4C3D19] opacity-40'}`}>Okay</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <button onClick={() => setReflection('green')} className={`text-3xl transition-transform ${reflection === 'green' ? 'scale-125 drop-shadow-md' : 'opacity-40 scale-95'}`}>🟢</button>
+              <span className={`text-[10px] font-bold uppercase tracking-widest transition-opacity ${reflection === 'green' ? 'text-[#889063] opacity-100' : 'text-[#4C3D19] opacity-40'}`}>Great</span>
+            </div>
           </div>
         </div>
 

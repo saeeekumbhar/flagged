@@ -40,10 +40,12 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
       'skip': 'Skipped Mess', 'outside': 'Ate Outside'
     };
 
+    const displayValue = value.split(',').filter(Boolean).map(v => formatMap[v] || v).join(', ');
+
     return (
       <div className="flex justify-between items-center py-3 border-b border-black/5 last:border-0">
         <span className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest">{label}</span>
-        <span className="text-sm font-bold text-[#1A2315] capitalize">{formatMap[value] || value}</span>
+        <span className="text-sm font-bold text-[#1A2315] capitalize text-right ml-4 leading-tight">{displayValue}</span>
       </div>
     );
   };
