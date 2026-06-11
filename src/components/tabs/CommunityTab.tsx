@@ -49,39 +49,39 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
       <h2 className="text-display text-2xl font-bold text-[#354024] px-1">Community</h2>
 
       {/* ── Daily Challenges ── */}
-      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-5 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-sm font-bold text-[#354024]">Active Challenges</h3>
-          <span className="text-[10px] text-[#889063] font-bold bg-[#CFBB99] px-2 py-1 rounded-md">2 New</span>
+          <h3 className="text-sm font-bold text-[#1A2315]">Active Challenges</h3>
+          <span className="text-[10px] text-[#889063] font-bold bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">2 New</span>
         </div>
         
         {/* Challenge 1 */}
-        <div className="mb-4 cursor-pointer active:scale-[0.98] transition-transform bg-[#E5D7C4] p-3 rounded-xl border border-[#CFBB99]" onClick={() => handleChallengeClick('ch1', 1, 20)}>
+        <div className="mb-4 cursor-pointer active:scale-[0.98] transition-transform premium-glass p-3 rounded-[20px]" onClick={() => handleChallengeClick('ch1', 1, 20)}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-[#CFBB99] rounded-xl flex items-center justify-center text-xl shrink-0 border border-[#BEE0BE]">🚌</div>
+            <div className="w-10 h-10 bg-white/40 rounded-xl flex items-center justify-center text-xl shrink-0 border border-white/60">🚌</div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-bold text-[#354024] truncate">Use public transport</div>
+              <div className="text-[13px] font-bold text-[#1A2315] truncate">Use public transport</div>
               <div className="text-[11px] text-[#4C3D19] mt-0.5 truncate">How'd you get here? Bus = green flag.</div>
             </div>
-            <div className="text-[11px] font-bold text-[#4C3D19] bg-[#FFF8E8] px-2 py-1 rounded-md">+20 XP</div>
+            <div className="text-[11px] font-bold text-[#889063] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+20 XP</div>
           </div>
-          <div className="h-2 bg-[#CFBB99] rounded-full overflow-hidden mb-1.5">
+          <div className="h-2 bg-black/5 rounded-full overflow-hidden mb-1.5 border border-black/5">
             <div className="h-full bg-[#889063] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch1'] || 0) / 1) * 100)}%` }} />
           </div>
           <div className="text-[10px] text-[#4C3D19] font-semibold text-right">{Math.min(1, challengeProgress['ch1'] || 0)} / 1</div>
         </div>
 
         {/* Challenge 2 */}
-        <div className="cursor-pointer active:scale-[0.98] transition-transform bg-[#E5D7C4] p-3 rounded-xl border border-[#CFBB99]" onClick={() => handleChallengeClick('ch2', 1, 15)}>
+        <div className="cursor-pointer active:scale-[0.98] transition-transform premium-glass p-3 rounded-[20px]" onClick={() => handleChallengeClick('ch2', 1, 15)}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-[#CFBB99] rounded-xl flex items-center justify-center text-xl shrink-0 border border-[#BEE0BE]">🥗</div>
+            <div className="w-10 h-10 bg-white/40 rounded-xl flex items-center justify-center text-xl shrink-0 border border-white/60">🥗</div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-bold text-[#354024] truncate">Eat a green meal</div>
+              <div className="text-[13px] font-bold text-[#1A2315] truncate">Eat a green meal</div>
               <div className="text-[11px] text-[#4C3D19] mt-0.5 truncate">Mess food hits different for the planet tbh.</div>
             </div>
-            <div className="text-[11px] font-bold text-[#4C3D19] bg-[#FFF8E8] px-2 py-1 rounded-md">+15 XP</div>
+            <div className="text-[11px] font-bold text-[#889063] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+15 XP</div>
           </div>
-          <div className="h-2 bg-[#CFBB99] rounded-full overflow-hidden mb-1.5">
+          <div className="h-2 bg-black/5 rounded-full overflow-hidden mb-1.5 border border-black/5">
             <div className="h-full bg-[#889063] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch2'] || 0) / 1) * 100)}%` }} />
           </div>
           <div className="text-[10px] text-[#4C3D19] font-semibold text-right">{Math.min(1, challengeProgress['ch2'] || 0)} / 1</div>
@@ -89,26 +89,26 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
       </motion.div>
 
       {/* ── Friend Leaderboard ── */}
-      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-5 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-4">Friend Rankings</h3>
+      <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-4">Friend Rankings</h3>
         <div className="flex flex-col gap-2">
           {friends.map((friend, index) => (
-            <div key={friend.name} className={`flex items-center justify-between p-3 rounded-xl border ${friend.isMe ? 'bg-[#CFBB99] border-[#BEE0BE]' : 'bg-[#E5D7C4] border-[#CFBB99]'}`}>
+            <div key={friend.name} className={`flex items-center justify-between p-3 rounded-[20px] ${friend.isMe ? 'bg-white/60 border border-white/80 shadow-sm' : 'premium-glass'}`}>
               <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${index === 0 ? 'bg-[#CFBB99] text-[#4C3D19]' : index === 1 ? 'bg-[#E0E0E0] text-[#606060]' : index === 2 ? 'bg-[#D4A574] text-[#4C3D19]' : 'bg-transparent text-[#4C3D19]'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${index === 0 ? 'bg-[#889063] text-white shadow-sm' : index === 1 ? 'bg-black/10 text-[#4C3D19]' : index === 2 ? 'bg-[#D4A574] text-white shadow-sm' : 'bg-transparent text-[#4C3D19]'}`}>
                   {index + 1}
                 </div>
                 <span className={`text-[13px] ${friend.isMe ? 'font-bold text-[#354024]' : 'font-medium text-[#354024]'}`}>
                   {friend.name} {friend.isMe && '(You)'}
                 </span>
               </div>
-              <span className={`text-[13px] font-bold ${friend.score >= 70 ? 'text-[#889063]' : friend.score <= 40 ? 'text-[#C04A4A]' : 'text-[#D4A574]'}`}>
+              <span className={`text-[13px] font-bold ${friend.score >= 70 ? 'text-[#889063]' : friend.score <= 40 ? 'text-[#D4614A]' : 'text-[#D4A574]'}`}>
                 {friend.score} pts
               </span>
             </div>
           ))}
         </div>
-        <button className="w-full mt-4 py-3 rounded-xl border border-[#CFBB99] text-xs font-bold text-[#354024] active:bg-[#F4F1EC] transition-colors">
+        <button className="w-full mt-4 py-4 rounded-[20px] bg-white/40 border border-white/60 text-[13px] font-bold text-[#1A2315] active:scale-95 transition-transform shadow-sm">
           Invite Friends
         </button>
       </motion.div>

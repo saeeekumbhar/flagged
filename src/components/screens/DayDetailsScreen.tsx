@@ -89,10 +89,10 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
     return (
       <button
         onClick={() => onChange(value)}
-        className={`px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+        className={`px-4 py-3 rounded-[20px] text-sm font-bold transition-all ${
           isSelected 
-            ? 'bg-[#889063] text-[#E5D7C4] shadow-md border-transparent scale-[1.02]' 
-            : 'bg-[#E5D7C4]/60 text-[#354024] border border-[#CFBB99] opacity-80 active:scale-95'
+            ? 'bg-[#354024] text-white shadow-md scale-[1.02]' 
+            : 'premium-glass text-[#354024] active:scale-95'
         }`}
       >
         {label}
@@ -102,7 +102,7 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 bg-[#E5D7C4] overflow-y-auto no-scrollbar pointer-events-auto"
+      className="absolute inset-0 z-50 bg-white/70 backdrop-blur-3xl overflow-y-auto no-scrollbar pointer-events-auto"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
@@ -111,10 +111,10 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
       <div className="max-w-[420px] mx-auto min-h-[100dvh] flex flex-col p-6 pb-24">
         
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 mt-2">
           <button
             onClick={onCancel}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#354024] bg-white/40 backdrop-blur-md border border-[#CFBB99] active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[#354024] premium-pill active:scale-95 transition-transform"
           >
             ←
           </button>
@@ -203,8 +203,8 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
         </div>
 
         {/* Optional Reflection */}
-        <div className="mb-8 p-5 bg-white/40 backdrop-blur-xl border border-[#CFBB99] rounded-[20px]">
-          <h3 className="text-sm font-bold text-[#4C3D19] uppercase tracking-widest text-center mb-4">How was your day?</h3>
+        <div className="mb-8 p-5 premium-glass rounded-[24px]">
+          <h3 className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest text-center mb-4">How was your day?</h3>
           <div className="flex justify-around">
             <button onClick={() => setReflection('rough')} className={`text-3xl transition-transform ${reflection === 'rough' ? 'scale-125 drop-shadow-md' : 'opacity-50 grayscale'}`}>🚩</button>
             <button onClick={() => setReflection('mixed')} className={`text-3xl transition-transform ${reflection === 'mixed' ? 'scale-125 drop-shadow-md' : 'opacity-50 grayscale'}`}>🟡</button>
@@ -217,7 +217,7 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
           <button
             onClick={handleSave}
             disabled={!transport && !food && !delivery && !energyAC && !shopping}
-            className="w-full py-4 bg-[#354024] text-[#E5D7C4] rounded-[16px] font-bold text-base shadow-md active:scale-[0.98] transition-transform disabled:opacity-50"
+            className="w-full py-[18px] bg-[#354024] text-white rounded-full font-bold text-[15px] shadow-[0_8px_30px_rgba(53,64,36,0.3)] active:scale-[0.98] transition-transform disabled:opacity-30 disabled:shadow-none"
           >
             Complete Check-In
           </button>

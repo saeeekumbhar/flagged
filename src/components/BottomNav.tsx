@@ -16,7 +16,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   ];
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-16 bg-[#E5D7C4]/60 backdrop-blur-xl border-t border-[#CFBB99]/50 flex justify-around items-center px-2 pb-1 z-50 shadow-[0_-4px_20px_rgba(30,26,22,0.05)]">
+    <div className="absolute bottom-0 left-0 right-0 h-16 premium-glass border-t border-white/60 flex justify-around items-center px-2 pb-1 z-50 shadow-[0_-8px_32px_rgba(0,0,0,0.05)] rounded-t-[32px]">
       {tabs.map(tab => {
         const isActive = activeTab === tab.id;
         return (
@@ -25,10 +25,10 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             onClick={() => onTabChange(tab.id)}
             className="flex flex-col items-center justify-center flex-1 h-full active:scale-95 transition-transform"
           >
-            <div className={`text-xl mb-0.5 transition-all ${isActive ? 'scale-110 drop-shadow-md opacity-100' : 'opacity-50 grayscale scale-90'}`}>
+            <div className={`text-xl mb-0.5 transition-all ${isActive ? 'scale-110 drop-shadow-sm opacity-100 text-[#354024]' : 'opacity-40 grayscale scale-90 text-[#354024]'}`}>
               {tab.icon}
             </div>
-            <div className={`text-[9px] font-bold transition-colors ${isActive ? 'text-[#889063]' : 'text-[#4C3D19]'}`}>
+            <div className={`text-[9px] font-bold transition-colors ${isActive ? 'text-[#354024]' : 'text-[#354024]/40'}`}>
               {tab.label}
             </div>
           </button>

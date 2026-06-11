@@ -40,7 +40,7 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
 
       {/* Weekly Roast Card */}
       {roast ? (
-        <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">🔥</span>
             <h3 className="text-[13px] font-bold text-[#4C3D19] uppercase tracking-wider">This Week's Roast</h3>
@@ -60,13 +60,13 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
           </div>
         </motion.div>
       ) : (
-        <div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99] text-center text-[#4C3D19]">
+        <div className="premium-glass rounded-[32px] p-6 text-center text-[#4C3D19] font-bold">
           Log some activities to receive your first roast!
         </div>
       )}
 
       {/* Best Habit Card */}
-      <motion.div className="bg-gradient-to-br from-[#FFF5D1] to-[#FFE898] rounded-[24px] p-6 shadow-sm border border-[#CFBB99] relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <motion.div className="bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-3xl rounded-[32px] p-6 shadow-lg shadow-black/5 border border-white/60 relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="flex items-start gap-4 relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-white/60 backdrop-blur-xl/50 flex items-center justify-center text-3xl shadow-inner border border-white/50 shrink-0">
             {topHabitEmoji}
@@ -81,16 +81,16 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
       </motion.div>
 
       {/* Recommendations / Chat Mockup */}
-      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+      <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <h3 className="text-sm font-bold text-[#354024] mb-4">Quick Questions</h3>
         <div className="flex flex-col gap-2">
-          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
+          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
             "How can I improve my transport score?"
           </button>
-          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
+          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
             "What's the carbon footprint of my AC?"
           </button>
-          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
+          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
             "Suggest a weekend challenge for me."
           </button>
         </div>

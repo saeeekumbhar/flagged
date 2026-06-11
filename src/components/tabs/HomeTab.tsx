@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
@@ -10,12 +10,11 @@ interface HomeTabProps {
   profile: UserProfile;
   logs: Record<string, DailyLog>;
   onAwardXP: (xp: number, coins: number, reason: string) => void;
-  onQuickLog: (type: 'green' | 'red') => void;
   onNavigate: (state: NavState) => void;
   showToastMsg: (msg: string, type?: 'green'|'darkGreen') => void;
 }
 
-export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, showToastMsg }: HomeTabProps) {
+export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) {
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
 
   const era = calculateEra(profile.flagScore);
@@ -62,153 +61,149 @@ export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, show
   if ((activityCounts['food_home'] || 0) >= 1) accessories.push('🍃');
 
   return (
-    <div className="pb-20 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
+    <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
       
       {/* ── Header (HUD) ── */}
       <motion.div className="flex items-center justify-between pl-1 mb-2"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Logo size="sm" />
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-xl rounded-full px-3 py-1 border border-[#CFBB99] text-xs font-semibold text-[#4C3D19] shadow-sm">
+          <div className="flex items-center gap-1 premium-pill px-3 py-1.5 text-xs font-bold text-[#1A2315]">
             <span>🟡</span> {profile.coins || 0} pts
           </div>
           <button 
             onClick={() => onNavigate({ type: 'tab', tab: 'profile' })}
-            className="w-8 h-8 rounded-full bg-white/60 backdrop-blur-xl border border-[#CFBB99] flex items-center justify-center shadow-sm active:scale-95 transition-transform text-[#354024]"
+            className="w-8 h-8 premium-pill flex items-center justify-center active:scale-95 transition-transform"
           >
-            👤
+            <span className="text-[#1A2315]">👤</span>
           </button>
         </div>
       </motion.div>
 
       {/* ── Era & Level Card ── */}
-      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[16px] p-[13px] shadow-sm border border-[#CFBB99] relative overflow-hidden"
+      <motion.div className="premium-glass rounded-[32px] p-5 relative overflow-hidden"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}>
-        <div className="flex justify-between items-center mb-2.5">
+        <div className="flex justify-between items-center mb-3">
           <div>
-            <div className="text-[13px] font-bold text-[#354024]">{era}</div>
-            <div className="text-[10px] text-[#4C3D19] mt-0.5">Every green flag grows your tree.</div>
+            <div className="text-lg font-bold text-[#1A2315] tracking-wide">{era}</div>
+            <div className="text-[11px] text-[#4C3D19] mt-0.5 font-medium">Every green flag grows your tree.</div>
           </div>
-          <div className="bg-[#889063] text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
+          <div className="bg-[#889063] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(136,144,99,0.3)]">
             Lv {profile.level || 1}
           </div>
         </div>
-        <div className="h-2.5 bg-[#CFBB99] rounded-full overflow-hidden mb-1">
+        <div className="h-2.5 bg-black/5 rounded-full overflow-hidden mb-1.5 border border-black/5">
           <div className="h-full bg-[#889063] rounded-full transition-all duration-1000 ease-out" style={{ width: `${((profile.xp || 0) / 1000) * 100}%` }} />
         </div>
-        <div className="flex justify-between text-[10px] text-[#4C3D19] font-medium">
+        <div className="flex justify-between text-[10px] text-[#4C3D19] font-bold tracking-wider">
           <span>{profile.xp || 0} XP</span>
           <span>1000 XP</span>
         </div>
       </motion.div>
 
-      {/* ── Flag Avatar Status Card ── */}
-      <motion.div 
-        className="w-full text-left bg-white/60 backdrop-blur-xl rounded-[16px] p-4 shadow-sm border border-[#CFBB99] relative overflow-hidden flex items-center justify-between mb-2"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-        <div className="flex items-center gap-4 relative z-10 flex-1 min-w-0 pr-3">
-          <div className="shrink-0 w-[72px] h-[72px]">
-             <AvatarDisplay score={profile.flagScore} size={72} accessories={accessories} />
+      {/* ── Asymmetrical Grid: Avatar & Streak ── */}
+      <div className="grid grid-cols-3 gap-3 mb-1">
+        <motion.div 
+          className="col-span-2 premium-glass rounded-[32px] p-4 flex flex-col justify-center relative overflow-hidden"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="shrink-0 w-16 h-16 bg-white/40 rounded-full flex items-center justify-center border border-white/60 shadow-inner">
+               <AvatarDisplay score={profile.flagScore} size={64} accessories={accessories} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-bold text-[#1A2315] truncate mb-0.5 tracking-wide">{flagEvolution.stageName}</p>
+              <p className="text-[11px] font-bold text-[#889063] mb-2 uppercase tracking-wider">Score: {profile.flagScore}</p>
+              {flagEvolution.nextThreshold ? (
+                 <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden border border-black/5">
+                   <div className="h-full bg-[#889063] rounded-full" style={{ width: `${Math.min(100, (profile.flagScore / flagEvolution.nextThreshold) * 100)}%` }} />
+                 </div>
+              ) : (
+                 <p className="text-[11px] font-bold text-[#889063]">Legendary Max! 🌟</p>
+              )}
+            </div>
           </div>
-          <div className="flex-1 min-w-0 flex flex-col justify-center">
-            <p className="text-[14px] font-bold text-[#354024] truncate mb-0.5">{flagEvolution.stageName}</p>
-            <p className="text-[12px] font-bold text-[#889063] mb-1.5">Score: {profile.flagScore}</p>
-            
-            {flagEvolution.nextThreshold ? (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between text-[9px] font-semibold text-[#4C3D19] pr-1">
-                  <span>Next: {flagEvolution.nextThreshold}</span>
-                  <span>{flagEvolution.pointsRemaining} left</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#CFBB99] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#889063] rounded-full" 
-                       style={{ width: `${Math.min(100, (profile.flagScore / flagEvolution.nextThreshold) * 100)}%` }} />
-                </div>
-              </div>
-            ) : (
-              <p className="text-[11px] font-bold text-[#CFBB99]">Legendary Max! 🌟</p>
-            )}
-          </div>
-        </div>
+        </motion.div>
 
-        <button 
+        <motion.button 
           onClick={handleStreakClick}
-          className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#CFBB99] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0 active:scale-95 transition-transform"
-        >
-          <div className="text-[20px] font-medium text-[#4C3D19] leading-none">{profile.streak}</div>
-          <div className="text-[9px] text-[#4C3D19] mt-0.5">day streak</div>
-        </button>
-      </motion.div>
-
-      {/* ── Flag Forecast Card ── */}
-      <motion.div 
-        className="bg-gradient-to-r from-[#E5D7C4] to-[#E5D7C4] rounded-[16px] p-3.5 mb-2 shadow-sm border border-[#CFBB99] flex items-center gap-3"
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
-      >
-        <div className="text-2xl drop-shadow-sm shrink-0">🔮</div>
-        <div className="flex-1">
-          <h4 className="text-[10px] font-bold text-[#4C3D19] uppercase tracking-wider mb-0.5">Forecast</h4>
-          <p className="text-xs font-bold text-[#354024] leading-tight mb-0.5">{forecast.prediction}</p>
-          <p className="text-[10px] text-[#889063] leading-tight">{forecast.opportunity}</p>
-        </div>
-      </motion.div>
-
-      {/* ── Daily Stats ── */}
-      <div className="grid grid-cols-2 gap-2 mb-2">
-        <div className="bg-[#E5D7C4] rounded-[12px] flex flex-col items-center justify-center py-2.5 px-2 text-center h-[60px]">
-          {greenToday === 0 ? (
-            <span className="text-[10px] text-[#4C3D19] font-medium leading-tight">Your day is unwritten.<br/>Make it green.</span>
-          ) : (
-            <>
-              <span className="text-[20px] font-medium text-[#354024] leading-none">{greenToday}</span>
-              <span className="text-[10px] text-[#4C3D19] mt-0.5">green today</span>
-            </>
-          )}
-        </div>
-        <div className="bg-[#E5D7C4] rounded-[12px] flex flex-col items-center justify-center py-2.5 px-2 text-center h-[60px]">
-          {redToday === 0 && greenToday === 0 ? (
-             <span className="text-[10px] text-[#4C3D19] font-medium leading-tight">No red flags.<br/>Keep it up!</span>
-          ) : (
-            <>
-              <span className="text-[20px] font-medium text-[#354024] leading-none">{redToday}</span>
-              <span className="text-[10px] text-[#4C3D19] mt-0.5">red today</span>
-            </>
-          )}
-        </div>
+          className="col-span-1 premium-glass rounded-[32px] p-4 flex flex-col items-center justify-center active:scale-95 transition-transform"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
+          <div className="text-3xl mb-1 drop-shadow-sm">🔥</div>
+          <div className="text-[26px] font-bold text-[#1A2315] leading-none tracking-tight">{profile.streak}</div>
+          <div className="text-[8px] font-bold text-[#4C3D19] uppercase tracking-widest mt-1">Streak</div>
+        </motion.button>
       </div>
 
-      {/* ── Action Cards ── */}
-      <div className="mb-2">
+      {/* ── Forecast & Daily Stats ── */}
+      <div className="grid grid-cols-2 gap-3 mb-2">
+        <motion.div 
+          className="col-span-2 premium-glass rounded-[24px] p-4 flex items-center gap-4"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          <div className="text-3xl drop-shadow-sm shrink-0">🔮</div>
+          <div className="flex-1">
+            <h4 className="text-[9px] font-bold text-[#4C3D19] uppercase tracking-widest mb-1">Forecast</h4>
+            <p className="text-[13px] font-bold text-[#1A2315] leading-tight mb-1">{forecast.prediction}</p>
+            <p className="text-[11px] text-[#889063] leading-tight font-medium">{forecast.opportunity}</p>
+          </div>
+        </motion.div>
+        
+        <motion.div className="premium-glass rounded-full aspect-square flex flex-col items-center justify-center text-center p-2 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25 }}>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#889063]/10 to-transparent pointer-events-none" />
+          {greenToday === 0 ? (
+            <span className="text-[11px] text-[#4C3D19] font-medium leading-tight">Your day is<br/>unwritten.</span>
+          ) : (
+            <>
+              <span className="text-4xl font-bold text-[#889063] drop-shadow-sm tracking-tighter">{greenToday}</span>
+              <span className="text-[9px] text-[#889063] font-bold uppercase tracking-widest mt-1">Green</span>
+            </>
+          )}
+        </motion.div>
+        
+        <motion.div className="premium-glass rounded-full aspect-square flex flex-col items-center justify-center text-center p-2 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#D4614A]/10 to-transparent pointer-events-none" />
+          {redToday === 0 && greenToday === 0 ? (
+             <span className="text-[11px] text-[#4C3D19] font-medium leading-tight">No red flags.<br/>Keep it up!</span>
+          ) : (
+            <>
+              <span className="text-4xl font-bold text-[#D4614A] drop-shadow-sm tracking-tighter">{redToday}</span>
+              <span className="text-[9px] text-[#D4614A] font-bold uppercase tracking-widest mt-1">Red</span>
+            </>
+          )}
+        </motion.div>
+      </div>
+
+      {/* ── Action CTA ── */}
+      <motion.div className="mt-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35 }}>
         {logs[todayStr] ? (
           <button 
             onClick={() => onNavigate({ type: 'day_summary', date: todayStr })}
-            className="w-full bg-[#E5D7C4]/60 backdrop-blur-xl rounded-[16px] py-[16px] px-[16px] border border-[#CFBB99] active:scale-95 transition-transform pointer-events-auto flex items-center justify-between"
+            className="w-full premium-glass rounded-full py-[20px] px-6 active:scale-95 transition-transform flex items-center justify-between group"
           >
-            <div className="flex items-center gap-3">
-              <div className="text-[28px] drop-shadow-sm">📝</div>
+            <div className="flex items-center gap-4">
+              <div className="text-2xl drop-shadow-sm">📝</div>
               <div className="text-left">
-                <div className="text-[14px] font-bold text-[#354024]">Day Logged</div>
-                <div className="text-[11px] text-[#4C3D19] mt-0.5">Tap to view summary</div>
+                <div className="text-[15px] font-bold text-[#1A2315] group-hover:text-[#889063] transition-colors tracking-wide">Day Logged</div>
+                <div className="text-[11px] text-[#4C3D19] font-medium mt-0.5">Tap to view summary</div>
               </div>
             </div>
-            <div className="text-[#889063] font-bold">→</div>
+            <div className="text-[#889063] font-bold text-lg">→</div>
           </button>
         ) : (
           <button 
             onClick={() => onNavigate({ type: 'day_details', date: todayStr })}
-            className="w-full bg-[#889063] rounded-[16px] py-[16px] px-[16px] shadow-md active:scale-95 transition-transform pointer-events-auto flex items-center justify-between"
+            className="w-full bg-[#354024] text-white rounded-full py-[20px] px-6 shadow-[0_8px_30px_rgba(53,64,36,0.3)] border border-[#4C3D19] active:scale-[0.98] transition-transform flex items-center justify-between"
           >
-            <div className="flex items-center gap-3">
-              <div className="text-[28px] drop-shadow-sm">✨</div>
+            <div className="flex items-center gap-4">
+              <div className="text-2xl drop-shadow-sm">✨</div>
               <div className="text-left">
-                <div className="text-[14px] font-bold text-[#E5D7C4]">Daily Check-In</div>
-                <div className="text-[11px] text-[#E5D7C4]/80 mt-0.5">Takes 30 seconds</div>
+                <div className="text-[15px] font-bold tracking-wide">Daily Check-In</div>
+                <div className="text-[11px] text-white/70 font-bold mt-0.5">Takes 30 seconds</div>
               </div>
             </div>
-            <div className="text-[#E5D7C4] font-bold">→</div>
+            <div className="text-white font-bold text-lg">→</div>
           </button>
         )}
-      </div>
+      </motion.div>
 
       {/* ── Streak Modal ── */}
       <AnimatePresence>
@@ -216,26 +211,26 @@ export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, show
           <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-auto">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/40" onClick={() => setIsStreakModalOpen(false)}
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsStreakModalOpen(false)}
             />
             <motion.div 
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white/60 backdrop-blur-xl w-full max-w-[420px] rounded-t-[24px] pb-8 pt-6 px-6 relative shadow-2xl flex flex-col items-center"
+              className="premium-glass w-full max-w-[420px] rounded-t-[40px] pb-10 pt-8 px-6 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col items-center"
             >
-              <button onClick={() => setIsStreakModalOpen(false)} className="absolute top-6 right-6 text-[#354024] font-bold text-lg active:scale-90 transition-transform">×</button>
-              <div className="w-full flex items-center gap-2 mb-1">
-                <h3 className="text-[17px] font-bold text-[#354024]">Streak reward!</h3>
+              <button onClick={() => setIsStreakModalOpen(false)} className="absolute top-8 right-8 text-[#4C3D19] hover:text-[#1A2315] font-bold text-xl active:scale-90 transition-transform">×</button>
+              <div className="w-full flex items-center justify-center gap-2 mb-2">
+                <h3 className="text-xl font-bold text-[#1A2315] tracking-wide">Streak reward!</h3>
               </div>
-              <p className="w-full text-[13px] text-[#354024] mb-8">You claimed your {profile.streak}-day streak bonus.</p>
+              <p className="text-[13px] text-[#4C3D19] mb-8 font-medium">You claimed your {profile.streak}-day streak bonus.</p>
               
-              <div className="text-[50px] mb-6 drop-shadow-md">
+              <div className="text-[60px] mb-8 drop-shadow-md">
                 🔥
               </div>
               
-              <div className="text-[20px] font-bold text-[#354024] mb-1">
-                +50 pts <span className="text-[#4C3D19] font-medium px-1">·</span> +30 XP
+              <div className="text-2xl font-bold text-[#889063] mb-2 drop-shadow-sm">
+                +50 pts <span className="text-[#CFBB99] font-medium px-2">·</span> +30 XP
               </div>
-              <p className="text-[13px] text-[#354024] font-medium text-center">Keep going for the 30-day badge!</p>
+              <p className="text-[13px] text-[#4C3D19] font-medium text-center">Keep going for the 30-day badge!</p>
             </motion.div>
           </div>
         )}

@@ -106,7 +106,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
         
         <div className="flex flex-col gap-3">
           {recentLogs.map(log => (
-            <div key={log.date} className="bg-white/60 backdrop-blur-xl border border-[#CFBB99] rounded-[16px] p-4 flex flex-col gap-2 shadow-sm" onClick={() => onNavigate({ type: 'day_summary', date: log.date })}>
+            <div key={log.date} className="premium-glass rounded-[24px] p-4 flex flex-col gap-2 shadow-sm" onClick={() => onNavigate({ type: 'day_summary', date: log.date })}>
               <div className="text-sm font-bold text-[#354024]">
                 {new Date(log.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
               </div>

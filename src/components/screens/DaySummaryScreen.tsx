@@ -41,16 +41,16 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
     };
 
     return (
-      <div className="flex justify-between items-center py-3 border-b border-[#CFBB99]/30 last:border-0">
-        <span className="text-sm font-bold text-[#889063] uppercase tracking-wider">{label}</span>
-        <span className="text-sm font-bold text-[#354024] capitalize">{formatMap[value] || value}</span>
+      <div className="flex justify-between items-center py-3 border-b border-black/5 last:border-0">
+        <span className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest">{label}</span>
+        <span className="text-sm font-bold text-[#1A2315] capitalize">{formatMap[value] || value}</span>
       </div>
     );
   };
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 bg-[#E5D7C4] overflow-y-auto no-scrollbar pointer-events-auto"
+      className="absolute inset-0 z-50 bg-white/70 backdrop-blur-3xl overflow-y-auto no-scrollbar pointer-events-auto"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
@@ -59,10 +59,10 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
       <div className="max-w-[420px] mx-auto min-h-[100dvh] flex flex-col p-6 pb-24">
         
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 mt-2">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#354024] bg-white/40 backdrop-blur-md border border-[#CFBB99] active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[#354024] premium-pill active:scale-95 transition-transform"
           >
             ←
           </button>
@@ -78,16 +78,16 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
 
         {/* Reflection Emoji Hero */}
         <div className="flex flex-col items-center justify-center py-6 mb-6">
-          <div className="text-7xl drop-shadow-lg mb-4">
+          <div className="text-7xl drop-shadow-md mb-4">
             {getEmoji(existingLog?.reflection)}
           </div>
-          <div className={`text-2xl font-bold ${existingLog?.totalFlagImpact && existingLog.totalFlagImpact > 0 ? 'text-[#889063]' : 'text-[#A03030]'}`}>
+          <div className={`text-2xl font-bold ${existingLog?.totalFlagImpact && existingLog.totalFlagImpact > 0 ? 'text-[#889063]' : 'text-[#D4614A]'}`}>
             {existingLog?.totalFlagImpact && existingLog.totalFlagImpact > 0 ? '+' : ''}{existingLog?.totalFlagImpact || 0} pts
           </div>
         </div>
 
         {/* Details Card */}
-        <div className="bg-white/60 backdrop-blur-xl border border-[#CFBB99] rounded-[24px] p-6 shadow-sm mb-6">
+        <div className="premium-glass rounded-[24px] p-6 mb-6">
           <SummaryItem label={profile.userType === 'hostelier' ? 'Mess Usage' : 'Transport'} value={existingLog?.transport} />
           <SummaryItem label="Food" value={existingLog?.food} />
           <SummaryItem label="Delivery" value={existingLog?.delivery} />
@@ -98,11 +98,11 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
           {/* Fallback for legacy activities */}
           {(!existingLog?.transport && !existingLog?.food && existingLog?.activities && existingLog.activities.length > 0) && (
             <div className="py-3">
-              <span className="text-sm font-bold text-[#889063] uppercase tracking-wider block mb-2">Legacy Logged Actions</span>
+              <span className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest block mb-3">Legacy Actions</span>
               <div className="flex flex-wrap gap-2">
                 {existingLog.activities.map(a => (
-                  <div key={a.activityId} className="bg-[#CFBB99]/30 text-[#354024] text-xs font-bold px-2 py-1 rounded-md">
-                    {a.activityId.replace('quick_', '').replace('_', ' ')} x{a.count}
+                  <div key={a.activityId} className="premium-pill text-[#1A2315] text-xs font-bold px-3 py-1.5 border-white/60">
+                    {a.activityId.replace('quick_', '').replace('_', ' ')} <span className="text-[#889063]">x{a.count}</span>
                   </div>
                 ))}
               </div>
@@ -114,7 +114,7 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
         <div className="mt-auto pt-4">
           <button
             onClick={onEdit}
-            className="w-full py-4 bg-white/60 text-[#354024] border border-[#CFBB99] rounded-[16px] font-bold text-base shadow-sm active:scale-[0.98] transition-transform"
+            className="w-full py-[18px] premium-glass rounded-full font-bold text-[15px] text-[#354024] active:scale-95 transition-transform"
           >
             Edit Entry
           </button>
