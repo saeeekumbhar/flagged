@@ -4,6 +4,7 @@ import { DailyLog, LoggedActivity } from '../types';
 import { ACTIVITIES } from '../activities';
 
 interface ActivityLoggerProps {
+  key?: string; // Add explicit key type to fix TS compiler error
   date: string; // YYYY-MM-DD
   existingLog?: DailyLog;
   onSave: (log: DailyLog) => void;

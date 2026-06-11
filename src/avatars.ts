@@ -37,3 +37,103 @@ export function getAvatarAura(score: number) {
     label: 'Living the green life ✨',
   };
 }
+
+export interface FlagEvolutionStage {
+  stage: number;
+  stageName: string;
+  mood: string;
+  nextThreshold: number | null;
+  pointsRemaining: number | null;
+  visual: {
+    color: string;
+    poleColor: string;
+    animationLevel: 'minimal' | 'slight' | 'noticeable' | 'strong' | 'legendary';
+    hasRibbons: boolean;
+    hasParticles: boolean;
+    hasEmblem: boolean;
+  };
+}
+
+export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
+  if (score <= 40) {
+    return {
+      stage: 1,
+      stageName: 'Red Flag Era',
+      mood: 'Needs improvement',
+      nextThreshold: 41,
+      pointsRemaining: 41 - score,
+      visual: {
+        color: '#D4614A',
+        poleColor: '#A0988A',
+        animationLevel: 'minimal',
+        hasRibbons: false,
+        hasParticles: false,
+        hasEmblem: false,
+      }
+    };
+  } else if (score <= 60) {
+    return {
+      stage: 2,
+      stageName: 'Recovering Flag',
+      mood: 'Recovering',
+      nextThreshold: 61,
+      pointsRemaining: 61 - score,
+      visual: {
+        color: '#D4A574',
+        poleColor: '#A0988A',
+        animationLevel: 'slight',
+        hasRibbons: false,
+        hasParticles: false,
+        hasEmblem: false,
+      }
+    };
+  } else if (score <= 75) {
+    return {
+      stage: 3,
+      stageName: 'Growing Green Flag',
+      mood: 'Building momentum',
+      nextThreshold: 76,
+      pointsRemaining: 76 - score,
+      visual: {
+        color: '#7BA87A',
+        poleColor: '#A0988A',
+        animationLevel: 'noticeable',
+        hasRibbons: false,
+        hasParticles: true,
+        hasEmblem: false,
+      }
+    };
+  } else if (score <= 90) {
+    return {
+      stage: 4,
+      stageName: 'Green Flag Era',
+      mood: 'Green Flag Era',
+      nextThreshold: 91,
+      pointsRemaining: 91 - score,
+      visual: {
+        color: '#5A8F5A',
+        poleColor: '#A0988A',
+        animationLevel: 'strong',
+        hasRibbons: true,
+        hasParticles: true,
+        hasEmblem: false,
+      }
+    };
+  } else {
+    return {
+      stage: 5,
+      stageName: 'Green Flag Legend',
+      mood: 'Green Flag Legend',
+      nextThreshold: null,
+      pointsRemaining: null,
+      visual: {
+        color: '#3A8F3A',
+        poleColor: '#F5D990',
+        animationLevel: 'legendary',
+        hasRibbons: true,
+        hasParticles: true,
+        hasEmblem: true,
+      }
+    };
+  }
+}

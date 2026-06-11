@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra } from '../types';
-import { AVATARS, getAvatar, getAvatarAura } from '../avatars';
+import { getFlagEvolutionStage } from '../avatars';
 import { AvatarDisplay } from './AvatarDisplay';
 
 interface ProfileProps {
@@ -18,10 +18,7 @@ const BADGES = [
 
 export function Profile({ profile, onBack, onAvatarChange }: ProfileProps) {
   const era = calculateEra(profile.flagScore);
-  const aura = getAvatarAura(profile.flagScore);
-  const avatar = getAvatar(profile.avatarId ?? 'av1');
-  const [changingAvatar, setChangingAvatar] = useState(false);
-  const [pendingAvatar, setPendingAvatar] = useState(profile.avatarId ?? 'av1');
+  const flagEvolution = getFlagEvolutionStage(profile.flagScore);
 
   const eraStyle = era === 'Green Flag Era' ? 'era-badge-green'
     : era === 'Glow Up Era' ? 'era-badge-mixed'
@@ -51,67 +48,40 @@ export function Profile({ profile, onBack, onAvatarChange }: ProfileProps) {
       {/* Profile Hero */}
       <motion.div className="garden-card p-6 text-center"
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="relative w-28 h-28 mx-auto mb-4">
-          <motion.div className="absolute inset-0 rounded-full"
-            animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.06, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ background: `radial-gradient(circle, ${aura.glow.replace('0.22', '0.5')} 0%, transparent 70%)` }}
-          />
-          <div className="w-28 h-28 rounded-full flex items-center justify-center text-6xl"
-            style={{
-              background: aura.bg,
-              boxShadow: `0 6px 28px ${aura.glow}`,
-              border: `3px solid ${aura.ring}`,
-              overflow: 'hidden',
-            }}>
-            <AvatarDisplay avatar={avatar} size={112} />
-          </div>
-          {/* Change avatar button */}
-          <button
-            onClick={() => { setPendingAvatar(profile.avatarId ?? 'av1'); setChangingAvatar(true); }}
-            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-            style={{ background: '#5A8F5A', color: 'white', boxShadow: '0 2px 8px rgba(90,143,90,0.4)' }}
-          >
-            ✏️
-          </button>
+        <div className="relative w-32 h-32 mx-auto mb-4 flex items-center justify-center">
+          <AvatarDisplay score={profile.flagScore} size={128} accessories={['🔥', '🚲', '🏆'].slice(0, Math.floor(profile.flagScore / 20))} />
         </div>
         <h2 className="text-display text-2xl font-bold text-[#1F3D20] mb-1">{profile.name}</h2>
-        <p className="text-sm text-[#8A8070] mb-3 capitalize">{profile.userType?.replace('_', ' ')}</p>
+        <p className="text-sm text-[#8A8070] mb-3 capitalize">{flagEvolution.stageName}</p>
         <span className={eraStyle}>{eraEmoji} {era}</span>
       </motion.div>
 
-      {/* Avatar Change Drawer */}
-      <AnimatePresence>
-        {changingAvatar && (
-          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            className="soft-card p-5">
-            <p className="text-sm font-bold text-[#1E1A16] mb-4">Choose your avatar</p>
-            <div className="grid grid-cols-5 gap-3 mb-4">
-              {AVATARS.map(av => (
-                <button key={av.id} onClick={() => setPendingAvatar(av.id)}
-                  className="flex flex-col items-center gap-1.5">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all"
-                    style={{
-                      background: pendingAvatar === av.id ? 'linear-gradient(135deg, #C4D9BC, #E4EDE0)' : 'rgba(253,250,245,0.9)',
-                      border: pendingAvatar === av.id ? '2.5px solid #5A8F5A' : '2px solid rgba(196,217,188,0.4)',
-                      boxShadow: pendingAvatar === av.id ? '0 4px 14px rgba(90,143,90,0.25)' : undefined,
-                      overflow: 'hidden',
-                    }}>
-                    <AvatarDisplay avatar={av} size={48} />
-                  </div>
-                  <span className="text-[9px] font-semibold text-[#5A8070] text-center">{av.tag}</span>
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => setChangingAvatar(false)}
-                className="flex-1 btn-secondary py-2.5 text-sm">Cancel</button>
-              <button onClick={() => { onAvatarChange?.(pendingAvatar); setChangingAvatar(false); }}
-                className="flex-1 btn-primary py-2.5 text-sm">Save</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Evolution History & Accessories */}
+      <motion.div className="soft-card p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <h3 className="text-sm font-bold text-[#1E1A16] mb-3">Evolution Status</h3>
+        <div className="flex flex-col gap-2 mb-4">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F0EDE4] border border-[#EBE5DA]">
+            <span className="text-sm font-semibold text-[#1E1A16]">Current Mood</span>
+            <span className="text-sm font-bold text-[#5A8F5A]">{flagEvolution.mood}</span>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F0EDE4] border border-[#EBE5DA]">
+            <span className="text-sm font-semibold text-[#1E1A16]">Stage</span>
+            <span className="text-sm font-bold text-[#1E1A16]">{flagEvolution.stage} / 5</span>
+          </div>
+        </div>
+
+        <h3 className="text-sm font-bold text-[#1E1A16] mb-3">Unlocked Accessories</h3>
+        <div className="flex gap-3">
+          {['🔥', '🚲', '🏆'].slice(0, Math.floor(profile.flagScore / 20)).map((acc, i) => (
+             <div key={i} className="w-12 h-12 rounded-xl bg-white border border-[#EBE5DA] flex items-center justify-center text-xl shadow-sm">
+                {acc}
+             </div>
+          ))}
+          {Math.floor(profile.flagScore / 20) === 0 && (
+            <span className="text-xs text-[#A0988A]">Keep logging to unlock accessories.</span>
+          )}
+        </div>
+      </motion.div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">

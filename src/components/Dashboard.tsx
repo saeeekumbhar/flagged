@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, Era, DailyLog } from '../types';
-import { getAvatar, getAvatarAura } from '../avatars';
+import { getAvatar, getAvatarAura, getFlagEvolutionStage } from '../avatars';
 import { GreenFlagIcon } from './GreenFlagIcon';
 import { AvatarDisplay } from './AvatarDisplay';
 import { ACTIVITIES } from '../activities';
@@ -259,6 +259,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
   const aura = getAvatarAura(profile.flagScore);
   const avatar = getAvatar(profile.avatarId ?? 'av1');
   const greeting = useMemo(() => getGreeting(profile.name), [profile.name]);
+  const flagEvolution = getFlagEvolutionStage(profile.flagScore);
 
   // Compute monthly stats
   const currentMonth = new Date().getMonth();
@@ -344,6 +345,12 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
     }
   };
 
+  const accessories: string[] = [];
+  if (profile.bestStreak >= 7) accessories.push('🔥');
+  if ((activityCounts['commute_public'] || 0) >= 1) accessories.push('🚲');
+  if ((activityCounts['food_home'] || 0) >= 1 || (activityCounts['food_vegan'] || 0) >= 1) accessories.push('🍃');
+  if (Object.values(challengeProgress).some((v: any) => v >= 1)) accessories.push('🏆');
+
   return (
     <div className="pb-8 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
 
@@ -398,52 +405,46 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
         </div>
       </motion.div>
 
-      {/* ── Avatar Profile Card ── */}
+      {/* ── Flag Avatar Status Card ── */}
       <motion.button 
         onClick={onOpenProfile}
-        className="w-full text-left bg-white rounded-[16px] p-[13px] shadow-sm border border-[#EBE5DA] relative overflow-hidden active:scale-[0.98] transition-transform"
+        className="w-full text-left bg-white rounded-[16px] p-4 shadow-sm border border-[#EBE5DA] relative overflow-hidden active:scale-[0.98] transition-transform flex items-center justify-between mb-2"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-        <div className="flex items-center gap-3 relative z-10 w-full">
-          {/* Avatar Area */}
-          <div className="relative">
-            <motion.div key={greenToday + redToday} animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 0.3 }}
-              className="w-[60px] h-[60px] rounded-full flex items-center justify-center text-2xl bg-[#E8F4E8] border-[3px] border-[#3A8F3A]"
-              style={{
-                boxShadow: `0 4px 16px ${aura.glow}`,
-              }}>
-              <AvatarDisplay avatar={avatar} size={54} score={profile.flagScore} />
-            </motion.div>
-            <div className="absolute -bottom-1 -right-1 bg-[#3A8F3A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[10px] border-[1.5px] border-white z-10">
-              {profile.level || 1}
-            </div>
+        <div className="flex items-center gap-4 relative z-10 flex-1 min-w-0 pr-3">
+          {/* Flag Avatar */}
+          <div className="shrink-0 w-[72px] h-[72px]">
+             <AvatarDisplay score={profile.flagScore} size={72} accessories={accessories} />
           </div>
           
-          {/* Player Info */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-bold text-[#1E1A16] truncate">{profile.name.split(' ')[0]}</p>
-            <p className="text-[11px] font-bold text-[#3A8F3A] mt-0.5 truncate">Main character energy. Green flag era loading...</p>
+          {/* Stage Info */}
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            <p className="text-[14px] font-bold text-[#1E1A16] truncate mb-0.5">{flagEvolution.stageName}</p>
+            <p className="text-[12px] font-bold text-[#5A8F5A] mb-1.5">Score: {profile.flagScore}</p>
+            
+            {flagEvolution.nextThreshold ? (
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between text-[9px] font-semibold text-[#8A8070] pr-1">
+                  <span>Next: {flagEvolution.nextThreshold}</span>
+                  <span>{flagEvolution.pointsRemaining} left</span>
+                </div>
+                <div className="w-full h-1.5 bg-[#F0EDE4] rounded-full overflow-hidden">
+                  <div className="h-full bg-[#5A8F5A] rounded-full" 
+                       style={{ width: `${Math.min(100, (profile.flagScore / flagEvolution.nextThreshold) * 100)}%` }} />
+                </div>
+              </div>
+            ) : (
+              <p className="text-[11px] font-bold text-[#F5D990]">Legendary Max! 🌟</p>
+            )}
           </div>
+        </div>
 
-          {/* Streak Badge */}
-          <button 
-            onClick={handleStreakClick}
-            className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0 active:scale-95 transition-transform"
-          >
-            <div className="text-[20px] font-medium text-[#854F0B] leading-none">{profile.streak}</div>
-            <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
-          </button>
-
-          {/* Score Ring */}
-          <div className="relative w-[50px] h-[50px] pointer-events-auto shrink-0 -mr-1">
-            <svg width="50" height="50" viewBox="0 0 58 58" className="-rotate-90">
-              <circle cx="29" cy="29" r="23" fill="none" stroke="#EAF3DE" strokeWidth="6" />
-              <circle cx="29" cy="29" r="23" fill="none" stroke="#3A8F3A" strokeWidth="6" strokeDasharray="144.5" strokeDashoffset={144.5 * (1 - profile.flagScore / 100)} className="transition-all duration-1000" />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[15px] font-bold text-[#1E1A16] leading-none">{profile.flagScore}</span>
-              <span className="text-[9px] text-[#A0988A] leading-none mt-0.5">score</span>
-            </div>
-          </div>
+        {/* Streak Badge */}
+        <div 
+          onClick={handleStreakClick}
+          className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0 active:scale-95 transition-transform"
+        >
+          <div className="text-[20px] font-medium text-[#854F0B] leading-none">{profile.streak}</div>
+          <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
         </div>
       </motion.button>
 
