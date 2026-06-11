@@ -100,8 +100,6 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
     day: 'numeric'
   });
 
-  const isHostelier = profile.userType === 'hostelier';
-
   const toggleSelection = (value: string, current: string, setter: (v: string) => void) => {
     const list = current ? current.split(',').filter(Boolean) : [];
     if (list.includes(value)) {
@@ -163,24 +161,16 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
         {/* Section 1: Transport or Mess */}
         <div className="mb-8">
           <h3 className="text-lg font-bold text-[#354024] mb-3">
-            {isHostelier ? 'Mess Usage' : 'How did you mostly travel?'}
+            How did you mostly travel?
           </h3>
-          {isHostelier ? (
-            <div className="grid grid-cols-2 gap-2">
-               <SelectionChip label="Skipped" value="skip" current={transport} onChange={setTransport} />
-               <SelectionChip label="Ate in Mess" value="mess" current={transport} onChange={setTransport} />
-               <SelectionChip label="Ate Outside" value="outside" current={transport} onChange={setTransport} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2">
-              <SelectionChip label="Walk" value="walk" current={transport} onChange={setTransport} />
-              <SelectionChip label="Cycle" value="cycle" current={transport} onChange={setTransport} />
-              <SelectionChip label="Bus" value="bus" current={transport} onChange={setTransport} />
-              <SelectionChip label="Metro" value="metro" current={transport} onChange={setTransport} />
-              <SelectionChip label="Auto" value="auto" current={transport} onChange={setTransport} />
-              <SelectionChip label="Car / Cab" value="car" current={transport} onChange={setTransport} />
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-2">
+            <SelectionChip label="Walk" value="walk" current={transport} onChange={setTransport} />
+            <SelectionChip label="Cycle" value="cycle" current={transport} onChange={setTransport} />
+            <SelectionChip label="Bus" value="bus" current={transport} onChange={setTransport} />
+            <SelectionChip label="Metro" value="metro" current={transport} onChange={setTransport} />
+            <SelectionChip label="Auto" value="auto" current={transport} onChange={setTransport} />
+            <SelectionChip label="Car / Cab" value="car" current={transport} onChange={setTransport} />
+          </div>
         </div>
 
         {/* Section 2: Food */}

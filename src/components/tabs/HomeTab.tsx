@@ -61,7 +61,7 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
   if ((activityCounts['food_home'] || 0) >= 1) accessories.push('🍃');
 
   return (
-    <div className="pb-6 max-w-[420px] mx-auto px-4 pt-4 flex flex-col h-[100dvh] gap-2.5 relative z-10 pointer-events-auto overflow-hidden">
+    <div className="h-full max-w-[420px] mx-auto px-4 pt-4 pb-4 flex flex-col justify-between relative z-10 pointer-events-auto">
       
       {/* ── Header (HUD) ── */}
       <motion.div className="flex items-center justify-between pl-1 mb-2"
@@ -169,14 +169,14 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
         {logs[todayStr] ? (
           <motion.button 
             whileTap={{ scale: 0.96 }}
-            onClick={() => onNavigate({ type: 'day_summary', date: todayStr })}
+            onClick={() => onNavigate({ type: 'day_details', date: todayStr })}
             className="w-full premium-glass rounded-full py-3.5 px-6 transition-transform flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">
               <div className="text-xl drop-shadow-sm">📝</div>
               <div className="text-left">
                 <div className="text-[14px] font-bold text-white group-hover:text-[#E4EDE0] transition-colors tracking-wide drop-shadow-md">Day Logged</div>
-                <div className="text-[10px] text-white/70 font-medium mt-0.5">Tap to view summary</div>
+                <div className="text-[10px] text-white/70 font-medium mt-0.5">Tap to edit trackers</div>
               </div>
             </div>
             <div className="text-white font-bold text-base">→</div>

@@ -15,7 +15,6 @@ import { InsightsTab } from './components/tabs/InsightsTab';
 import { CommunityTab } from './components/tabs/CommunityTab';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
-import { DaySummaryScreen } from './components/screens/DaySummaryScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
 
 export default function App() {
@@ -228,7 +227,7 @@ export default function App() {
       });
     }
     if (navState.type === 'day_details') {
-      setNavState({ type: 'day_summary', date: log.date });
+      setNavState({ type: 'tab', tab: 'home' });
     }
   };
 
@@ -372,16 +371,6 @@ export default function App() {
               existingLog={logs[navState.date]}
               onSave={handleLogSave}
               onCancel={() => setNavState({ type: 'tab', tab: 'journey' })}
-            />
-          )}
-          {navState.type === 'day_summary' && (
-            <DaySummaryScreen
-              key="day_summary"
-              profile={profile}
-              date={navState.date}
-              existingLog={logs[navState.date]}
-              onEdit={() => setNavState({ type: 'day_details', date: navState.date })}
-              onBack={() => setNavState({ type: 'tab', tab: 'journey' })}
             />
           )}
           {navState.type === 'badge_details' && (

@@ -8,8 +8,8 @@ interface OnboardingProps {
   onComplete: (profile: Partial<UserProfile>) => void;
 }
 
-type Step = 'welcome' | 'name' | 'type' | 'commute' | 'food' | 'delivery' | 'device' | 'avatar' | 'reveal';
-const STEPS: Step[] = ['welcome', 'name', 'type', 'commute', 'food', 'delivery', 'device', 'avatar', 'reveal'];
+type Step = 'welcome' | 'name' | 'commute' | 'food' | 'delivery' | 'device' | 'avatar' | 'reveal';
+const STEPS: Step[] = ['welcome', 'name', 'commute', 'food', 'delivery', 'device', 'avatar', 'reveal'];
 
 function ProgressDots({ current, total }: { current: number; total: number }) {
   return (
@@ -143,23 +143,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         );
 
-      case 'type':
-        return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🏫</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How's campus life, {firstName}?</h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              <ChoiceBtn emoji="🏠" label="I live on campus" desc="Hostel life, full immersion"
-                selected={profile.userType === 'hostelier'}
-                onClick={() => { setProfile({ ...profile, userType: 'hostelier' }); nextStep(); }} />
-              <ChoiceBtn emoji="🚌" label="I commute daily" desc="Home or PG, commuting in"
-                selected={profile.userType === 'day_scholar'}
-                onClick={() => { setProfile({ ...profile, userType: 'day_scholar' }); nextStep(); }} />
-            </div>
-          </div>
-        );
+
 
       case 'commute':
         return (
@@ -190,23 +174,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">What's your food vibe?</h2>
             </div>
             <div className="flex flex-col gap-3">
-              {profile.userType === 'day_scholar' ? (
-                <>
-                  <ChoiceBtn emoji="🏠" label="Home cooked" desc="Lowest footprint, highest love"
-                    onClick={() => { setProfile({ ...profile, foodPreferences: 'home' }); nextStep(); }} />
-                  <ChoiceBtn emoji="🍽️" label="College canteen" desc="Community and consistent"
-                    onClick={() => { setProfile({ ...profile, foodPreferences: 'canteen' }); nextStep(); }} />
-                  <ChoiceBtn emoji="🥡" label="Eat outside" desc="Balanced, adventurous"
-                    onClick={() => { setProfile({ ...profile, foodPreferences: 'eat_out' }); nextStep(); }} />
-                </>
-              ) : (
-                <>
-                  <ChoiceBtn emoji="🍽️" label="Mess / Canteen" desc="Community and consistent"
-                    onClick={() => { setProfile({ ...profile, foodPreferences: 'mess' }); nextStep(); }} />
-                  <ChoiceBtn emoji="👨‍🍳" label="Cook my own" desc="Self-sufficient and mindful"
-                    onClick={() => { setProfile({ ...profile, foodPreferences: 'cook' }); nextStep(); }} />
-                </>
-              )}
+              <ChoiceBtn emoji="🏠" label="Home cooked" desc="Lowest footprint, highest love"
+                onClick={() => { setProfile({ ...profile, foodPreferences: 'home' }); nextStep(); }} />
+              <ChoiceBtn emoji="🍽️" label="Mess / Canteen" desc="Community and consistent"
+                onClick={() => { setProfile({ ...profile, foodPreferences: 'mess' }); nextStep(); }} />
+              <ChoiceBtn emoji="👨‍🍳" label="Cook my own" desc="Self-sufficient and mindful"
+                onClick={() => { setProfile({ ...profile, foodPreferences: 'cook' }); nextStep(); }} />
+              <ChoiceBtn emoji="🥡" label="Eat outside" desc="Balanced, adventurous"
+                onClick={() => { setProfile({ ...profile, foodPreferences: 'eat_out' }); nextStep(); }} />
             </div>
           </div>
         );
