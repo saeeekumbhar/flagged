@@ -24,7 +24,21 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  // Legacy greenToday/redToday has been deprecated.
+  let greenToday = 0;
+  let redToday = 0;
+  if (logs[todayStr]) {
+    const l = logs[todayStr];
+    if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') greenToday++;
+    if (l.transport === 'car' || l.transport === 'cab') redToday++;
+    if (l.food === 'home' || l.food === 'mess' || l.food === 'veg') greenToday++;
+    if (l.food === 'nonveg' || l.food === 'mixed') redToday++;
+    if (l.energyAC === 'none') greenToday++;
+    if (l.energyAC === '6+h' || l.energyAC === '2-6h') redToday++;
+    if (l.shopping === 'no') greenToday++;
+    if (l.shopping === 'large' || l.shopping === 'medium') redToday++;
+    if (l.delivery === 'no') greenToday++;
+    if (l.delivery === 'multiple' || l.delivery === 'once') redToday++;
+  }
 
   const handleStreakClick = (e: React.MouseEvent) => {
     e.stopPropagation();
