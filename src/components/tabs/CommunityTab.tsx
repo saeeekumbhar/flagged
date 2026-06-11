@@ -46,13 +46,13 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-[#354024] px-1">Community</h2>
+      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Community</h2>
 
       {/* ── Daily Challenges ── */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-bold text-[#1A2315]">Active Challenges</h3>
-          <span className="text-[10px] text-[#889063] font-bold bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">2 New</span>
+          <span className="text-[10px] text-[#1A2315] font-bold bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">2 New</span>
         </div>
         
         {/* Challenge 1 */}
@@ -63,7 +63,7 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
               <div className="text-[13px] font-bold text-[#1A2315] truncate">Use public transport</div>
               <div className="text-[11px] text-[#4C3D19] mt-0.5 truncate">How'd you get here? Bus = green flag.</div>
             </div>
-            <div className="text-[11px] font-bold text-[#889063] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+20 XP</div>
+            <div className="text-[11px] font-bold text-[#1A2315] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+20 XP</div>
           </div>
           <div className="h-2 bg-black/5 rounded-full overflow-hidden mb-1.5 border border-black/5">
             <div className="h-full bg-[#889063] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch1'] || 0) / 1) * 100)}%` }} />
@@ -79,7 +79,7 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
               <div className="text-[13px] font-bold text-[#1A2315] truncate">Eat a green meal</div>
               <div className="text-[11px] text-[#4C3D19] mt-0.5 truncate">Mess food hits different for the planet tbh.</div>
             </div>
-            <div className="text-[11px] font-bold text-[#889063] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+15 XP</div>
+            <div className="text-[11px] font-bold text-[#1A2315] bg-[#E4EDE0] border border-[#BEE0BE] px-2 py-1 rounded-md">+15 XP</div>
           </div>
           <div className="h-2 bg-black/5 rounded-full overflow-hidden mb-1.5 border border-black/5">
             <div className="h-full bg-[#889063] transition-all" style={{ width: `${Math.min(100, ((challengeProgress['ch2'] || 0) / 1) * 100)}%` }} />
@@ -102,7 +102,7 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
                   {friend.name} {friend.isMe && '(You)'}
                 </span>
               </div>
-              <span className={`text-[13px] font-bold ${friend.score >= 70 ? 'text-[#889063]' : friend.score <= 40 ? 'text-[#D4614A]' : 'text-[#D4A574]'}`}>
+              <span className={`text-[13px] font-bold ${friend.score >= 70 ? 'text-[#1A2315]' : friend.score <= 40 ? 'text-[#D4614A]' : 'text-[#D4A574]'}`}>
                 {friend.score} pts
               </span>
             </div>

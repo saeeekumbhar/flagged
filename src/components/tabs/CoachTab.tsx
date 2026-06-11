@@ -36,16 +36,16 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-[#354024] px-1">AI Coach</h2>
+      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">AI Coach</h2>
 
       {/* Weekly Roast Card */}
       {roast ? (
         <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">🔥</span>
-            <h3 className="text-[13px] font-bold text-[#4C3D19] uppercase tracking-wider">This Week's Roast</h3>
+            <h3 className="text-[13px] font-bold text-[#1A2315] uppercase tracking-wider">This Week's Roast</h3>
           </div>
-          <p className="text-lg font-bold text-[#354024] mb-2 leading-snug">"{roast.roast}"</p>
+          <p className="text-lg font-bold text-[#1A2315] mb-2 leading-snug">"{roast.roast}"</p>
           <p className="text-sm text-[#4C3D19] italic mb-5">{roast.realityCheck}</p>
           
           <div className="grid grid-cols-2 gap-3">

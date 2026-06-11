@@ -43,17 +43,17 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-[#354024] px-1">Your Journey</h2>
+      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Your Journey</h2>
 
       {/* Calendar Section */}
-      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-[0_4px_20px_rgba(30,26,22,0.03)] border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div className="premium-glass rounded-[32px] p-6 shadow-sm border border-white/60" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-sm font-bold text-[#354024]">
+          <h3 className="text-sm font-bold text-[#1A2315]">
             {currentDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
           </h3>
           <div className="flex gap-2">
-            <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full border border-[#F4F1EC] flex items-center justify-center text-[#4C3D19] active:bg-[#F4F1EC] transition-colors">{'<'}</button>
-            <button onClick={handleNextMonth} className="w-8 h-8 rounded-full border border-[#F4F1EC] flex items-center justify-center text-[#4C3D19] active:bg-[#F4F1EC] transition-colors">{'>'}</button>
+            <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'<'}</button>
+            <button onClick={handleNextMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'>'}</button>
           </div>
         </div>
         
@@ -70,7 +70,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
             
             let bgColor = 'transparent';
-            let textColor = '#B8B0A5';
+            let textColor = '#4C3D19';
             let fontWeight = '600';
 
             if (isToday) {
@@ -78,9 +78,9 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
               textColor = '#FFFFFF';
               fontWeight = 'bold';
             } else if (log) {
-              if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#2D5D2D'; fontWeight = 'bold'; }
+              if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#1A2315'; fontWeight = 'bold'; }
               else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
-              else { bgColor = '#F4F1EC'; textColor = '#354024'; fontWeight = 'bold'; }
+              else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
             }
 
             return (
@@ -101,13 +101,13 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
       {/* Recent Activity Section */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="flex justify-between items-center mb-3 px-1">
-          <h3 className="text-sm font-bold text-[#354024]">Recent Activity</h3>
+          <h3 className="text-sm font-bold text-white drop-shadow-md">Recent Activity</h3>
         </div>
         
         <div className="flex flex-col gap-3">
           {recentLogs.map(log => (
             <div key={log.date} className="premium-glass rounded-[24px] p-4 flex flex-col gap-2 shadow-sm" onClick={() => onNavigate({ type: 'day_summary', date: log.date })}>
-              <div className="text-sm font-bold text-[#354024]">
+              <div className="text-sm font-bold text-[#1A2315]">
                 {new Date(log.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
               </div>
               <div className="flex flex-wrap gap-2">
@@ -124,32 +124,32 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             </div>
           ))}
           {recentLogs.length === 0 && (
-            <div className="text-center text-[#4C3D19] text-sm py-6 font-medium">No recent activities.</div>
+            <div className="text-center text-white/80 drop-shadow-sm text-sm py-6 font-medium">No recent activities.</div>
           )}
         </div>
       </motion.div>
 
       {/* Trends Section */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-3 px-1">All-Time Trends</h3>
+        <h3 className="text-sm font-bold text-white drop-shadow-md mb-3 px-1">All-Time Trends</h3>
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="bg-[#EAF3EA] rounded-[16px] p-4 flex flex-col items-center justify-center text-center border border-[#BEE0BE]">
+          <div className="premium-glass rounded-[24px] p-4 flex flex-col items-center justify-center text-center">
             <div className="text-2xl mb-1">🌱</div>
-            <div className="text-lg font-bold text-[#2D5D2D]">{totalGreen}</div>
-            <div className="text-[10px] uppercase tracking-widest text-[#889063] font-semibold mt-1">Green Flags</div>
+            <div className="text-lg font-bold text-[#1A2315]">{totalGreen}</div>
+            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-semibold mt-1">Green Flags</div>
           </div>
-          <div className="bg-[#FDECEE] rounded-[16px] p-4 flex flex-col items-center justify-center text-center border border-[#F4B2B8]">
+          <div className="premium-glass rounded-[24px] p-4 flex flex-col items-center justify-center text-center">
             <div className="text-2xl mb-1">⚠️</div>
-            <div className="text-lg font-bold text-[#A03030]">{totalRed}</div>
+            <div className="text-lg font-bold text-[#D4614A]">{totalRed}</div>
             <div className="text-[10px] uppercase tracking-widest text-[#D4614A] font-semibold mt-1">Red Flags</div>
           </div>
         </div>
-        <div className="bg-[#E5D7C4] rounded-[16px] p-4 flex items-center justify-between border border-[#CFBB99]">
+        <div className="premium-glass rounded-[24px] p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-2xl">🔥</div>
+            <div className="text-2xl drop-shadow-sm">🔥</div>
             <div>
               <div className="text-[11px] uppercase tracking-widest text-[#4C3D19] font-semibold">Longest Streak</div>
-              <div className="text-sm font-bold text-[#354024]">{profile.bestStreak} Days</div>
+              <div className="text-sm font-bold text-[#1A2315]">{profile.bestStreak} Days</div>
             </div>
           </div>
         </div>

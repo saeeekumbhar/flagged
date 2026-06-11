@@ -61,7 +61,7 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
   if ((activityCounts['food_home'] || 0) >= 1) accessories.push('🍃');
 
   return (
-    <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-4 relative z-10 pointer-events-auto">
+    <div className="pb-24 max-w-[420px] mx-auto px-4 pt-4 flex flex-col gap-3 relative z-10 pointer-events-auto">
       
       {/* ── Header (HUD) ── */}
       <motion.div className="flex items-center justify-between pl-1 mb-2"
@@ -71,9 +71,10 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
           <div className="flex items-center gap-1 premium-pill px-3 py-1.5 text-xs font-bold text-[#1A2315]">
             <span>🟡</span> {profile.coins || 0} pts
           </div>
-          <button 
+          <motion.button 
             onClick={() => onNavigate({ type: 'tab', tab: 'profile' })}
-            className="w-8 h-8 premium-pill flex items-center justify-center active:scale-95 transition-transform"
+            whileTap={{ scale: 0.9 }}
+            className="w-8 h-8 premium-pill flex items-center justify-center transition-transform"
           >
             <span className="text-[#1A2315]">👤</span>
           </button>
@@ -81,12 +82,12 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
       </motion.div>
 
       {/* ── Era & Level Card ── */}
-      <motion.div className="premium-glass rounded-[32px] p-5 relative overflow-hidden"
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}>
-        <div className="flex justify-between items-center mb-3">
+      <motion.div className="premium-glass rounded-[24px] py-3 px-4 relative overflow-hidden"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
+        <div className="flex justify-between items-center mb-2">
           <div>
-            <div className="text-lg font-bold text-[#1A2315] tracking-wide">{era}</div>
-            <div className="text-[11px] text-[#4C3D19] mt-0.5 font-medium">Every green flag grows your tree.</div>
+            <div className="text-base font-bold text-[#1A2315] tracking-wide leading-tight">{era}</div>
+            <div className="text-[10px] text-[#4C3D19] font-medium">Every green flag grows your tree.</div>
           </div>
           <div className="bg-[#889063] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(136,144,99,0.3)]">
             Lv {profile.level || 1}
@@ -102,10 +103,10 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
       </motion.div>
 
       {/* ── Asymmetrical Grid: Avatar & Streak ── */}
-      <div className="grid grid-cols-3 gap-3 mb-1">
+      <div className="grid grid-cols-3 gap-3">
         <motion.div 
-          className="col-span-2 premium-glass rounded-[32px] p-4 flex flex-col justify-center relative overflow-hidden"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+          className="col-span-2 premium-glass rounded-[28px] p-4 flex flex-col justify-center relative overflow-hidden"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
           <div className="flex items-center gap-3 relative z-10">
             <div className="shrink-0 w-16 h-16 bg-white/40 rounded-full flex items-center justify-center border border-white/60 shadow-inner">
                <AvatarDisplay score={profile.flagScore} size={64} accessories={accessories} />
@@ -126,8 +127,9 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
 
         <motion.button 
           onClick={handleStreakClick}
-          className="col-span-1 premium-glass rounded-[32px] p-4 flex flex-col items-center justify-center active:scale-95 transition-transform"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
+          whileTap={{ scale: 0.95 }}
+          className="col-span-1 premium-glass rounded-[28px] p-3 flex flex-col items-center justify-center transition-transform"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>
           <div className="text-3xl mb-1 drop-shadow-sm">🔥</div>
           <div className="text-[26px] font-bold text-[#1A2315] leading-none tracking-tight">{profile.streak}</div>
           <div className="text-[8px] font-bold text-[#4C3D19] uppercase tracking-widest mt-1">Streak</div>
@@ -135,49 +137,40 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
       </div>
 
       {/* ── Forecast & Daily Stats ── */}
-      <div className="grid grid-cols-2 gap-3 mb-2">
+      <div className="flex flex-col gap-3">
         <motion.div 
-          className="col-span-2 premium-glass rounded-[24px] p-4 flex items-center gap-4"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          className="premium-glass rounded-[24px] p-4 flex items-center gap-4"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
           <div className="text-3xl drop-shadow-sm shrink-0">🔮</div>
           <div className="flex-1">
-            <h4 className="text-[9px] font-bold text-[#4C3D19] uppercase tracking-widest mb-1">Forecast</h4>
+            <h4 className="text-[9px] font-bold text-[#4C3D19] uppercase tracking-widest mb-0.5">Forecast</h4>
             <p className="text-[13px] font-bold text-[#1A2315] leading-tight mb-1">{forecast.prediction}</p>
-            <p className="text-[11px] text-[#889063] leading-tight font-medium">{forecast.opportunity}</p>
+            <p className="text-[11px] text-[#1A2315] leading-tight font-medium">{forecast.opportunity}</p>
           </div>
         </motion.div>
         
-        <motion.div className="premium-glass rounded-full aspect-square flex flex-col items-center justify-center text-center p-2 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25 }}>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#889063]/10 to-transparent pointer-events-none" />
-          {greenToday === 0 ? (
-            <span className="text-[11px] text-[#4C3D19] font-medium leading-tight">Your day is<br/>unwritten.</span>
-          ) : (
-            <>
-              <span className="text-4xl font-bold text-[#889063] drop-shadow-sm tracking-tighter">{greenToday}</span>
-              <span className="text-[9px] text-[#889063] font-bold uppercase tracking-widest mt-1">Green</span>
-            </>
-          )}
-        </motion.div>
-        
-        <motion.div className="premium-glass rounded-full aspect-square flex flex-col items-center justify-center text-center p-2 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#D4614A]/10 to-transparent pointer-events-none" />
-          {redToday === 0 && greenToday === 0 ? (
-             <span className="text-[11px] text-[#4C3D19] font-medium leading-tight">No red flags.<br/>Keep it up!</span>
-          ) : (
-            <>
-              <span className="text-4xl font-bold text-[#D4614A] drop-shadow-sm tracking-tighter">{redToday}</span>
-              <span className="text-[9px] text-[#D4614A] font-bold uppercase tracking-widest mt-1">Red</span>
-            </>
-          )}
-        </motion.div>
+        <div className="grid grid-cols-2 gap-3">
+          <motion.div className="premium-glass rounded-[20px] p-3 flex items-center justify-center gap-3 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#889063]/10 to-transparent pointer-events-none" />
+            <div className="text-3xl font-bold text-[#889063] drop-shadow-sm tracking-tighter leading-none">{greenToday}</div>
+            <div className="text-[10px] text-[#1A2315] font-bold uppercase tracking-widest leading-tight">Green<br/>Flags</div>
+          </motion.div>
+          
+          <motion.div className="premium-glass rounded-[20px] p-3 flex items-center justify-center gap-3 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#D4614A]/10 to-transparent pointer-events-none" />
+            <div className="text-3xl font-bold text-[#D4614A] drop-shadow-sm tracking-tighter leading-none">{redToday}</div>
+            <div className="text-[10px] text-[#1A2315] font-bold uppercase tracking-widest leading-tight">Red<br/>Flags</div>
+          </motion.div>
+        </div>
       </div>
 
       {/* ── Action CTA ── */}
-      <motion.div className="mt-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35 }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}>
         {logs[todayStr] ? (
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.96 }}
             onClick={() => onNavigate({ type: 'day_summary', date: todayStr })}
-            className="w-full premium-glass rounded-full py-[20px] px-6 active:scale-95 transition-transform flex items-center justify-between group"
+            className="w-full premium-glass rounded-full py-[16px] px-6 transition-transform flex items-center justify-between group"
           >
             <div className="flex items-center gap-4">
               <div className="text-2xl drop-shadow-sm">📝</div>
@@ -186,12 +179,15 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
                 <div className="text-[11px] text-[#4C3D19] font-medium mt-0.5">Tap to view summary</div>
               </div>
             </div>
-            <div className="text-[#889063] font-bold text-lg">→</div>
-          </button>
+            <div className="text-[#1A2315] font-bold text-lg">→</div>
+          </motion.button>
         ) : (
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.96 }}
+            animate={{ boxShadow: ['0 0 0px rgba(136,144,99,0)', '0 0 24px rgba(136,144,99,0.4)', '0 0 0px rgba(136,144,99,0)'] }}
+            transition={{ boxShadow: { repeat: Infinity, duration: 2, ease: "easeInOut" } }}
             onClick={() => onNavigate({ type: 'day_details', date: todayStr })}
-            className="w-full bg-[#354024] text-white rounded-full py-[20px] px-6 shadow-[0_8px_30px_rgba(53,64,36,0.3)] border border-[#4C3D19] active:scale-[0.98] transition-transform flex items-center justify-between"
+            className="w-full bg-[#354024] text-white rounded-full py-[16px] px-6 shadow-[0_8px_30px_rgba(53,64,36,0.3)] border border-[#4C3D19] flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
               <div className="text-2xl drop-shadow-sm">✨</div>

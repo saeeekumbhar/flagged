@@ -30,8 +30,8 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-display text-2xl font-bold text-[#354024] px-1">Profile</h2>
-        <button className="w-10 h-10 rounded-full premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform">
+        <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Profile</h2>
+        <button className="w-10 h-10 rounded-full premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform text-xl">
           ⚙️
         </button>
       </div>
@@ -41,19 +41,19 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
 
       {/* Evolution Status */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-3">Evolution Status</h3>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-3">Evolution Status</h3>
         <div className="flex flex-col gap-2 mb-4">
-          <div className="flex items-center justify-between p-4 rounded-[20px] premium-glass">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
             <span className="text-sm font-semibold text-[#1A2315]">Current Mood</span>
-            <span className="text-sm font-bold text-[#889063]">{flagEvolution.mood}</span>
+            <span className="text-sm font-bold text-[#1A2315]">{flagEvolution.mood}</span>
           </div>
-          <div className="flex items-center justify-between p-4 rounded-[20px] premium-glass">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
             <span className="text-sm font-semibold text-[#1A2315]">Stage</span>
             <span className="text-sm font-bold text-[#1A2315]">{flagEvolution.stage} / 5</span>
           </div>
         </div>
 
-        <h3 className="text-sm font-bold text-[#354024] mb-3">Unlocked Accessories</h3>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-3">Unlocked Accessories</h3>
         <div className="flex gap-3">
           {['🔥', '🚲', '🏆'].slice(0, Math.floor(profile.flagScore / 20)).map((acc, i) => (
              <div key={i} className="w-12 h-12 rounded-[20px] premium-glass flex items-center justify-center text-xl shadow-sm">
@@ -68,30 +68,30 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
 
       {/* Glow-Up Counter */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-1">Glow-Up Stats</h3>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-1">Glow-Up Stats</h3>
         <p className="text-[10px] text-[#4C3D19] mb-4">Since joining FLAGGED</p>
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-[#E4EDE0] rounded-[24px] p-4 flex flex-col justify-center border border-white/60 shadow-inner">
             <div className="text-xl mb-1">🌲</div>
-            <div className="text-lg font-bold text-[#354024]">{glowUp.treesEquivalent}</div>
-            <div className="text-[9px] text-[#889063] font-bold uppercase tracking-wide leading-tight">Trees worth of CO₂</div>
+            <div className="text-lg font-bold text-[#1A2315]">{glowUp.treesEquivalent}</div>
+            <div className="text-[9px] text-[#2D5D2D] font-bold uppercase tracking-wide leading-tight">Trees worth of CO₂</div>
           </div>
           <div className="premium-glass rounded-[24px] p-4 flex flex-col justify-center">
             <div className="text-xl mb-1">💸</div>
-            <div className="text-lg font-bold text-[#354024]">₹{glowUp.moneySaved}</div>
+            <div className="text-lg font-bold text-[#1A2315]">₹{glowUp.moneySaved}</div>
             <div className="text-[9px] text-[#4C3D19] font-bold uppercase tracking-wide leading-tight">Estimated savings</div>
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between p-4 rounded-[20px] premium-glass">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
             <span className="text-sm font-semibold text-[#1A2315]">Green Flags Completed</span>
-            <span className="text-sm font-bold text-[#889063]">{glowUp.greenFlagsCompleted}</span>
+            <span className="text-sm font-bold text-[#1A2315]">{glowUp.greenFlagsCompleted}</span>
           </div>
-          <div className="flex items-center justify-between p-4 rounded-[20px] premium-glass">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
             <span className="text-sm font-semibold text-[#1A2315]">Days Logged</span>
             <span className="text-sm font-bold text-[#1A2315]">{glowUp.daysLogged}</span>
           </div>
-          <div className="flex items-center justify-between p-4 rounded-[20px] premium-glass">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
             <span className="text-sm font-semibold text-[#1A2315]">Best Streak</span>
             <span className="text-sm font-bold text-[#D4614A]">{glowUp.bestStreak} 🔥</span>
           </div>
@@ -100,7 +100,7 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
 
       {/* Badges */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-4">Badges</h3>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-4">Badges</h3>
         <div className="flex gap-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {BADGES.map((badge) => (
             <div 
@@ -108,10 +108,10 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
               className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform"
               onClick={() => onNavigate({ type: 'badge_details', badgeId: badge.id })}
             >
-              <div className="w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-sm premium-glass">
+              <div className="w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-sm bg-white/40 border border-white/60">
                 {badge.emoji}
               </div>
-              <span className="text-[10px] font-bold text-[#5A8070] uppercase text-center leading-tight max-w-[56px]">{badge.label}</span>
+              <span className="text-[10px] font-bold text-[#1A2315] uppercase text-center leading-tight max-w-[56px]">{badge.label}</span>
             </div>
           ))}
         </div>
