@@ -364,8 +364,13 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
       {/* ── Header (HUD) ── */}
       <motion.div className="flex items-center justify-between pl-1 mb-2"
         initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className="flex items-center gap-1.5 font-logo text-[#3A8F3A] text-[18px]">
-          <span className="text-[20px] relative top-[-1px]">⚑</span> FLAGGED
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1.5 font-logo text-[#3A8F3A] text-[18px]">
+            <span className="text-[20px] relative top-[-1px]">⚑</span> FLAGGED
+          </div>
+          <div className="text-[9px] text-[#8A8070] uppercase tracking-wider font-bold ml-6 -mt-1">
+            Carbon Footprint Tracker
+          </div>
         </div>
         <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-[#F5D990] text-xs font-semibold text-[#854F0B] shadow-sm">
           <span>🟡</span> {profile.coins || 0} pts
@@ -378,7 +383,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
         <div className="flex justify-between items-center mb-2.5">
           <div>
             <div className="text-[13px] font-bold text-[#1E1A16]">{era}</div>
-            <div className="text-[10px] text-[#A0988A] mt-0.5">Keep logging to level up</div>
+            <div className="text-[10px] text-[#A0988A] mt-0.5">Every green flag grows your tree.</div>
           </div>
           <div className="bg-[#3A8F3A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
             Lv {profile.level || 1}
@@ -401,13 +406,14 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
         <div className="flex items-center gap-3 relative z-10 w-full">
           {/* Avatar Area */}
           <div className="relative">
-            <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-2xl bg-[#E8F4E8] border-[3px] border-[#3A8F3A]"
+            <motion.div key={greenToday + redToday} animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 0.3 }}
+              className="w-[60px] h-[60px] rounded-full flex items-center justify-center text-2xl bg-[#E8F4E8] border-[3px] border-[#3A8F3A]"
               style={{
                 boxShadow: `0 4px 16px ${aura.glow}`,
               }}>
-              <AvatarDisplay avatar={avatar} size={44} />
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-[#3A8F3A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[10px] border-[1.5px] border-white">
+              <AvatarDisplay avatar={avatar} size={54} score={profile.flagScore} />
+            </motion.div>
+            <div className="absolute -bottom-1 -right-1 bg-[#3A8F3A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[10px] border-[1.5px] border-white z-10">
               {profile.level || 1}
             </div>
           </div>
@@ -415,7 +421,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
           {/* Player Info */}
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-bold text-[#1E1A16] truncate">{profile.name.split(' ')[0]}</p>
-            <p className="text-[11px] font-bold text-[#3A8F3A] mt-0.5 truncate">You're glowing up 🔥</p>
+            <p className="text-[11px] font-bold text-[#3A8F3A] mt-0.5 truncate">Main character energy. Green flag era loading...</p>
           </div>
 
           {/* Streak Badge */}
@@ -443,13 +449,25 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
 
       {/* ── Daily Stats ── */}
       <div className="grid grid-cols-2 gap-2 mb-2">
-        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5">
-          <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{greenToday}</span>
-          <span className="text-[10px] text-[#A0988A] mt-0.5">green today</span>
+        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5 px-2 text-center h-[60px]">
+          {greenToday === 0 ? (
+            <span className="text-[10px] text-[#A0988A] font-medium leading-tight">Your day is unwritten.<br/>Make it green.</span>
+          ) : (
+            <>
+              <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{greenToday}</span>
+              <span className="text-[10px] text-[#A0988A] mt-0.5">green today</span>
+            </>
+          )}
         </div>
-        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5">
-          <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{redToday}</span>
-          <span className="text-[10px] text-[#A0988A] mt-0.5">red today</span>
+        <div className="bg-[#F6F4EE] rounded-[12px] flex flex-col items-center justify-center py-2.5 px-2 text-center h-[60px]">
+          {redToday === 0 && greenToday === 0 ? (
+             <span className="text-[10px] text-[#A0988A] font-medium leading-tight">No red flags.<br/>Keep it up!</span>
+          ) : (
+            <>
+              <span className="text-[20px] font-medium text-[#1E1A16] leading-none">{redToday}</span>
+              <span className="text-[10px] text-[#A0988A] mt-0.5">red today</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -460,9 +478,9 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
             if (onQuickLog) onQuickLog('green');
             showToastMsg('Green logged! +10 XP +5 pts', 'darkGreen');
           }} 
-          className="bg-[#E8F4E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#B2D9B2] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
-          <div className="text-[26px]">🟢</div>
-          <div className="text-[11px] font-medium text-[#3A6E3A]">Green choice</div>
+          className="bg-[#E8F4E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#B2D9B2] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px] h-[90px] justify-center">
+          <div className="text-[28px] drop-shadow-sm">🌿</div>
+          <div className="text-[11px] font-bold text-[#3A6E3A]">Green choice</div>
           <div className="text-[10px] text-[#3A6E3A]">+10 XP · +5 pts</div>
         </button>
         
@@ -471,10 +489,10 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
             if (onQuickLog) onQuickLog('red');
             showToastMsg('Red logged — you got this!', 'darkGreen');
           }} 
-          className="bg-[#FDE8E8] rounded-[14px] py-[14px] px-[10px] text-center border border-[#F5B8B8] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[5px]">
-          <div className="text-[26px]">🔴</div>
-          <div className="text-[11px] font-medium text-[#C04A4A]">Red choice</div>
-          <div className="text-[10px] text-[#C04A4A]">-5 XP · reflect</div>
+          className="bg-[#FDE8E8] rounded-[14px] py-[12px] px-[10px] text-center border border-[#F5B8B8] active:scale-95 transition-transform pointer-events-auto flex flex-col items-center gap-[2px] h-[90px] justify-center">
+          <div className="text-[28px] drop-shadow-sm">💨</div>
+          <div className="text-[11px] font-bold text-[#C04A4A]">Red choice</div>
+          <div className="text-[9px] text-[#C04A4A] leading-tight opacity-90">Red flag, but fixable.<br/>We don't judge.</div>
         </button>
       </div>
 
@@ -491,7 +509,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
             <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🚌</div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[#1E1A16] truncate">Use public transport</div>
-              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Log transport today</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">How'd you get here? Bus = automatic green flag.</div>
             </div>
             <div className="text-[10px] font-bold text-[#854F0B]">+20 XP</div>
           </div>
@@ -507,7 +525,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
             <div className="w-9 h-9 bg-[#EAF3DE] rounded-[10px] flex items-center justify-center text-lg shrink-0">🥗</div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-[#1E1A16] truncate">Eat a green meal</div>
-              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">No processed food</div>
+              <div className="text-[10px] text-[#A0988A] mt-0.5 truncate">Mess food hits different for the planet tbh.</div>
             </div>
             <div className="text-[10px] font-bold text-[#854F0B]">+15 XP</div>
           </div>
