@@ -7,49 +7,16 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
 
-  /* Sage Greens */
-  --color-sage-50:  #F4F7F2;
-  --color-sage-100: #E4EDE0;
-  --color-sage-200: #C4D9BC;
-  --color-sage-400: #7BA87A;
-  --color-sage-500: #5A8F5A;
-  --color-sage-600: #3D6B3D;
-  --color-sage-800: #1F3D20;
-
-  /* Warm Earth */
-  --color-earth-50:  #FDF9F3;
-  --color-earth-100: #FDF6EC;
-  --color-earth-200: #F5E4C8;
-  --color-earth-400: #D4A574;
-  --color-earth-500: #B8835A;
-  --color-earth-600: #8B6240;
-
-  /* Soft Coral (Red Flags — warm, not harsh) */
-  --color-coral-50:  #FEF5F4;
-  --color-coral-100: #FDEEED;
-  --color-coral-300: #F0A899;
-  --color-coral-400: #E8856A;
-  --color-coral-500: #D4614A;
-
-  /* Sky (streaks / morning) */
-  --color-sky-100: #E4EFF5;
-  --color-sky-200: #C8DCE8;
-  --color-sky-400: #7EB3CC;
-  --color-sky-500: #5A9AB5;
-
-  /* Warm Neutrals */
-  --color-cream:     #FDFAF5;
-  --color-warm-50:   #FAF7F0;
-  --color-warm-100:  #F2EDE3;
-  --color-warm-200:  #E0D8CC;
-  --color-warm-300:  #C8C0B0;
-  --color-warm-500:  #8A8070;
-  --color-warm-700:  #4A4038;
-  --color-warm-900:  #1E1A16;
+  /* Premium Earth Palette */
+  --color-cafe: #4C3D19;
+  --color-kombu: #354024;
+  --color-moss: #889063;
+  --color-tan: #CFBB99;
+  --color-bone: #E5D7C4;
 
   /* Legacy (compatibility) */
-  --color-neutral-bg: var(--color-cream);
-  --color-text-primary: var(--color-warm-900);
+  --color-neutral-bg: var(--color-bone);
+  --color-text-primary: var(--color-kombu);
 }
 
 @layer base {
@@ -63,10 +30,10 @@
   }
 
   body {
-    @apply bg-[#FDFAF5] text-[#1E1A16] font-sans antialiased overflow-x-hidden;
+    @apply bg-bone text-kombu font-sans antialiased overflow-x-hidden;
     background-image:
-      radial-gradient(ellipse 120% 60% at 50% 0%, rgba(196,217,188,0.25) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 40% at 80% 100%, rgba(212,165,116,0.12) 0%, transparent 50%);
+      radial-gradient(ellipse 120% 60% at 50% 0%, rgba(207, 187, 153, 0.4) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 40% at 80% 100%, rgba(136, 144, 99, 0.15) 0%, transparent 50%);
     background-attachment: fixed;
     min-height: 100dvh;
   }
@@ -81,11 +48,11 @@
    GARDEN CARD — Hero component
 ═══════════════════════════════════════════ */
 .garden-card {
-  background: linear-gradient(160deg, #E4EDE0 0%, #FDF6EC 100%);
+  background: linear-gradient(160deg, var(--color-tan) 0%, var(--color-bone) 100%);
   border-radius: 24px;
   box-shadow:
-    0 4px 24px rgba(30, 26, 22, 0.08),
-    0 1px 4px rgba(30, 26, 22, 0.04);
+    0 4px 24px rgba(53, 64, 36, 0.08),
+    0 1px 4px rgba(53, 64, 36, 0.04);
   overflow: hidden;
   position: relative;
 }
@@ -102,12 +69,12 @@
    SOFT CARDS
 ═══════════════════════════════════════════ */
 .soft-card {
-  background: rgba(253, 250, 245, 0.9);
+  background: rgba(229, 215, 196, 0.85); /* bone with opacity */
   border-radius: 20px;
   box-shadow:
-    0 2px 16px rgba(30, 26, 22, 0.06),
-    0 1px 3px rgba(30, 26, 22, 0.04);
-  border: 1.5px solid rgba(196, 217, 188, 0.5);
+    0 2px 16px rgba(53, 64, 36, 0.06),
+    0 1px 3px rgba(53, 64, 36, 0.04);
+  border: 1.5px solid rgba(207, 187, 153, 0.6); /* tan border */
   backdrop-filter: blur(8px);
 }
 
@@ -136,8 +103,8 @@
    BUTTONS
 ═══════════════════════════════════════════ */
 .btn-primary {
-  background: linear-gradient(135deg, #5A8F5A 0%, #7BA87A 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-moss) 0%, var(--color-kombu) 100%);
+  color: var(--color-bone);
   border-radius: 16px;
   font-weight: 700;
   font-family: var(--font-sans);
@@ -145,8 +112,8 @@
   font-size: 1rem;
   letter-spacing: 0.01em;
   box-shadow:
-    0 4px 16px rgba(90, 143, 90, 0.35),
-    0 1px 4px rgba(90, 143, 90, 0.2);
+    0 4px 16px rgba(53, 64, 36, 0.35),
+    0 1px 4px rgba(53, 64, 36, 0.2);
   transition: all 0.15s ease;
   border: none;
   cursor: pointer;
@@ -163,15 +130,15 @@
 }
 
 .btn-secondary {
-  background: rgba(253, 250, 245, 0.95);
-  color: #3D6B3D;
+  background: rgba(229, 215, 196, 0.95);
+  color: var(--color-kombu);
   border-radius: 16px;
   font-weight: 700;
   font-family: var(--font-sans);
   padding: 14px 20px;
   font-size: 0.9375rem;
-  box-shadow: 0 2px 12px rgba(30, 26, 22, 0.08);
-  border: 1.5px solid rgba(196, 217, 188, 0.7);
+  box-shadow: 0 2px 12px rgba(53, 64, 36, 0.08);
+  border: 1.5px solid rgba(136, 144, 99, 0.5);
   transition: all 0.15s ease;
   cursor: pointer;
   display: flex;
@@ -191,19 +158,19 @@
 }
 
 .btn-choice {
-  background: rgba(253, 250, 245, 0.9);
+  background: rgba(229, 215, 196, 0.9);
   border-radius: 18px;
   font-weight: 600;
   font-family: var(--font-sans);
   padding: 20px 16px;
   font-size: 0.9375rem;
-  box-shadow: 0 2px 12px rgba(30, 26, 22, 0.07);
-  border: 2px solid rgba(196, 217, 188, 0.5);
+  box-shadow: 0 2px 12px rgba(53, 64, 36, 0.07);
+  border: 2px solid rgba(207, 187, 153, 0.5);
   transition: all 0.2s ease;
   cursor: pointer;
   text-align: center;
   width: 100%;
-  color: #1E1A16;
+  color: var(--color-kombu);
 }
 
 .btn-choice:hover, .btn-choice.selected {
@@ -220,7 +187,7 @@
    ERA BADGE
 ═══════════════════════════════════════════ */
 .era-badge-green {
-  background: linear-gradient(135deg, #5A8F5A, #7BA87A);
+  background: var(--color-moss);
   color: white;
   border-radius: 999px;
   padding: 6px 16px;
@@ -234,8 +201,8 @@
 }
 
 .era-badge-mixed {
-  background: linear-gradient(135deg, #B8835A, #D4A574);
-  color: white;
+  background: linear-gradient(135deg, var(--color-cafe), var(--color-tan));
+  color: var(--color-bone);
   border-radius: 999px;
   padding: 6px 16px;
   font-size: 0.8125rem;
@@ -244,7 +211,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 10px rgba(184, 131, 90, 0.3);
+  box-shadow: 0 2px 10px rgba(76, 61, 25, 0.3);
 }
 
 .era-badge-red {
@@ -417,22 +384,22 @@ input[type="range"]::-webkit-slider-thumb {
    TEXT INPUT
 ═══════════════════════════════════════════ */
 .soft-input {
-  background: rgba(253, 250, 245, 0.9);
-  border: 2px solid rgba(196, 217, 188, 0.6);
+  background: rgba(229, 215, 196, 0.9);
+  border: 2px solid rgba(207, 187, 153, 0.6);
   border-radius: 14px;
   padding: 14px 18px;
   font-family: var(--font-sans);
   font-size: 1rem;
-  color: #1E1A16;
+  color: var(--color-kombu);
   width: 100%;
   outline: none;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(30, 26, 22, 0.04);
+  box-shadow: 0 2px 8px rgba(53, 64, 36, 0.04);
 }
 
 .soft-input:focus {
-  border-color: #7BA87A;
-  box-shadow: 0 0 0 4px rgba(90, 143, 90, 0.1), 0 2px 8px rgba(30, 26, 22, 0.04);
+  border-color: var(--color-moss);
+  box-shadow: 0 0 0 4px rgba(136, 144, 99, 0.1), 0 2px 8px rgba(53, 64, 36, 0.04);
 }
 
 /* ═══════════════════════════════════════════

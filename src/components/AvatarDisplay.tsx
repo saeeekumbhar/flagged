@@ -113,7 +113,7 @@ export function AvatarDisplay({ avatar, score = 50, size = 96, accessories = [],
         {visual.hasRibbons && (
           <motion.path 
             d="M 28 15 Q 10 30 15 50" 
-            stroke="#F5D990" 
+            stroke="#CFBB99" 
             strokeWidth="3" 
             fill="none" 
             strokeLinecap="round"
@@ -133,7 +133,7 @@ export function AvatarDisplay({ avatar, score = 50, size = 96, accessories = [],
 
       {/* Accessories */}
       {accessories.length > 0 && (
-        <div className="absolute -bottom-2 flex gap-1 bg-white/90 rounded-full px-2 py-1 shadow-md border border-[#EBE5DA] z-30">
+        <div className="absolute -bottom-2 flex gap-1 bg-white/60 backdrop-blur-xl/90 rounded-full px-2 py-1 shadow-md border border-[#CFBB99] z-30">
           {accessories.map((acc, i) => (
             <span key={i} className="text-[12px] leading-none drop-shadow-sm">{acc}</span>
           ))}

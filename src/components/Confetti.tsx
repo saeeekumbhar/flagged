@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const COLORS = ['#7BA87A', '#C4D9BC', '#F5D990', '#E8856A', '#7EB3CC'];
+const COLORS = ['#889063', '#C4D9BC', '#CFBB99', '#E8856A', '#7EB3CC'];
 
 export function Confetti({ duration = 1500 }: { duration?: number }) {
   const [particles, setParticles] = useState<any[]>([]);

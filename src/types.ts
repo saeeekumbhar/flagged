@@ -37,7 +37,19 @@ export interface LoggedActivity {
 
 export interface DailyLog {
   date: string; // ISO string 'YYYY-MM-DD'
+  
+  // Legacy
   activities: LoggedActivity[];
+
+  // New Structured Fields
+  transport?: string;
+  food?: string;
+  delivery?: string;
+  energyLaptop?: string;
+  energyAC?: string;
+  shopping?: string;
+  reflection?: 'rough' | 'mixed' | 'green';
+
   totalFlagImpact: number;
   totalCarbonEstimate: number;
   notes: string;
@@ -54,4 +66,5 @@ export type TabType = 'home' | 'journey' | 'coach' | 'community' | 'profile';
 export type NavState = 
   | { type: 'tab'; tab: TabType }
   | { type: 'day_details'; date: string }
+  | { type: 'day_summary'; date: string }
   | { type: 'badge_details'; badgeId: string };

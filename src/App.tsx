@@ -15,6 +15,7 @@ import { CoachTab } from './components/tabs/CoachTab';
 import { CommunityTab } from './components/tabs/CommunityTab';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
+import { DaySummaryScreen } from './components/screens/DaySummaryScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
 
 export default function App() {
@@ -113,7 +114,7 @@ export default function App() {
            activities: isGreen ? [{ activityId: 'commute_walk_bike', count: 1 }] : [{ activityId: 'commute_car', count: 1 }],
            totalFlagImpact: isGreen ? 10 : -5,
            totalCarbonEstimate: isGreen ? 0.5 : 12,
-           notes: 'Mock entry'
+           notes: ''
          };
       }
       localStorage.setItem('flagged_logs', JSON.stringify(l));
@@ -227,7 +228,7 @@ export default function App() {
       });
     }
     if (navState.type === 'day_details') {
-      setNavState({ type: 'tab', tab: 'journey' });
+      setNavState({ type: 'day_summary', date: log.date });
     }
   };
 
@@ -328,7 +329,7 @@ export default function App() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
       <div 
-        className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[#FDF9F3] sm:rounded-[40px] sm:border-[8px] sm:border-white sm:shadow-[0_0_40px_rgba(0,0,0,0.08)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
+        className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[url('/bg-green.png')] bg-cover bg-center bg-no-repeat sm:rounded-[40px] sm:border-[8px] sm:border-white/20 sm:shadow-[0_0_40px_rgba(0,0,0,0.2)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
         style={{ contain: 'paint' }}
       >
         {/* Toast */}
@@ -337,7 +338,7 @@ export default function App() {
             <div className="absolute top-6 inset-x-0 z-[100] flex justify-center pointer-events-none px-4">
               <motion.div 
                 initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-                className={`${toast.type === 'darkGreen' ? 'bg-[#3A6E3A]' : 'bg-[#3A8F3A]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
+                className={`${toast.type === 'darkGreen' ? 'bg-[#889063]' : 'bg-[#889063]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
               >
                 {toast.msg}
               </motion.div>
@@ -366,10 +367,21 @@ export default function App() {
           {navState.type === 'day_details' && (
             <DayDetailsScreen
               key="day_details"
+              profile={profile}
               date={navState.date}
               existingLog={logs[navState.date]}
               onSave={handleLogSave}
               onCancel={() => setNavState({ type: 'tab', tab: 'journey' })}
+            />
+          )}
+          {navState.type === 'day_summary' && (
+            <DaySummaryScreen
+              key="day_summary"
+              profile={profile}
+              date={navState.date}
+              existingLog={logs[navState.date]}
+              onEdit={() => setNavState({ type: 'day_details', date: navState.date })}
+              onBack={() => setNavState({ type: 'tab', tab: 'journey' })}
             />
           )}
           {navState.type === 'badge_details' && (

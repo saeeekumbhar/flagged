@@ -41,7 +41,7 @@ export function BadgeDetailsScreen({ badgeId, profile, logs, onBack }: BadgeDeta
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 bg-[#FDF9F3] overflow-y-auto no-scrollbar pointer-events-auto"
+      className="absolute inset-0 z-50 bg-[#E5D7C4] overflow-y-auto no-scrollbar pointer-events-auto"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
@@ -53,7 +53,7 @@ export function BadgeDetailsScreen({ badgeId, profile, logs, onBack }: BadgeDeta
         <div className="flex items-center justify-between mb-12">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#1E1A16] bg-white border border-[#EBE5DA] shadow-sm active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[#354024] bg-white/60 backdrop-blur-xl border border-[#CFBB99] shadow-sm active:scale-95 transition-transform"
           >
             ←
           </button>
@@ -65,25 +65,25 @@ export function BadgeDetailsScreen({ badgeId, profile, logs, onBack }: BadgeDeta
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', delay: 0.1 }}
-            className={`w-40 h-40 rounded-[32px] flex items-center justify-center text-[70px] mb-8 shadow-lg border border-[#EBE5DA] ${badge.isUnlocked ? 'bg-gradient-to-br from-[#E4EDE0] to-[#FDF6EC]' : 'bg-[#F0EDE4] opacity-50 grayscale'}`}
+            className={`w-40 h-40 rounded-[32px] flex items-center justify-center text-[70px] mb-8 shadow-lg border border-[#CFBB99] ${badge.isUnlocked ? 'bg-gradient-to-br from-[#E4EDE0] to-[#E5D7C4]' : 'bg-[#CFBB99] opacity-50 grayscale'}`}
           >
             {badge.icon}
           </motion.div>
           
-          <h2 className="text-3xl font-bold text-[#1E1A16] mb-2 text-center">
+          <h2 className="text-3xl font-bold text-[#354024] mb-2 text-center">
             {badge.label}
           </h2>
           
-          <p className="text-sm font-bold text-[#8A8070] uppercase tracking-wider mb-6 text-center">
+          <p className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-6 text-center">
             {badge.desc}
           </p>
           
-          <div className="bg-white rounded-2xl p-5 border border-[#EBE5DA] shadow-sm w-full">
-            <h3 className="text-xs font-bold text-[#1E1A16] uppercase tracking-wider mb-2">Status</h3>
-            <p className={`text-sm font-semibold ${badge.isUnlocked ? 'text-[#3A8F3A]' : 'text-[#8A8070]'}`}>
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-[#CFBB99] shadow-sm w-full">
+            <h3 className="text-xs font-bold text-[#354024] uppercase tracking-wider mb-2">Status</h3>
+            <p className={`text-sm font-semibold ${badge.isUnlocked ? 'text-[#889063]' : 'text-[#4C3D19]'}`}>
               {badge.isUnlocked ? 'Unlocked!' : 'Locked'}
             </p>
-            <p className="text-sm text-[#1E1A16] mt-2">
+            <p className="text-sm text-[#354024] mt-2">
               {badge.isUnlocked ? badge.unlockedMsg : badge.lockedMsg}
             </p>
           </div>

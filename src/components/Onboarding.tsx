@@ -18,7 +18,7 @@ function ProgressDots({ current, total }: { current: number; total: number }) {
         <motion.div key={i} className="h-2 rounded-full"
           animate={{
             width: i === current ? 24 : 8,
-            backgroundColor: i < current ? '#5A8F5A' : i === current ? '#7BA87A' : 'rgba(196,217,188,0.4)',
+            backgroundColor: i < current ? '#889063' : i === current ? '#889063' : 'rgba(196,217,188,0.4)',
           }}
           transition={{ duration: 0.3 }}
         />
@@ -37,8 +37,8 @@ function ChoiceBtn({ emoji, label, desc, onClick, selected }: {
     >
       <span className="text-3xl flex-shrink-0">{emoji}</span>
       <div>
-        <div className="font-semibold text-[#1E1A16]">{label}</div>
-        {desc && <div className="text-sm text-[#8A8070] mt-0.5">{desc}</div>}
+        <div className="font-semibold text-[#354024]">{label}</div>
+        {desc && <div className="text-sm text-[#4C3D19] mt-0.5">{desc}</div>}
       </div>
     </motion.button>
   );
@@ -98,12 +98,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <div className="absolute inset-0 rounded-full glow-pulse"
                 style={{ background: 'radial-gradient(circle, rgba(90,143,90,0.2) 0%, transparent 70%)' }} />
               <div className="w-36 h-36 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #FDF6EC 100%)', boxShadow: '0 8px 32px rgba(90,143,90,0.2)' }}>
+                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #E5D7C4 100%)', boxShadow: '0 8px 32px rgba(90,143,90,0.2)' }}>
                 <span className="text-7xl plant-float">🚩</span>
               </div>
             </motion.div>
             <div>
-              <h1 className="text-display text-4xl font-bold text-[#1F3D20] mb-3 leading-tight">
+              <h1 className="text-display text-4xl font-bold text-[#354024] mb-3 leading-tight">
                 Are you a green flag?<br />Let's find out.
               </h1>
               <p className="text-[#5A8070] text-base leading-relaxed">
@@ -121,8 +121,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">✨</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">What should we call you?</h2>
-              <p className="text-[#8A8070] text-sm">Your journey will be uniquely yours.</p>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">What should we call you?</h2>
+              <p className="text-[#4C3D19] text-sm">Your journey will be uniquely yours.</p>
             </div>
             <input type="text" className="soft-input text-center text-lg"
               placeholder="Your name"
@@ -132,7 +132,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             />
             {profile.name && (
               <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="text-center text-[#5A8F5A] font-semibold">
+                className="text-center text-[#889063] font-semibold">
                 Hi {profile.name?.split(' ')[0]}! Let's see your flag 🚩
               </motion.p>
             )}
@@ -148,7 +148,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">🏫</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">How's campus life, {firstName}?</h2>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How's campus life, {firstName}?</h2>
             </div>
             <div className="flex flex-col gap-3">
               <ChoiceBtn emoji="🏠" label="I live on campus" desc="Hostel life, full immersion"
@@ -166,8 +166,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">🛤️</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">How do you move?</h2>
-              <p className="text-[#8A8070] text-sm">Your commute affects your footprint.</p>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How do you move?</h2>
+              <p className="text-[#4C3D19] text-sm">Your commute affects your footprint.</p>
             </div>
             <div className="flex flex-col gap-3">
               <ChoiceBtn emoji="🚶" label="Walk or cycle" desc="Zero emissions 🌿"
@@ -187,7 +187,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">🍱</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">What's your food vibe?</h2>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">What's your food vibe?</h2>
             </div>
             <div className="flex flex-col gap-3">
               {profile.userType === 'day_scholar' ? (
@@ -216,18 +216,18 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">📦</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">How often does delivery call?</h2>
-              <p className="text-[#8A8070] text-sm">Packaging waste adds up — be honest.</p>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How often does delivery call?</h2>
+              <p className="text-[#4C3D19] text-sm">Packaging waste adds up — be honest.</p>
             </div>
             <div className="soft-card p-6">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-3xl font-mono font-bold text-[#5A8F5A]">{profile.deliveryFrequency}×</span>
-                <span className="text-sm text-[#8A8070]">per week</span>
+                <span className="text-3xl font-mono font-bold text-[#889063]">{profile.deliveryFrequency}×</span>
+                <span className="text-sm text-[#4C3D19]">per week</span>
               </div>
               <input type="range" min="0" max="7" value={profile.deliveryFrequency || 0}
                 onChange={e => setProfile({ ...profile, deliveryFrequency: parseInt(e.target.value) })}
                 className="w-full" />
-              <div className="flex justify-between mt-2 text-xs text-[#8A8070]">
+              <div className="flex justify-between mt-2 text-xs text-[#4C3D19]">
                 <span>Never 🌿</span><span>Every day 📦</span>
               </div>
             </div>
@@ -240,7 +240,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">🔌</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2 leading-tight">
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2 leading-tight">
                 Leave chargers plugged in when empty?
               </h2>
             </div>
@@ -258,8 +258,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-6">
             <div className="text-center">
               <div className="text-4xl mb-4">🪞</div>
-              <h2 className="text-display text-3xl font-bold text-[#1F3D20] mb-2">Pick your avatar</h2>
-              <p className="text-[#8A8070] text-sm">This will represent you across the app.</p>
+              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">Pick your avatar</h2>
+              <p className="text-[#4C3D19] text-sm">This will represent you across the app.</p>
             </div>
 
             <div className="grid grid-cols-5 gap-3">
@@ -275,7 +275,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                         ? 'linear-gradient(135deg, #C4D9BC, #E4EDE0)'
                         : 'rgba(253,250,245,0.9)',
                       border: selectedAvatar === av.id
-                        ? '2.5px solid #5A8F5A'
+                        ? '2.5px solid #889063'
                         : '2px solid rgba(196,217,188,0.4)',
                       boxShadow: selectedAvatar === av.id
                         ? '0 4px 16px rgba(90,143,90,0.25)'
@@ -297,11 +297,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 <AvatarDisplay avatar={chosenAvatar} size={48} />
               </div>
               <div>
-                <p className="font-bold text-[#1E1A16]">{profile.name?.split(' ')[0] || 'You'}</p>
-                <p className="text-xs text-[#8A8070]">{chosenAvatar.tag} · {chosenAvatar.label}</p>
+                <p className="font-bold text-[#354024]">{profile.name?.split(' ')[0] || 'You'}</p>
+                <p className="text-xs text-[#4C3D19]">{chosenAvatar.tag} · {chosenAvatar.label}</p>
               </div>
               <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                className="ml-auto text-[#5A8F5A] text-xl">✓</motion.span>
+                className="ml-auto text-[#889063] text-xl">✓</motion.span>
             </div>
 
             <motion.button className="btn-primary py-4" onClick={nextStep} whileTap={{ scale: 0.97 }}>
@@ -320,17 +320,17 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               <div className="absolute inset-0 rounded-full glow-pulse"
                 style={{ background: 'radial-gradient(circle, rgba(90,143,90,0.3) 0%, transparent 70%)' }} />
               <div className="w-40 h-40 rounded-full overflow-hidden relative"
-                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #FDF6EC 100%)', boxShadow: '0 12px 40px rgba(90,143,90,0.25)', border: '3px solid rgba(196,217,188,0.6)' }}>
+                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #E5D7C4 100%)', boxShadow: '0 12px 40px rgba(90,143,90,0.25)', border: '3px solid rgba(196,217,188,0.6)' }}>
                 <AvatarDisplay avatar={chosenAvatar} size={160} />
               </div>
             </motion.div>
 
             <div>
-              <motion.p className="text-sm font-semibold text-[#7BA87A] uppercase tracking-widest mb-2"
+              <motion.p className="text-sm font-semibold text-[#889063] uppercase tracking-widest mb-2"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
                 Welcome to <span className="font-logo text-[15px]">FLAGGED</span>,
               </motion.p>
-              <motion.h1 className="text-display text-4xl font-bold text-[#1F3D20] mb-4"
+              <motion.h1 className="text-display text-4xl font-bold text-[#354024] mb-4"
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
                 {firstName} 🚩
               </motion.h1>
@@ -338,7 +338,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 className="inline-flex items-center gap-2 era-badge-mixed px-4 py-2 text-base">
                 <span>🔥</span> Glow Up Era
               </motion.div>
-              <motion.p className="text-[#8A8070] text-sm mt-4 leading-relaxed"
+              <motion.p className="text-[#4C3D19] text-sm mt-4 leading-relaxed"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}>
                 Your footprint journey starts now.<br />Every green flag you earn lowers your impact.
               </motion.p>
@@ -358,7 +358,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   return (
     <div className="min-h-screen flex flex-col p-6 overflow-hidden"
-      style={{ background: 'radial-gradient(ellipse 100% 60% at 50% 0%, rgba(196,217,188,0.35) 0%, transparent 65%), #FDFAF5' }}>
+      style={{ background: 'radial-gradient(ellipse 100% 60% at 50% 0%, rgba(196,217,188,0.35) 0%, transparent 65%), #E5D7C4' }}>
       {showDots && <div className="mb-6"><ProgressDots current={dotIndex} total={STEPS.length - 2} /></div>}
       {!showDots && <div className="h-8" />}
       <div className="flex-1 flex items-center justify-center">

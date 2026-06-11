@@ -21,13 +21,13 @@ export function getAvatarAura(score: number) {
   if (score <= 40) return {
     ring: 'rgba(212,97,74,0.5)',
     glow: 'rgba(212,97,74,0.2)',
-    bg: 'linear-gradient(135deg, #FDEEED, #FDF9F3)',
+    bg: 'linear-gradient(135deg, #FDEEED, #E5D7C4)',
     label: 'Keep going — every step counts 🌱',
   };
   if (score <= 70) return {
     ring: 'rgba(212,165,116,0.6)',
     glow: 'rgba(212,165,116,0.22)',
-    bg: 'linear-gradient(135deg, #FDF6EC, #FDFAF5)',
+    bg: 'linear-gradient(135deg, #E5D7C4, #E5D7C4)',
     label: "You're glowing up 🔥",
   };
   return {
@@ -64,7 +64,7 @@ export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
       pointsRemaining: 41 - score,
       visual: {
         color: '#D4614A',
-        poleColor: '#A0988A',
+        poleColor: '#4C3D19',
         animationLevel: 'minimal',
         hasRibbons: false,
         hasParticles: false,
@@ -80,7 +80,7 @@ export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
       pointsRemaining: 61 - score,
       visual: {
         color: '#D4A574',
-        poleColor: '#A0988A',
+        poleColor: '#4C3D19',
         animationLevel: 'slight',
         hasRibbons: false,
         hasParticles: false,
@@ -95,8 +95,8 @@ export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
       nextThreshold: 76,
       pointsRemaining: 76 - score,
       visual: {
-        color: '#7BA87A',
-        poleColor: '#A0988A',
+        color: '#889063',
+        poleColor: '#4C3D19',
         animationLevel: 'noticeable',
         hasRibbons: false,
         hasParticles: true,
@@ -111,8 +111,8 @@ export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
       nextThreshold: 91,
       pointsRemaining: 91 - score,
       visual: {
-        color: '#5A8F5A',
-        poleColor: '#A0988A',
+        color: '#889063',
+        poleColor: '#4C3D19',
         animationLevel: 'strong',
         hasRibbons: true,
         hasParticles: true,
@@ -127,8 +127,8 @@ export function getFlagEvolutionStage(score: number): FlagEvolutionStage {
       nextThreshold: null,
       pointsRemaining: null,
       visual: {
-        color: '#3A8F3A',
-        poleColor: '#F5D990',
+        color: '#889063',
+        poleColor: '#CFBB99',
         animationLevel: 'legendary',
         hasRibbons: true,
         hasParticles: true,

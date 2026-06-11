@@ -36,44 +36,44 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-[#1F3D20] px-1">AI Coach</h2>
+      <h2 className="text-display text-2xl font-bold text-[#354024] px-1">AI Coach</h2>
 
       {/* Weekly Roast Card */}
       {roast ? (
-        <motion.div className="bg-white rounded-[24px] p-6 shadow-sm border border-[#EBE5DA]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">🔥</span>
-            <h3 className="text-[13px] font-bold text-[#8A8070] uppercase tracking-wider">This Week's Roast</h3>
+            <h3 className="text-[13px] font-bold text-[#4C3D19] uppercase tracking-wider">This Week's Roast</h3>
           </div>
-          <p className="text-lg font-bold text-[#1E1A16] mb-2 leading-snug">"{roast.roast}"</p>
-          <p className="text-sm text-[#A0988A] italic mb-5">{roast.realityCheck}</p>
+          <p className="text-lg font-bold text-[#354024] mb-2 leading-snug">"{roast.roast}"</p>
+          <p className="text-sm text-[#4C3D19] italic mb-5">{roast.realityCheck}</p>
           
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[#FDECEE] rounded-xl p-3 border border-[#F4B2B8]">
               <div className="text-[10px] uppercase font-bold text-[#A03030] mb-1">One Fix</div>
-              <div className="text-xs font-semibold text-[#1E1A16] leading-snug">{roast.oneFix}</div>
+              <div className="text-xs font-semibold text-[#354024] leading-snug">{roast.oneFix}</div>
             </div>
-            <div className="bg-[#EAF3DE] rounded-xl p-3 border border-[#BEE0BE]">
+            <div className="bg-[#CFBB99] rounded-xl p-3 border border-[#BEE0BE]">
               <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-1">One Win</div>
-              <div className="text-xs font-semibold text-[#1E1A16] leading-snug">{roast.oneWin}</div>
+              <div className="text-xs font-semibold text-[#354024] leading-snug">{roast.oneWin}</div>
             </div>
           </div>
         </motion.div>
       ) : (
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-[#EBE5DA] text-center text-[#A0988A]">
+        <div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99] text-center text-[#4C3D19]">
           Log some activities to receive your first roast!
         </div>
       )}
 
       {/* Best Habit Card */}
-      <motion.div className="bg-gradient-to-br from-[#FFF5D1] to-[#FFE898] rounded-[24px] p-6 shadow-sm border border-[#F5D990] relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <motion.div className="bg-gradient-to-br from-[#FFF5D1] to-[#FFE898] rounded-[24px] p-6 shadow-sm border border-[#CFBB99] relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="flex items-start gap-4 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-white/50 flex items-center justify-center text-3xl shadow-inner border border-white/50 shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-white/60 backdrop-blur-xl/50 flex items-center justify-center text-3xl shadow-inner border border-white/50 shrink-0">
             {topHabitEmoji}
           </div>
           <div className="flex-1">
-            <h4 className="text-[11px] font-bold text-[#854F0B] uppercase tracking-wider mb-1">Top Habit</h4>
-            <p className="text-[15px] font-bold text-[#1E1A16] leading-snug">
+            <h4 className="text-[11px] font-bold text-[#4C3D19] uppercase tracking-wider mb-1">Top Habit</h4>
+            <p className="text-[15px] font-bold text-[#354024] leading-snug">
               {topHabitText}
             </p>
           </div>
@@ -81,16 +81,16 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
       </motion.div>
 
       {/* Recommendations / Chat Mockup */}
-      <motion.div className="bg-white rounded-[24px] p-6 shadow-sm border border-[#EBE5DA]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold text-[#1E1A16] mb-4">Quick Questions</h3>
+      <motion.div className="bg-white/60 backdrop-blur-xl rounded-[24px] p-6 shadow-sm border border-[#CFBB99]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <h3 className="text-sm font-bold text-[#354024] mb-4">Quick Questions</h3>
         <div className="flex flex-col gap-2">
-          <button className="text-left w-full bg-[#FDF9F3] border border-[#EBE5DA] rounded-xl p-3 text-sm font-semibold text-[#1E1A16] active:scale-95 transition-transform">
+          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
             "How can I improve my transport score?"
           </button>
-          <button className="text-left w-full bg-[#FDF9F3] border border-[#EBE5DA] rounded-xl p-3 text-sm font-semibold text-[#1E1A16] active:scale-95 transition-transform">
+          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
             "What's the carbon footprint of my AC?"
           </button>
-          <button className="text-left w-full bg-[#FDF9F3] border border-[#EBE5DA] rounded-xl p-3 text-sm font-semibold text-[#1E1A16] active:scale-95 transition-transform">
+          <button className="text-left w-full bg-[#E5D7C4] border border-[#CFBB99] rounded-xl p-3 text-sm font-semibold text-[#354024] active:scale-95 transition-transform">
             "Suggest a weekend challenge for me."
           </button>
         </div>

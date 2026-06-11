@@ -72,7 +72,7 @@ function GreenFlagIcon({ size = 80 }: { size?: number }) {
 const FLAG_STAGES = [
   { color: '#D4614A', opacity: 0.4, label: 'Red' },   // red flag
   { color: '#D4A574', opacity: 0.6, label: 'Mixed' }, // in between
-  { color: '#5A8F5A', opacity: 1.0, label: 'Green' }, // green flag
+  { color: '#889063', opacity: 1.0, label: 'Green' }, // green flag
 ];
 
 export function Splash({ onStart }: SplashProps) {
@@ -91,7 +91,7 @@ export function Splash({ onStart }: SplashProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-between p-6 overflow-hidden"
       style={{
-        background: 'radial-gradient(ellipse 100% 70% at 50% 0%, rgba(196,217,188,0.4) 0%, transparent 70%), #FDFAF5'
+        background: 'radial-gradient(ellipse 100% 70% at 50% 0%, rgba(196,217,188,0.4) 0%, transparent 70%), #E5D7C4'
       }}
     >
       {/* Top area — decorative */}
@@ -152,7 +152,7 @@ export function Splash({ onStart }: SplashProps) {
               className="h-2 rounded-full"
               animate={{
                 width: i === stage ? 24 : 8,
-                backgroundColor: i === stage ? s.color : i < stage ? '#5A8F5A' : 'rgba(196,217,188,0.4)',
+                backgroundColor: i === stage ? s.color : i < stage ? '#889063' : 'rgba(196,217,188,0.4)',
               }}
               transition={{ duration: 0.35 }}
             />
@@ -176,7 +176,7 @@ export function Splash({ onStart }: SplashProps) {
           Are you a green flag? Let's find out.
         </motion.button>
 
-        <p className="text-center text-xs text-[#8A8070] mt-4">
+        <p className="text-center text-xs text-[#4C3D19] mt-4">
           Track your footprint. Lower your impact. Live greener.
         </p>
       </motion.div>
