@@ -320,7 +320,7 @@ export default function App() {
         className="w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[#FDF9F3] sm:rounded-[40px] sm:border-[8px] sm:border-white sm:shadow-[0_0_40px_rgba(0,0,0,0.08)] relative overflow-y-auto overflow-x-hidden no-scrollbar ring-1 ring-black/5"
         style={{ contain: 'paint' }}
       >
-        <Profile profile={profile} onBack={() => setViewingProfile(false)} onAvatarChange={handleAvatarChange} />
+        <Profile profile={profile} logs={logs} onBack={() => setViewingProfile(false)} onAvatarChange={handleAvatarChange} />
       </div>
     </div>
     );

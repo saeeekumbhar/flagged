@@ -5,6 +5,7 @@ import { getAvatar, getAvatarAura, getFlagEvolutionStage } from '../avatars';
 import { GreenFlagIcon } from './GreenFlagIcon';
 import { AvatarDisplay } from './AvatarDisplay';
 import { ACTIVITIES } from '../activities';
+import { generateWeeklyRoast, generateFlagForecast } from '../utils/growthEngine';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -243,6 +244,31 @@ function MonthlyCalendar({ logs, onLogDate, profile }: { logs: Record<string, Da
               </div>
             </div>
           </div>
+
+          {/* ── Weekly Roast Card ── */}
+          {(() => {
+            const roast = generateWeeklyRoast(logs);
+            if (!roast) return null;
+            return (
+              <div className="bg-white rounded-[16px] p-4 mt-2 shadow-sm border border-[#EBE5DA]">
+                <h4 className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wider mb-2">Weekly Roast</h4>
+                <p className="text-sm font-bold text-[#1E1A16] mb-1">"{roast.roast}"</p>
+                <p className="text-xs text-[#A0988A] italic mb-3">{roast.realityCheck}</p>
+                
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <div className="bg-[#FDECEE] rounded-xl p-2.5">
+                    <div className="text-[10px] uppercase font-bold text-[#A03030] mb-0.5">One Fix</div>
+                    <div className="text-[11px] text-[#1E1A16] leading-tight">{roast.oneFix}</div>
+                  </div>
+                  <div className="bg-[#EAF3DE] rounded-xl p-2.5">
+                    <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-0.5">One Win</div>
+                    <div className="text-[11px] text-[#1E1A16] leading-tight">{roast.oneWin}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
         </div>
       )}
     </motion.div>
@@ -260,6 +286,7 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
   const avatar = getAvatar(profile.avatarId ?? 'av1');
   const greeting = useMemo(() => getGreeting(profile.name), [profile.name]);
   const flagEvolution = getFlagEvolutionStage(profile.flagScore);
+  const forecast = generateFlagForecast(logs, profile);
 
   // Compute monthly stats
   const currentMonth = new Date().getMonth();
@@ -447,6 +474,19 @@ export function Dashboard({ profile, logs, onLogDate, onOpenProfile, onAwardXP, 
           <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
         </div>
       </motion.button>
+
+      {/* ── Flag Forecast Card ── */}
+      <motion.div 
+        className="bg-gradient-to-r from-[#F0F5ED] to-[#FDF9F3] rounded-[16px] p-3.5 mb-2 shadow-sm border border-[#EBE5DA] flex items-center gap-3"
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <div className="text-2xl drop-shadow-sm shrink-0">🔮</div>
+        <div className="flex-1">
+          <h4 className="text-[10px] font-bold text-[#8A8070] uppercase tracking-wider mb-0.5">Forecast</h4>
+          <p className="text-xs font-bold text-[#1E1A16] leading-tight mb-0.5">{forecast.prediction}</p>
+          <p className="text-[10px] text-[#5A8F5A] leading-tight">{forecast.opportunity}</p>
+        </div>
+      </motion.div>
 
       {/* ── Daily Stats ── */}
       <div className="grid grid-cols-2 gap-2 mb-2">
