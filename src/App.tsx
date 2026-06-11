@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, DailyLog, NavState } from './types';
-import { calculateHistoricalScore } from './utils/ScoreEngine';
+import { calculateHistoricalScore, calculateDailyScore } from './utils/ScoreEngine';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
 import { Confetti } from './components/Confetti';
@@ -62,6 +62,12 @@ export default function App() {
         migrated = true;
         log.notes = '';
         console.warn(`Cleared mock entry notes in log ${date}`);
+      }
+      
+      if (log.dailyScore === undefined) {
+        migrated = true;
+        log.dailyScore = calculateDailyScore(log);
+        console.warn(`Assigned missing dailyScore to log ${date}: ${log.dailyScore}`);
       }
     });
     if (migrated) {

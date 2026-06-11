@@ -1,5 +1,4 @@
 import { DailyLog, UserProfile } from '../types';
-import { calculateDailyFlagImpact } from './CarbonEngine';
 
 export const calculateBaseScore = (profile: Partial<UserProfile>): number => {
   let score = 50;
@@ -19,70 +18,122 @@ export const calculateBaseScore = (profile: Partial<UserProfile>): number => {
   return Math.max(0, Math.min(100, score));
 };
 
+export const calculateDailyScore = (log: Partial<DailyLog>): number => {
+  // Transport (35%)
+  let tScore = 100;
+  switch (log.transport) {
+    case 'walk': case 'cycle': case 'none': tScore = 100; break;
+    case 'bus': case 'metro': tScore = 85; break;
+    case 'auto': tScore = 65; break;
+    case 'car': case 'cab': tScore = 35; break;
+  }
+
+  // Food (25%)
+  let fScore = 100;
+  switch (log.food) {
+    case 'mess': case 'home': case 'veg': case 'none': fScore = 100; break;
+    case 'mixed': fScore = 75; break;
+    case 'nonveg': fScore = 40; break;
+  }
+
+  // Delivery (10%)
+  let dScore = 100;
+  switch (log.delivery) {
+    case 'no': dScore = 100; break;
+    case 'once': dScore = 60; break;
+    case 'multiple': dScore = 20; break;
+  }
+
+  // Shopping (10%)
+  let sScore = 100;
+  switch (log.shopping) {
+    case 'no': sScore = 100; break;
+    case 'small': sScore = 80; break;
+    case 'medium': sScore = 50; break;
+    case 'large': sScore = 20; break;
+  }
+
+  // Energy - Laptop (10%)
+  let elScore = 100;
+  switch (log.energyLaptop) {
+    case '<2h': case 'none': elScore = 100; break;
+    case '2-4h': elScore = 80; break;
+    case '4-8h': elScore = 60; break;
+    case '8+h': elScore = 40; break;
+  }
+
+  // Energy - AC (10%)
+  let eaScore = 100;
+  switch (log.energyAC) {
+    case 'none': eaScore = 100; break;
+    case '<2h': eaScore = 80; break;
+    case '2-6h': eaScore = 50; break;
+    case '6+h': eaScore = 20; break;
+  }
+
+  return Math.round(
+    (tScore * 0.35) +
+    (fScore * 0.25) +
+    (dScore * 0.10) +
+    (sScore * 0.10) +
+    (elScore * 0.10) +
+    (eaScore * 0.10)
+  );
+};
+
 export interface DerivedScoreState {
   score: number;
   streak: number;
 }
 
 export const calculateHistoricalScore = (profile: UserProfile, logs: Record<string, DailyLog>): DerivedScoreState => {
-  let score = calculateBaseScore(profile);
-  let streak = 0;
-
   const dates = Object.keys(logs).sort();
+  let streak = 0;
   let lastLoggedDate: Date | null = null;
+  const last30Scores: number[] = [];
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
 
   for (const dateStr of dates) {
     const log = logs[dateStr];
     const logDate = new Date(dateStr);
 
-    // Apply Decay before the log is counted
+    // Apply Streak logic
     if (lastLoggedDate) {
       const daysDiff = Math.floor((logDate.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
-      
-      // Streak breaks if gap is > 1 day
       if (daysDiff > 1 && streak > 0) {
         streak = 0;
       }
-      
-      // Decay starts after 3 missed days
-      if (daysDiff > 3) {
-        const decay = daysDiff - 3;
-        if (score > 50) score = Math.max(50, score - decay);
-        else if (score < 50) score = Math.min(50, score + decay);
-      }
     }
-
     streak += 1;
-
-    let impact = calculateDailyFlagImpact(log);
-    
-    // Comeback Multiplier: 1.5x points if in Red Flag Era
-    if (score <= 40 && impact > 0) {
-      impact = Math.ceil(impact * 1.5);
-    }
-    
-    score = Math.max(0, Math.min(100, score + impact));
     lastLoggedDate = logDate;
+
+    // We rely on log.dailyScore, or calculate it on the fly if missing (e.g. migration hasn't fired yet)
+    const dayScore = log.dailyScore !== undefined ? log.dailyScore : calculateDailyScore(log);
+    
+    // Only include in 30-day average if it's within 30 days
+    if (logDate >= thirtyDaysAgo) {
+      last30Scores.push(dayScore);
+    }
   }
 
-  // Final decay check against today
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  
+  // Final streak check against today
   if (lastLoggedDate) {
     const d1 = new Date(todayStr);
     const daysDiff = Math.floor((d1.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
-    
     if (daysDiff > 1 && streak > 0) {
       streak = 0;
     }
-    
-    if (daysDiff > 3) {
-      const decay = daysDiff - 3;
-      if (score > 50) score = Math.max(50, score - decay);
-      else if (score < 50) score = Math.min(50, score + decay);
-    }
   }
 
-  return { score, streak };
+  let finalScore = calculateBaseScore(profile);
+  if (last30Scores.length > 0) {
+    const sum = last30Scores.reduce((a, b) => a + b, 0);
+    finalScore = Math.round(sum / last30Scores.length);
+  }
+
+  return { score: finalScore, streak };
 };

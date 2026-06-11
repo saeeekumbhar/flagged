@@ -74,7 +74,12 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
               bgColor = '#347346';
               textColor = '#FFFFFF';
               fontWeight = 'bold';
+            } else if (log && log.dailyScore !== undefined) {
+              if (log.dailyScore >= 70) { bgColor = '#EAF3EA'; textColor = '#1A2315'; fontWeight = 'bold'; }
+              else if (log.dailyScore < 40) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
+              else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
             } else if (log) {
+              // Legacy Fallback
               if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#1A2315'; fontWeight = 'bold'; }
               else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
               else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
@@ -119,9 +124,15 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
                   <div className="text-xs text-[#4C3D19] italic">No check-in recorded</div>
                 )}
                 
-                <div className="text-xs font-bold mt-2 text-[#354024] bg-black/5 self-start px-3 py-1 rounded-full">
-                  Flag Impact: {log.totalFlagImpact > 0 ? '+' : ''}{log.totalFlagImpact}
-                </div>
+                {log.dailyScore !== undefined ? (
+                  <div className={`text-xs font-bold mt-2 self-start px-3 py-1 rounded-full ${log.dailyScore >= 70 ? 'bg-[#EAF3EA] text-[#347346]' : log.dailyScore < 40 ? 'bg-[#FDECEE] text-[#A03030]' : 'bg-[#E5D7C4] text-[#4C3D19]'}`}>
+                    {log.dailyScore >= 70 ? '🟢' : log.dailyScore < 40 ? '🔴' : '🟡'} {log.dailyScore}/100
+                  </div>
+                ) : (
+                  <div className="text-xs font-bold mt-2 text-[#354024] bg-black/5 self-start px-3 py-1 rounded-full">
+                    Flag Impact: {log.totalFlagImpact > 0 ? '+' : ''}{log.totalFlagImpact}
+                  </div>
+                )}
               </div>
               {log.notes && <div className="text-xs italic text-[#4C3D19] mt-1">"{log.notes}"</div>}
             </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { DailyLog, UserProfile } from '../../types';
 import { calculateDailyEmissions, calculateDailyFlagImpact } from '../../utils/CarbonEngine';
+import { calculateDailyScore } from '../../utils/ScoreEngine';
 
 interface DayDetailsScreenProps {
   key?: string;
@@ -34,6 +35,7 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
 
     const flagImpact = calculateDailyFlagImpact(logData);
     const carbonEstimate = calculateDailyEmissions(logData);
+    const dailyScore = calculateDailyScore(logData);
 
     onSave({
       date,
@@ -45,6 +47,7 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
       energyAC: energyAC as any,
       shopping: shopping as any,
       reflection,
+      dailyScore,
       totalFlagImpact: flagImpact,
       totalCarbonEstimate: carbonEstimate,
       notes: existingLog?.notes || ''

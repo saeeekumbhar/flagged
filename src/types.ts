@@ -50,7 +50,8 @@ export interface DailyLog {
   shopping?: 'no' | 'small' | 'medium' | 'large';
   reflection?: 'rough' | 'mixed' | 'green';
 
-  totalFlagImpact: number;
+  dailyScore?: number; // 0-100 Daily Sustainability Score
+  totalFlagImpact: number; // Deprecated: legacy cumulative impact delta
   totalCarbonEstimate: number;
   notes: string;
 }

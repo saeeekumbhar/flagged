@@ -25,6 +25,29 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
   const dna = calculateFlagDNA(logs);
   const glowUp = calculateGlowUp(logs, profile);
 
+  const logValues = Object.values(logs).filter(l => l.dailyScore !== undefined).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  let bestDay = { score: 0, date: 'N/A' };
+  let worstDay = { score: 100, date: 'N/A' };
+  let trend = 'Neutral ➖';
+
+  if (logValues.length > 0) {
+    logValues.forEach(log => {
+      if (log.dailyScore! >= bestDay.score) bestDay = { score: log.dailyScore!, date: log.date };
+      if (log.dailyScore! <= worstDay.score) worstDay = { score: log.dailyScore!, date: log.date };
+    });
+
+    if (logValues.length >= 2) {
+      const firstHalf = logValues.slice(0, Math.floor(logValues.length / 2));
+      const secondHalf = logValues.slice(Math.floor(logValues.length / 2));
+      const avg1 = firstHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / firstHalf.length;
+      const avg2 = secondHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / secondHalf.length;
+      if (avg2 > avg1 + 5) trend = 'Improving 📈';
+      else if (avg2 < avg1 - 5) trend = 'Declining 📉';
+    }
+  }
+  
+  const formatShortDate = (dStr: string) => dStr === 'N/A' ? 'N/A' : new Date(dStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
@@ -63,6 +86,29 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
           {Math.floor(profile.flagScore / 20) === 0 && (
             <span className="text-xs text-[#4C3D19]">Keep logging to unlock accessories.</span>
           )}
+        </div>
+      </motion.div>
+
+      {/* Flag Score Stats */}
+      <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <h3 className="text-sm font-bold text-[#1A2315] mb-3">Score Analytics</h3>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
+            <span className="text-sm font-semibold text-[#1A2315]">30-Day Average</span>
+            <span className="text-sm font-bold text-[#347346]">{profile.flagScore}/100</span>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
+            <span className="text-sm font-semibold text-[#1A2315]">Best Day</span>
+            <span className="text-sm font-bold text-[#1A2315]">{bestDay.date === 'N/A' ? 'N/A' : `${bestDay.score}/100 (${formatShortDate(bestDay.date)})`}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
+            <span className="text-sm font-semibold text-[#1A2315]">Worst Day</span>
+            <span className="text-sm font-bold text-[#A03030]">{worstDay.date === 'N/A' ? 'N/A' : `${worstDay.score}/100 (${formatShortDate(worstDay.date)})`}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-[20px] bg-white/40 border border-white/60">
+            <span className="text-sm font-semibold text-[#1A2315]">Monthly Trend</span>
+            <span className="text-sm font-bold text-[#1A2315]">{trend}</span>
+          </div>
         </div>
       </motion.div>
 
