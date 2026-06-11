@@ -15,24 +15,29 @@ export function BadgeDetailsScreen({ badgeId, profile, logs, onBack }: BadgeDeta
   // Re-calculate some metrics
   const currentMonth = new Date().getMonth();
   let monthlyGreenFlags = 0;
-  const activityCounts: Record<string, number> = {};
+  let activeCommuteDays = 0;
+  let unpluggedDays = 0;
+  let busDays = 0;
   
   Object.values(logs).forEach(log => {
+    if (log.transport === 'walk' || log.transport === 'cycle') activeCommuteDays++;
+    if (log.energyAC === 'none') unpluggedDays++;
+    if (log.transport === 'bus' || log.transport === 'metro') busDays++;
+
     const logMonth = new Date(log.date).getMonth();
     if (logMonth === currentMonth) {
-      log.activities.forEach(a => {
-        activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + 1;
-        if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home') || a.activityId === 'quick_green') monthlyGreenFlags++;
-      });
+      if (log.dailyScore && log.dailyScore >= 70) {
+        monthlyGreenFlags++;
+      }
     }
   });
 
   const allBadges = [
     { id: 'b1', icon: '🚩', label: 'First Flag', desc: 'Started your journey', isUnlocked: true, lockedMsg: 'Log your first activity.', unlockedMsg: 'You officially started your journey!' },
-    { id: 'b2', icon: '🚲', label: 'Active Mover', desc: '5 days active commute', isUnlocked: (activityCounts['commute_walk_bike'] || 0) >= 5, lockedMsg: 'Walk or cycle for 5 days.', unlockedMsg: 'You are an active commuter!' },
-    { id: 'b3', icon: '💧', label: 'Mindful Energy', desc: 'Unplugged 7 times', isUnlocked: (activityCounts['energy_mindful'] || 0) >= 7, lockedMsg: 'Unplug chargers 7 times.', unlockedMsg: 'Great job saving energy!' },
+    { id: 'b2', icon: '🚲', label: 'Active Mover', desc: '5 days active commute', isUnlocked: activeCommuteDays >= 5, lockedMsg: 'Walk or cycle for 5 days.', unlockedMsg: 'You are an active commuter!' },
+    { id: 'b3', icon: '💧', label: 'Mindful Energy', desc: 'Unplugged 7 times', isUnlocked: unpluggedDays >= 7, lockedMsg: 'Log 7 days with no AC usage.', unlockedMsg: 'Great job saving energy!' },
     { id: 'streak7', icon: '🔥', label: 'Streak 7', desc: '7 days in a row', isUnlocked: profile.bestStreak >= 7, lockedMsg: 'Keep logging every day to unlock this.', unlockedMsg: 'Great work earning a 7-day streak!' },
-    { id: 'busRider', icon: '🚌', label: 'Bus rider', desc: 'Use public transport', isUnlocked: (activityCounts['commute_public'] || 0) > 0, lockedMsg: 'Use public transport to unlock this.', unlockedMsg: 'You are a bus rider!' },
+    { id: 'busRider', icon: '🚌', label: 'Bus rider', desc: 'Use public transport', isUnlocked: busDays > 0, lockedMsg: 'Use public transport to unlock this.', unlockedMsg: 'You are a bus rider!' },
     { id: 'greenWeek', icon: '🌱', label: 'Green week', desc: '7 green flags', isUnlocked: monthlyGreenFlags >= 7, lockedMsg: 'Log 7 green choices this month to unlock.', unlockedMsg: 'You had a very green week!' },
     { id: '30days', icon: '💎', label: '30 days', desc: '30 days streak', isUnlocked: profile.bestStreak >= 30, lockedMsg: 'Keep logging green choices to unlock this.', unlockedMsg: 'Incredible 30-day streak!' }
   ];

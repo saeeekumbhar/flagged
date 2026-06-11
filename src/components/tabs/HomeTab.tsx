@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
-import { generateFlagForecast } from '../../utils/growthEngine';
+import { generateFlagForecast } from '../../utils/InsightEngine';
 import { Logo } from '../Logo';
 
 interface HomeTabProps {
@@ -24,14 +24,7 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  let greenToday = 0;
-  let redToday = 0;
-  if (logs[todayStr]) {
-    logs[todayStr].activities.forEach(a => {
-      if (a.activityId.includes('commute_walk') || a.activityId.includes('thrift') || a.activityId.includes('mindful') || a.activityId.includes('food_home') || a.activityId === 'quick_green') greenToday += a.count;
-      if (a.activityId.includes('car') || a.activityId.includes('delivery') || a.activityId.includes('ac') || a.activityId.includes('major') || a.activityId === 'quick_red') redToday += a.count;
-    });
-  }
+  // Legacy greenToday/redToday has been deprecated.
 
   const handleStreakClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -45,20 +38,21 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
   };
 
   const currentMonth = new Date().getMonth();
-  const activityCounts: Record<string, number> = {};
+  let hasPublicTransport = false;
+  let hasHomeFood = false;
+
   Object.values(logs).forEach(log => {
     const logMonth = new Date(log.date).getMonth();
     if (logMonth === currentMonth) {
-      log.activities.forEach(a => {
-        activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + 1;
-      });
+      if (log.transport === 'bus' || log.transport === 'metro') hasPublicTransport = true;
+      if (log.food === 'home' || log.food === 'mess') hasHomeFood = true;
     }
   });
 
   const accessories: string[] = [];
   if (profile.bestStreak >= 7) accessories.push('🔥');
-  if ((activityCounts['commute_public'] || 0) >= 1) accessories.push('🚲');
-  if ((activityCounts['food_home'] || 0) >= 1) accessories.push('🍃');
+  if (hasPublicTransport) accessories.push('🚲');
+  if (hasHomeFood) accessories.push('🍃');
 
   return (
     <div className="h-full max-w-[420px] mx-auto px-4 pt-4 pb-4 flex flex-col justify-between relative z-10 pointer-events-auto">

@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
-import { generateWeeklyRoast, generateFlagForecast } from '../../utils/InsightEngine';
-import { ACTIVITIES } from '../../activities';
+import { generateWeeklyRoast } from '../../utils/InsightEngine';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;
@@ -12,24 +11,36 @@ interface InsightsTabProps {
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const roast = generateWeeklyRoast(logs);
 
+  let walks = 0;
+  let homeFood = 0;
+  let noAC = 0;
+  let noShopping = 0;
+  
   const currentMonth = new Date().getMonth();
-  const activityCounts: Record<string, number> = {};
   
   Object.values(logs).forEach(log => {
-    log.activities.forEach(a => {
-      activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + a.count;
-    });
+    const logMonth = new Date(log.date).getMonth();
+    if (logMonth === currentMonth) {
+      if (log.transport === 'walk' || log.transport === 'cycle') walks++;
+      if (log.food === 'home' || log.food === 'mess') homeFood++;
+      if (log.energyAC === 'none') noAC++;
+      if (log.shopping === 'no') noShopping++;
+    }
   });
 
-  const sortedActivities = Object.entries(activityCounts).sort((a, b) => b[1] - a[1]);
+  const habits = [
+    { label: 'Walking/Cycling', count: walks, emoji: '🚶' },
+    { label: 'Home Food', count: homeFood, emoji: '🍱' },
+    { label: 'Unplugged AC', count: noAC, emoji: '❄️' },
+    { label: 'No Shopping', count: noShopping, emoji: '🛍️' }
+  ].sort((a, b) => b.count - a.count);
+
   let topHabitText = "Start logging to discover your best habits!";
   let topHabitEmoji = "⭐";
-  if (sortedActivities.length > 0) {
-    const topDef = ACTIVITIES.find(a => a.id === sortedActivities[0][0]);
-    if (topDef) {
-      topHabitText = `Crushing it with ${topDef.label} — ${sortedActivities[0][1]} times logged!`;
-      topHabitEmoji = topDef.emoji;
-    }
+  
+  if (habits[0].count > 0) {
+    topHabitText = `Crushing it with ${habits[0].label} — ${habits[0].count} times this month!`;
+    topHabitEmoji = habits[0].emoji;
   }
 
   return (

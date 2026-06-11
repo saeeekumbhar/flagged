@@ -89,14 +89,7 @@ export const calculateDailyFlagImpact = (log: Partial<DailyLog>): number => {
     case 'large': impact -= 8; break;
   }
 
-  // Legacy fallback (adds legacy points if the structured log hasn't fully replaced it yet)
-  if (log.activities) {
-    log.activities.forEach(a => {
-      // Small manual mappings for quick buttons since we will move to derived mode
-      if (a.activityId === 'quick_green') impact += 1;
-      if (a.activityId === 'quick_red') impact -= 1;
-    });
-  }
+  // Removed legacy activities fallback
 
   return impact;
 };

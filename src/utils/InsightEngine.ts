@@ -20,22 +20,21 @@ export function calculateFlagDNA(logs: Record<string, DailyLog>): FlagDNA {
   let communityScore = 2;
 
   Object.values(logs).forEach(log => {
-    log.activities.forEach(a => {
-      const c = a.count;
-      if (a.activityId === 'commute_walk_bike' || a.activityId === 'commute_public') transportScore += c * 0.5;
-      if (a.activityId === 'commute_car') transportScore -= c * 0.5;
-      
-      if (a.activityId === 'food_home') foodScore += c * 0.5;
-      if (a.activityId === 'food_delivery') foodScore -= c * 0.5;
-      
-      if (a.activityId === 'energy_mindful') energyScore += c * 0.5;
-      if (a.activityId === 'energy_ac') energyScore -= c * 0.5;
-      
-      if (a.activityId === 'purchase_thrift') shoppingScore += c * 0.5;
-      if (a.activityId === 'purchase_major') shoppingScore -= c * 0.5;
-
-      if (a.activityId === 'quick_green') communityScore += c * 0.2;
-    });
+    // Transport Trait
+    if (log.transport === 'walk' || log.transport === 'cycle' || log.transport === 'bus') transportScore += 0.5;
+    if (log.transport === 'car' || log.transport === 'cab') transportScore -= 0.5;
+    
+    // Food Trait
+    if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') foodScore += 0.5;
+    if (log.food === 'nonveg' || log.food === 'mixed') foodScore -= 0.5;
+    
+    // Energy Trait
+    if (log.energyAC === 'none' && (log.energyLaptop === 'none' || log.energyLaptop === '<2h')) energyScore += 0.5;
+    if (log.energyAC === '6+h' || log.energyLaptop === '8+h') energyScore -= 0.5;
+    
+    // Shopping Trait
+    if (log.shopping === 'no' || log.shopping === 'small') shoppingScore += 0.5;
+    if (log.shopping === 'large') shoppingScore -= 0.5;
   });
 
   // Clamp 1-5 and round
@@ -100,22 +99,22 @@ export function calculateGlowUp(logs: Record<string, DailyLog>, profile: UserPro
   const baselineFoodCO2 = 3; 
 
   Object.values(logs).forEach(log => {
-    let dayCO2 = 0;
-    log.activities.forEach(a => {
-      const isGreen = !a.activityId.includes('red') && !a.activityId.includes('car') && !a.activityId.includes('ac') && !a.activityId.includes('delivery') && !a.activityId.includes('major');
-      if (isGreen) greenFlagsCompleted += a.count;
+    // Determine if day was generally green (Score >= 70)
+    if (log.dailyScore && log.dailyScore >= 70) {
+      greenFlagsCompleted += 1;
+    }
 
-      if (a.activityId === 'commute_walk_bike' || a.activityId === 'commute_public') {
-        co2AvoidedKg += baselineCarCO2 * a.count;
-        moneySaved += 50 * a.count; // ~₹50 saved vs cab
-      }
-      if (a.activityId === 'food_home') {
-        co2AvoidedKg += baselineFoodCO2 * a.count;
-        moneySaved += 150 * a.count; // ~₹150 saved vs delivery
-      }
-      if (a.activityId === 'energy_mindful') moneySaved += 10 * a.count;
-      if (a.activityId === 'purchase_thrift') moneySaved += 500 * a.count;
-    });
+    if (log.transport === 'walk' || log.transport === 'cycle' || log.transport === 'bus' || log.transport === 'metro') {
+      co2AvoidedKg += baselineCarCO2;
+      moneySaved += 50; // ~₹50 saved vs cab
+    }
+    if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') {
+      co2AvoidedKg += baselineFoodCO2;
+      moneySaved += 150; // ~₹150 saved vs delivery
+    }
+    if (log.shopping === 'no') {
+      moneySaved += 500; // Simulating not buying fast fashion
+    }
   });
 
   const daysLogged = Object.keys(logs).length;
@@ -140,25 +139,25 @@ export interface WeeklyRoast {
 }
 
 export function generateWeeklyRoast(logs: Record<string, DailyLog>): WeeklyRoast | null {
-  const logValues = Object.values(logs);
-  if (logValues.length === 0) return null;
+  const recentLogs = Object.values(logs)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 7);
 
-  // Only consider the last 7 days logically, but for this client demo, we just look at all available recent logs
-  const activityCounts: Record<string, number> = {};
-  logValues.forEach(log => {
-    log.activities.forEach(a => {
-      activityCounts[a.activityId] = (activityCounts[a.activityId] || 0) + a.count;
-    });
+  if (recentLogs.length === 0) return null;
+
+  let deliveries = 0;
+  let cabs = 0;
+  let ac = 0;
+  let walks = 0;
+  let homeFood = 0;
+
+  recentLogs.forEach(log => {
+    if (log.delivery === 'once' || log.delivery === 'multiple') deliveries++;
+    if (log.transport === 'cab' || log.transport === 'car') cabs++;
+    if (log.energyAC === '6+h' || log.energyAC === '2-6h') ac++;
+    if (log.transport === 'walk' || log.transport === 'cycle') walks++;
+    if (log.food === 'home' || log.food === 'mess') homeFood++;
   });
-
-  const getCount = (id: string) => activityCounts[id] || 0;
-
-  const deliveries = getCount('food_delivery');
-  const cabs = getCount('commute_car');
-  const ac = getCount('energy_ac');
-  
-  const walks = getCount('commute_walk_bike');
-  const homeFood = getCount('food_home');
 
   let roast = "You've been too perfect lately, no roast for you.";
   let realityCheck = "Keep it up!";
@@ -210,7 +209,7 @@ export function generateFlagForecast(logs: Record<string, DailyLog>, profile: Us
   if (profile.streak >= 3) {
     prediction = "You're on a hot streak! Transport looks strong.";
     opportunity = "Keep the momentum to reach a new best streak.";
-  } else if (logValues.length > 0 && logValues[logValues.length - 1].totalFlagImpact < 0) {
+  } else if (logValues.length > 0 && logValues[logValues.length - 1].dailyScore !== undefined && logValues[logValues.length - 1].dailyScore! < 40) {
     prediction = "Food delivery might be your biggest red flag this week.";
     opportunity = "One home-cooked meal could unlock your next milestone.";
     suggestedChallenge = "Eat a green meal";

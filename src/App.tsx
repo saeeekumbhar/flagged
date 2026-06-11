@@ -91,7 +91,10 @@ export default function App() {
          const isGreen = mockPattern[6 - i] > 0;
          l[dateStr] = {
            date: dateStr,
-           activities: isGreen ? [{ activityId: 'commute_walk_bike', count: 1 }] : [{ activityId: 'commute_car', count: 1 }],
+           activities: [], // Legacy compat
+           transport: isGreen ? 'walk' : 'car',
+           food: isGreen ? 'home' : 'delivery',
+           dailyScore: isGreen ? 85 : 30,
            totalFlagImpact: isGreen ? 10 : -5,
            totalCarbonEstimate: isGreen ? 0.5 : 12,
            notes: ''
@@ -190,34 +193,7 @@ export default function App() {
     }
   };
 
-  const handleQuickLog = (type: 'green' | 'red') => {
-    if (!profile) return;
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
-    const prevLog = logs[dateStr] || { date: dateStr, activities: [], notes: '', totalFlagImpact: 0, totalCarbonEstimate: 0 };
-    
-    const impactDelta = type === 'green' ? 1 : -1;
-    const newLog = {
-      ...prevLog,
-      totalFlagImpact: prevLog.totalFlagImpact + impactDelta,
-      activities: [
-        ...prevLog.activities,
-        { activityId: `quick_${type}`, count: 1 }
-      ]
-    };
-    
-    setLogs(prev => {
-      const updated = { ...prev, [dateStr]: newLog };
-      localStorage.setItem('flagged_logs', JSON.stringify(updated));
-      return updated;
-    });
-
-    if (type === 'green') {
-      handleAwardXP(10, 5, 'Quick Green Action');
-    } else {
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 400);
+  // handleQuickLog was removed as it relied on the legacy action-spam system.
       handleAwardXP(-5, 0, 'Quick Red Action');
     }
   };
@@ -272,7 +248,7 @@ export default function App() {
         <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
           {navState.type === 'tab' && (
             <>
-              {navState.tab === 'home' && <HomeTab profile={derivedProfile} logs={logs} onAwardXP={handleAwardXP} onQuickLog={handleQuickLog} onNavigate={setNavState} showToastMsg={showToastMsg} />}
+              {navState.tab === 'home' && <HomeTab profile={derivedProfile} logs={logs} onAwardXP={handleAwardXP} onNavigate={setNavState} showToastMsg={showToastMsg} />}
               {navState.tab === 'journey' && <JourneyTab profile={derivedProfile} logs={logs} onNavigate={setNavState} />}
               {navState.tab === 'insights' && <InsightsTab profile={derivedProfile} logs={logs} />}
               {navState.tab === 'community' && <CommunityTab profile={derivedProfile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
