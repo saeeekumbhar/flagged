@@ -74,8 +74,16 @@ export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, show
             Carbon Footprint Tracker
           </div>
         </div>
-        <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-[#F5D990] text-xs font-semibold text-[#854F0B] shadow-sm">
-          <span>🟡</span> {profile.coins || 0} pts
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1 border border-[#F5D990] text-xs font-semibold text-[#854F0B] shadow-sm">
+            <span>🟡</span> {profile.coins || 0} pts
+          </div>
+          <button 
+            onClick={() => onNavigate({ type: 'tab', tab: 'profile' })}
+            className="w-8 h-8 rounded-full bg-white border border-[#EBE5DA] flex items-center justify-center shadow-sm active:scale-95 transition-transform text-[#1E1A16]"
+          >
+            👤
+          </button>
         </div>
       </motion.div>
 
@@ -101,9 +109,8 @@ export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, show
       </motion.div>
 
       {/* ── Flag Avatar Status Card ── */}
-      <motion.button 
-        onClick={() => onNavigate({ type: 'tab', tab: 'profile' })}
-        className="w-full text-left bg-white rounded-[16px] p-4 shadow-sm border border-[#EBE5DA] relative overflow-hidden active:scale-[0.98] transition-transform flex items-center justify-between mb-2"
+      <motion.div 
+        className="w-full text-left bg-white rounded-[16px] p-4 shadow-sm border border-[#EBE5DA] relative overflow-hidden flex items-center justify-between mb-2"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
         <div className="flex items-center gap-4 relative z-10 flex-1 min-w-0 pr-3">
           <div className="shrink-0 w-[72px] h-[72px]">
@@ -130,14 +137,14 @@ export function HomeTab({ profile, logs, onAwardXP, onQuickLog, onNavigate, show
           </div>
         </div>
 
-        <div 
+        <button 
           onClick={handleStreakClick}
           className="flex flex-col items-center bg-[#FFF8E8] border-[0.5px] border-[#F5D990] rounded-xl px-2.5 py-1.5 pointer-events-auto shrink-0 active:scale-95 transition-transform"
         >
           <div className="text-[20px] font-medium text-[#854F0B] leading-none">{profile.streak}</div>
           <div className="text-[9px] text-[#854F0B] mt-0.5">day streak</div>
-        </div>
-      </motion.button>
+        </button>
+      </motion.div>
 
       {/* ── Flag Forecast Card ── */}
       <motion.div 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Logo } from './Logo';
 
 interface SplashProps {
   onStart: () => void;
@@ -135,17 +136,12 @@ export function Splash({ onStart }: SplashProps) {
 
         {/* Brand */}
         <motion.div
-          className="text-center"
+          className="flex justify-center w-full mt-4"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.7 }}
         >
-          <h1 className="font-logo text-5xl text-[#1F3D20] mb-2 tracking-tight">
-            FLAGGED
-          </h1>
-          <p className="text-[#5A8070] text-base font-medium">
-            Green flag behavior starts here.
-          </p>
+          <Logo size="lg" />
         </motion.div>
 
         {/* Stage dots — red → mixed → green */}
