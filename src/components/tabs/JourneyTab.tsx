@@ -43,7 +43,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Your Journey</h2>
+      <h2 className="text-display text-2xl font-bold drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Your Journey</h2>
 
       {/* Calendar Section */}
       <motion.div className="premium-glass rounded-[32px] p-6 shadow-sm border border-white/60" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
@@ -70,7 +70,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
             
             let bgColor = 'transparent';
-            let textColor = '#4C3D19';
+            let textColor = '#1A2315';
             let fontWeight = '600';
 
             if (isToday) {
@@ -101,7 +101,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
       {/* Recent Activity Section */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <div className="flex justify-between items-center mb-3 px-1">
-          <h3 className="text-sm font-bold text-white drop-shadow-md">Recent Activity</h3>
+          <h3 className="text-sm font-bold drop-shadow-md" style={{ color: '#FFFFFF' }}>Recent Activity</h3>
         </div>
         
         <div className="flex flex-col gap-3">
@@ -111,11 +111,17 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
                 {new Date(log.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
               </div>
               <div className="flex flex-wrap gap-2">
-                {log.activities.map((act, i) => {
+                {Object.values(log.activities.reduce((acc, a) => {
+                  acc[a.activityId] = acc[a.activityId] || { ...a, count: 0 };
+                  acc[a.activityId].count += a.count;
+                  return acc;
+                }, {} as Record<string, { activityId: string, count: number }>)).map((act, i) => {
                   const isRed = act.activityId.includes('red') || act.activityId.includes('car') || act.activityId.includes('ac') || act.activityId.includes('delivery') || act.activityId.includes('major');
                   return (
-                    <div key={i} className={`text-xs px-2 py-1 rounded-md flex items-center gap-1 ${isRed ? 'bg-[#FDECEE] text-[#A03030]' : 'bg-[#EAF3EA] text-[#2D5D2D]'}`}>
-                      {isRed ? '🔴' : '🟢'} {act.activityId.replace('quick_', '').replace('_', ' ')} x{act.count}
+                    <div key={i} className={`text-[11px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 ${isRed ? 'bg-[#FDECEE]/80 text-[#A03030]' : 'bg-[#EAF3EA]/80 text-[#1A2315]'}`}>
+                      <div className={`w-2 h-2 rounded-full ${isRed ? 'bg-[#D4614A]' : 'bg-[#889063]'}`} />
+                      <span className="capitalize">{act.activityId.replace('quick_', '').replace('_', ' ')}</span>
+                      <span className="opacity-60 ml-0.5">x{act.count}</span>
                     </div>
                   );
                 })}
@@ -131,17 +137,15 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
 
       {/* Trends Section */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold text-white drop-shadow-md mb-3 px-1">All-Time Trends</h3>
+        <h3 className="text-sm font-bold drop-shadow-md mb-3 px-1" style={{ color: '#FFFFFF' }}>All-Time Trends</h3>
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="premium-glass rounded-[24px] p-4 flex flex-col items-center justify-center text-center">
-            <div className="text-2xl mb-1">🌱</div>
-            <div className="text-lg font-bold text-[#1A2315]">{totalGreen}</div>
-            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-semibold mt-1">Green Flags</div>
+          <div className="premium-glass rounded-[24px] p-5 flex flex-col justify-center border-l-4 border-l-[#889063]">
+            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-bold mb-1">Green Flags</div>
+            <div className="text-3xl font-bold text-[#1A2315] leading-none">{totalGreen}</div>
           </div>
-          <div className="premium-glass rounded-[24px] p-4 flex flex-col items-center justify-center text-center">
-            <div className="text-2xl mb-1">⚠️</div>
-            <div className="text-lg font-bold text-[#D4614A]">{totalRed}</div>
-            <div className="text-[10px] uppercase tracking-widest text-[#D4614A] font-semibold mt-1">Red Flags</div>
+          <div className="premium-glass rounded-[24px] p-5 flex flex-col justify-center border-l-4 border-l-[#D4614A]">
+            <div className="text-[10px] uppercase tracking-widest text-[#4C3D19] font-bold mb-1">Red Flags</div>
+            <div className="text-3xl font-bold text-[#D4614A] leading-none">{totalRed}</div>
           </div>
         </div>
         <div className="premium-glass rounded-[24px] p-4 flex items-center justify-between">

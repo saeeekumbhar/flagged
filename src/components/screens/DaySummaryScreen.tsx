@@ -67,10 +67,10 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
             ←
           </button>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-[#889063] uppercase tracking-wider mb-0.5">
+            <p className="text-[10px] font-bold text-white/70 uppercase tracking-wider mb-0.5 drop-shadow-sm">
               Day Summary
             </p>
-            <h2 className="text-xl font-bold text-[#354024]">
+            <h2 className="text-xl font-bold text-white drop-shadow-md">
               {displayDate}
             </h2>
           </div>
@@ -100,9 +100,13 @@ export function DaySummaryScreen({ profile, date, existingLog, onEdit, onBack }:
             <div className="py-3">
               <span className="text-xs font-bold text-[#4C3D19] uppercase tracking-widest block mb-3">Legacy Actions</span>
               <div className="flex flex-wrap gap-2">
-                {existingLog.activities.map(a => (
-                  <div key={a.activityId} className="premium-pill text-[#1A2315] text-xs font-bold px-3 py-1.5 border-white/60">
-                    {a.activityId.replace('quick_', '').replace('_', ' ')} <span className="text-[#889063]">x{a.count}</span>
+                {Object.values(existingLog.activities.reduce((acc, a) => {
+                  acc[a.activityId] = acc[a.activityId] || { ...a, count: 0 };
+                  acc[a.activityId].count += a.count;
+                  return acc;
+                }, {} as Record<string, { activityId: string, count: number }>)).map(a => (
+                  <div key={a.activityId} className={`premium-pill text-xs font-bold px-3 py-1.5 border-white/60 ${a.activityId.includes('green') ? 'text-[#1A2315] bg-[#EAF3EA]/50' : 'text-[#A03030] bg-[#FDECEE]/50'}`}>
+                    <span className="capitalize">{a.activityId.replace('quick_', '').replace('_', ' ')}</span> <span className="opacity-60 ml-1">x{a.count}</span>
                   </div>
                 ))}
               </div>

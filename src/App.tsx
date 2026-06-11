@@ -11,7 +11,7 @@ import { Confetti } from './components/Confetti';
 import { BottomNav } from './components/BottomNav';
 import { HomeTab } from './components/tabs/HomeTab';
 import { JourneyTab } from './components/tabs/JourneyTab';
-import { CoachTab } from './components/tabs/CoachTab';
+import { InsightsTab } from './components/tabs/InsightsTab';
 import { CommunityTab } from './components/tabs/CommunityTab';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
@@ -352,7 +352,7 @@ export default function App() {
             <>
               {navState.tab === 'home' && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onQuickLog={handleQuickLog} onNavigate={setNavState} showToastMsg={showToastMsg} />}
               {navState.tab === 'journey' && <JourneyTab profile={profile} logs={logs} onNavigate={setNavState} />}
-              {navState.tab === 'coach' && <CoachTab profile={profile} logs={logs} />}
+              {navState.tab === 'insights' && <InsightsTab profile={profile} logs={logs} />}
               {navState.tab === 'community' && <CommunityTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
               {navState.tab === 'profile' && <ProfileTab profile={profile} logs={logs} onNavigate={setNavState} onAvatarChange={handleAvatarChange} />}
             </>

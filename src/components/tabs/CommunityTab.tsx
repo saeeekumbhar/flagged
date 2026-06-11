@@ -46,7 +46,7 @@ export function CommunityTab({ profile, onAwardXP, showToastMsg }: CommunityTabP
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Community</h2>
+      <h2 className="text-display text-2xl font-bold drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Community</h2>
 
       {/* ── Daily Challenges ── */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>

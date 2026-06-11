@@ -10,7 +10,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs: { id: TabType; icon: string; label: string }[] = [
     { id: 'home', icon: '🏠', label: 'Home' },
     { id: 'journey', icon: '🗺️', label: 'Journey' },
-    { id: 'coach', icon: '🦉', label: 'Coach' },
+    { id: 'insights', icon: '👣', label: 'Insights' },
     { id: 'community', icon: '🌍', label: 'Community' },
     { id: 'profile', icon: '👤', label: 'Profile' },
   ];

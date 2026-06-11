@@ -4,12 +4,12 @@ import { UserProfile, DailyLog } from '../../types';
 import { generateWeeklyRoast } from '../../utils/growthEngine';
 import { ACTIVITIES } from '../../activities';
 
-interface CoachTabProps {
+interface InsightsTabProps {
   logs: Record<string, DailyLog>;
   profile: UserProfile;
 }
 
-export function CoachTab({ logs, profile }: CoachTabProps) {
+export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const roast = generateWeeklyRoast(logs);
 
   const currentMonth = new Date().getMonth();
@@ -36,7 +36,7 @@ export function CoachTab({ logs, profile }: CoachTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">AI Coach</h2>
+      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Insights</h2>
 
       {/* Weekly Roast Card */}
       {roast ? (

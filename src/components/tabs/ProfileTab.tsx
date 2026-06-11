@@ -30,7 +30,7 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1">Profile</h2>
+        <h2 className="text-display text-2xl font-bold drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Profile</h2>
         <button className="w-10 h-10 rounded-full premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform text-xl">
           ⚙️
         </button>

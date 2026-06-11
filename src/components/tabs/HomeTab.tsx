@@ -137,35 +137,33 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
       </div>
 
       {/* ── Forecast & Daily Stats ── */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4 mt-2 px-1">
         <motion.div 
-          className="premium-glass rounded-[24px] p-4 flex items-center gap-4"
+          className="flex items-start gap-4"
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-          <div className="text-3xl drop-shadow-sm shrink-0">🔮</div>
+          <div className="text-3xl drop-shadow-md shrink-0">🔮</div>
           <div className="flex-1">
-            <h4 className="text-[9px] font-bold text-[#4C3D19] uppercase tracking-widest mb-0.5">Forecast</h4>
-            <p className="text-[13px] font-bold text-[#1A2315] leading-tight mb-1">{forecast.prediction}</p>
-            <p className="text-[11px] text-[#1A2315] leading-tight font-medium">{forecast.opportunity}</p>
+            <h4 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
+            <p className="text-[14px] font-bold text-white leading-tight mb-1 drop-shadow-md">{forecast.prediction}</p>
+            <p className="text-[12px] text-white/90 leading-tight font-medium drop-shadow-md">{forecast.opportunity}</p>
           </div>
         </motion.div>
         
-        <div className="grid grid-cols-2 gap-3">
-          <motion.div className="premium-glass rounded-[20px] p-3 flex items-center justify-center gap-3 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#889063]/10 to-transparent pointer-events-none" />
-            <div className="text-3xl font-bold text-[#889063] drop-shadow-sm tracking-tighter leading-none">{greenToday}</div>
-            <div className="text-[10px] text-[#1A2315] font-bold uppercase tracking-widest leading-tight">Green<br/>Flags</div>
+        <div className="grid grid-cols-2 gap-4 mt-1">
+          <motion.div className="flex items-center gap-3 relative" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
+            <div className="text-[40px] font-bold text-[#E4EDE0] drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)] tracking-tighter leading-none">{greenToday}</div>
+            <div className="text-[11px] text-[#E4EDE0] font-bold uppercase tracking-widest leading-tight drop-shadow-md">Green<br/>Flags</div>
           </motion.div>
           
-          <motion.div className="premium-glass rounded-[20px] p-3 flex items-center justify-center gap-3 relative overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#D4614A]/10 to-transparent pointer-events-none" />
-            <div className="text-3xl font-bold text-[#D4614A] drop-shadow-sm tracking-tighter leading-none">{redToday}</div>
-            <div className="text-[10px] text-[#1A2315] font-bold uppercase tracking-widest leading-tight">Red<br/>Flags</div>
+          <motion.div className="flex items-center gap-3 relative" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
+            <div className="text-[40px] font-bold text-[#FDECEE] drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)] tracking-tighter leading-none">{redToday}</div>
+            <div className="text-[11px] text-[#FDECEE] font-bold uppercase tracking-widest leading-tight drop-shadow-md">Red<br/>Flags</div>
           </motion.div>
         </div>
       </div>
 
       {/* ── Action CTA ── */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}>
+      <motion.div className="mt-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}>
         {logs[todayStr] ? (
           <motion.button 
             whileTap={{ scale: 0.96 }}

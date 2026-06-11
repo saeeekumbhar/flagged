@@ -61,7 +61,7 @@ export const calculateEra = (score: number): Era => {
   return 'Green Flag Era';
 };
 
-export type TabType = 'home' | 'journey' | 'coach' | 'community' | 'profile';
+export type TabType = 'home' | 'journey' | 'insights' | 'community' | 'profile';
 
 export type NavState = 
   | { type: 'tab'; tab: TabType }
