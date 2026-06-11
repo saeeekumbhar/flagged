@@ -48,3 +48,10 @@ export const calculateEra = (score: number): Era => {
   if (score <= 70) return 'Glow Up Era';
   return 'Green Flag Era';
 };
+
+export type TabType = 'home' | 'journey' | 'coach' | 'community' | 'profile';
+
+export type NavState = 
+  | { type: 'tab'; tab: TabType }
+  | { type: 'day_details'; date: string }
+  | { type: 'badge_details'; badgeId: string };

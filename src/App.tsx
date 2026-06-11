@@ -3,20 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
-import { UserProfile, DailyLog } from './types';
+import { motion, AnimatePresence } from 'motion/react';
+import { UserProfile, DailyLog, NavState } from './types';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
-import { Dashboard } from './components/Dashboard';
-import { ActivityLogger } from './components/ActivityLogger';
-import { Profile } from './components/Profile';
 import { Confetti } from './components/Confetti';
+import { BottomNav } from './components/BottomNav';
+import { HomeTab } from './components/tabs/HomeTab';
+import { JourneyTab } from './components/tabs/JourneyTab';
+import { CoachTab } from './components/tabs/CoachTab';
+import { CommunityTab } from './components/tabs/CommunityTab';
+import { ProfileTab } from './components/tabs/ProfileTab';
+import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
+import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [logs, setLogs] = useState<Record<string, DailyLog>>({});
-  const [loggingDate, setLoggingDate] = useState<string | null>(null);
-  const [viewingProfile, setViewingProfile] = useState(false);
+  const [navState, setNavState] = useState<NavState>({ type: 'tab', tab: 'home' });
+  const [toast, setToast] = useState<{msg: string, type?: 'green'|'darkGreen'} | null>(null);
   const [isShaking, setIsShaking] = useState(false);
   const [hasSeenSplash, setHasSeenSplash] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -221,7 +226,9 @@ export default function App() {
         coins: newCoins
       });
     }
-    setLoggingDate(null);
+    if (navState.type === 'day_details') {
+      setNavState({ type: 'tab', tab: 'journey' });
+    }
   };
 
   const handleAvatarChange = (avatarId: string) => {
@@ -310,47 +317,72 @@ export default function App() {
     });
   };
 
+  const showToastMsg = (msg: string, type?: 'green'|'darkGreen') => {
+    setToast({msg, type});
+    setTimeout(() => setToast(null), 3000);
+  };
+
   if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
   if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
-
-  if (viewingProfile) {
-    return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
-      <div 
-        className="w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[#FDF9F3] sm:rounded-[40px] sm:border-[8px] sm:border-white sm:shadow-[0_0_40px_rgba(0,0,0,0.08)] relative overflow-y-auto overflow-x-hidden no-scrollbar ring-1 ring-black/5"
-        style={{ contain: 'paint' }}
-      >
-        <Profile profile={profile} logs={logs} onBack={() => setViewingProfile(false)} onAvatarChange={handleAvatarChange} />
-      </div>
-    </div>
-    );
-  }
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
       <div 
-        className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[#FDF9F3] sm:rounded-[40px] sm:border-[8px] sm:border-white sm:shadow-[0_0_40px_rgba(0,0,0,0.08)] relative overflow-y-auto overflow-x-hidden no-scrollbar ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
+        className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[#FDF9F3] sm:rounded-[40px] sm:border-[8px] sm:border-white sm:shadow-[0_0_40px_rgba(0,0,0,0.08)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
         style={{ contain: 'paint' }}
       >
-        <Dashboard
-          profile={profile}
-          logs={logs}
-          onLogDate={(date) => setLoggingDate(date)}
-          onOpenProfile={() => setViewingProfile(true)}
-          onAwardXP={handleAwardXP}
-          onQuickLog={handleQuickLog}
-        />
+        {/* Toast */}
         <AnimatePresence>
-          {loggingDate && (
-            <ActivityLogger
-              key={loggingDate}
-              date={loggingDate}
-              existingLog={logs[loggingDate]}
+          {toast && (
+            <div className="absolute top-6 inset-x-0 z-[100] flex justify-center pointer-events-none px-4">
+              <motion.div 
+                initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
+                className={`${toast.type === 'darkGreen' ? 'bg-[#3A6E3A]' : 'bg-[#3A8F3A]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
+              >
+                {toast.msg}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Current Tab Render */}
+        <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
+          {navState.type === 'tab' && (
+            <>
+              {navState.tab === 'home' && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onQuickLog={handleQuickLog} onNavigate={setNavState} showToastMsg={showToastMsg} />}
+              {navState.tab === 'journey' && <JourneyTab profile={profile} logs={logs} onNavigate={setNavState} />}
+              {navState.tab === 'coach' && <CoachTab profile={profile} logs={logs} />}
+              {navState.tab === 'community' && <CommunityTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
+              {navState.tab === 'profile' && <ProfileTab profile={profile} logs={logs} onNavigate={setNavState} onAvatarChange={handleAvatarChange} />}
+            </>
+          )}
+        </div>
+
+        {/* Bottom Navigation */}
+        <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(t) => setNavState({ type: 'tab', tab: t })} />
+
+        {/* Detail Screens */}
+        <AnimatePresence>
+          {navState.type === 'day_details' && (
+            <DayDetailsScreen
+              key="day_details"
+              date={navState.date}
+              existingLog={logs[navState.date]}
               onSave={handleLogSave}
-              onCancel={() => setLoggingDate(null)}
+              onCancel={() => setNavState({ type: 'tab', tab: 'journey' })}
+            />
+          )}
+          {navState.type === 'badge_details' && (
+            <BadgeDetailsScreen
+              key="badge_details"
+              badgeId={navState.badgeId}
+              profile={profile}
+              logs={logs}
+              onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
             />
           )}
         </AnimatePresence>
+
         {showConfetti && <Confetti duration={1500} />}
       </div>
     </div>
