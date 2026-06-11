@@ -1,3 +1,8 @@
+/**
+ * @deprecated This legacy activity system is being phased out in favor of the CarbonEngine
+ * and structured DailyLog fields (transport, food, delivery, energyLaptop, energyAC, shopping).
+ * Do not add new activities here.
+ */
 import { ActivityDefinition } from './types';
 
 export const ACTIVITIES: ActivityDefinition[] = [

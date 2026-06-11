@@ -42,12 +42,12 @@ export interface DailyLog {
   activities: LoggedActivity[];
 
   // New Structured Fields
-  transport?: string;
-  food?: string;
-  delivery?: string;
-  energyLaptop?: string;
-  energyAC?: string;
-  shopping?: string;
+  transport?: 'walk' | 'cycle' | 'bus' | 'metro' | 'auto' | 'car' | 'cab' | 'none';
+  food?: 'mess' | 'home' | 'veg' | 'mixed' | 'nonveg' | 'none';
+  delivery?: 'no' | 'once' | 'multiple';
+  energyLaptop?: '<2h' | '2-4h' | '4-8h' | '8+h' | 'none';
+  energyAC?: 'none' | '<2h' | '2-6h' | '6+h';
+  shopping?: 'no' | 'small' | 'medium' | 'large';
   reflection?: 'rough' | 'mixed' | 'green';
 
   totalFlagImpact: number;

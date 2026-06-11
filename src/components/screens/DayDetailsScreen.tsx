@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { DailyLog, UserProfile } from '../../types';
+import { calculateDailyEmissions, calculateDailyFlagImpact } from '../../utils/CarbonEngine';
 
 interface DayDetailsScreenProps {
   key?: string;
@@ -21,72 +22,28 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
   const [reflection, setReflection] = useState<'rough' | 'mixed' | 'green' | undefined>(existingLog?.reflection);
 
   const handleSave = () => {
-    let flagImpact = 0;
-    let carbonEstimate = 0;
+    const logData: Partial<DailyLog> = {
+      transport: transport as any,
+      food: food as any,
+      delivery: delivery as any,
+      energyLaptop: energyLaptop as any,
+      energyAC: energyAC as any,
+      shopping: shopping as any,
+      activities: existingLog?.activities || []
+    };
 
-    // Scoring Logic
-    transport.split(',').forEach(v => {
-      if (!v) return;
-      if (v === 'walk' || v === 'cycle') { flagImpact += 10; carbonEstimate += 0.5; }
-      if (v === 'bus' || v === 'metro') { flagImpact += 5; carbonEstimate += 2; }
-      if (v === 'auto') { flagImpact -= 2; carbonEstimate += 5; }
-      if (v === 'car' || v === 'cab') { flagImpact -= 5; carbonEstimate += 12; }
-    });
-
-    food.split(',').forEach(v => {
-      if (!v) return;
-      if (v === 'mess' || v === 'home') { flagImpact += 5; carbonEstimate += 1.5; }
-      if (v === 'mixed') { flagImpact += 2; carbonEstimate += 3; }
-      if (v === 'nonveg') { flagImpact -= 5; carbonEstimate += 8; }
-    });
-
-    delivery.split(',').forEach(v => {
-      if (!v) return;
-      if (v === 'once') { flagImpact -= 3; carbonEstimate += 3; }
-      if (v === 'multiple') { flagImpact -= 8; carbonEstimate += 8; }
-      if (v === 'no') { flagImpact += 5; carbonEstimate += 0; }
-    });
-
-    energyLaptop.split(',').forEach(v => {
-      if (!v) return;
-      if (v === '<2h') { flagImpact += 5; carbonEstimate += 0.2; }
-      if (v === '8+h') { flagImpact -= 2; carbonEstimate += 1; }
-    });
-
-    energyAC.split(',').forEach(v => {
-      if (!v) return;
-      if (v === 'none') { flagImpact += 10; carbonEstimate += 0; }
-      if (v === '<2h') { flagImpact += 0; carbonEstimate += 2; }
-      if (v === '2-6h') { flagImpact -= 5; carbonEstimate += 6; }
-      if (v === '6+h') { flagImpact -= 10; carbonEstimate += 12; }
-    });
-
-    shopping.split(',').forEach(v => {
-      if (!v) return;
-      if (v === 'no') { flagImpact += 5; carbonEstimate += 0; }
-      if (v === 'small') { flagImpact += 0; carbonEstimate += 2; }
-      if (v === 'medium') { flagImpact -= 2; carbonEstimate += 5; }
-      if (v === 'large') { flagImpact -= 8; carbonEstimate += 15; }
-    });
-
-    // Add back legacy logic score if any (to preserve previous arbitrary points)
-    let legacyImpact = 0;
-    let legacyCarbon = 0;
-    if (existingLog?.activities && existingLog.activities.length > 0) {
-      // If we are overwriting, we might lose old arbitrary points.
-      // But if the user edits via this new form, they overwrite with structured data.
-      // We'll keep the activities array to not break older references.
-    }
+    const flagImpact = calculateDailyFlagImpact(logData);
+    const carbonEstimate = calculateDailyEmissions(logData);
 
     onSave({
       date,
       activities: existingLog?.activities || [],
-      transport,
-      food,
-      delivery,
-      energyLaptop,
-      energyAC,
-      shopping,
+      transport: transport as any,
+      food: food as any,
+      delivery: delivery as any,
+      energyLaptop: energyLaptop as any,
+      energyAC: energyAC as any,
+      shopping: shopping as any,
       reflection,
       totalFlagImpact: flagImpact,
       totalCarbonEstimate: carbonEstimate,
@@ -100,25 +57,11 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
     day: 'numeric'
   });
 
-  const toggleSelection = (value: string, current: string, setter: (v: string) => void) => {
-    const list = current ? current.split(',').filter(Boolean) : [];
-    if (list.includes(value)) {
-      setter(list.filter(v => v !== value).join(','));
-    } else {
-      // If "no" is selected, clear everything else. If something else is selected, remove "no".
-      if (value === 'no' || value === 'none') {
-        setter(value);
-      } else {
-        setter([...list.filter(v => v !== 'no' && v !== 'none'), value].join(','));
-      }
-    }
-  };
-
   const SelectionChip = ({ label, value, current, onChange }: { label: string, value: string, current: string, onChange: (v: string) => void }) => {
-    const isSelected = current.split(',').filter(Boolean).includes(value);
+    const isSelected = current === value;
     return (
       <button
-        onClick={() => toggleSelection(value, current, onChange)}
+        onClick={() => onChange(isSelected ? '' : value)}
         className={`px-4 py-3 rounded-[20px] text-sm font-bold transition-all ${
           isSelected 
             ? 'bg-[#354024] text-white shadow-md scale-[1.02]' 

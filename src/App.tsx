@@ -2,9 +2,10 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, DailyLog, NavState } from './types';
+import { calculateHistoricalScore } from './utils/ScoreEngine';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
 import { Confetti } from './components/Confetti';
@@ -43,58 +44,27 @@ export default function App() {
       catch (e) { console.error('Failed to parse logs', e); }
     }
 
+    // Migration Step for Comma-Separated Legacy Logs
+    let migrated = false;
+    Object.keys(l).forEach(date => {
+      const log = l[date];
+      ['transport', 'food', 'delivery', 'energyLaptop', 'energyAC', 'shopping'].forEach(key => {
+        const val = log[key as keyof DailyLog];
+        if (typeof val === 'string' && val.includes(',')) {
+          migrated = true;
+          // Just take the first element for safety to clean up impossible multi-selects
+          const fixed = val.split(',').filter(Boolean)[0] || 'none';
+          (log as any)[key] = fixed;
+          console.warn(`Migrated legacy multi-select in log ${date} for ${key}: "${val}" -> "${fixed}"`);
+        }
+      });
+    });
+    if (migrated) {
+      localStorage.setItem('flagged_logs', JSON.stringify(l));
+    }
+
     if (p) {
-      // Calculate missing days for Score Decay and Streak tracking
-      const today = new Date();
-      // Use local date string YYYY-MM-DD
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      const loggedDates = Object.keys(l).sort();
-      const lastLoggedDate = loggedDates.length > 0 ? loggedDates[loggedDates.length - 1] : null;
-
-      let needsUpdate = false;
-      let newScore = p.flagScore;
-      let newStreak = p.streak;
-
-      if (lastLoggedDate) {
-        // Calculate diff in calendar days (ignore time)
-        const d1 = new Date(todayStr);
-        const d2 = new Date(lastLoggedDate);
-        const daysDiff = Math.floor((d1.getTime() - d2.getTime()) / (1000 * 3600 * 24));
-
-        if (daysDiff > 1 && newStreak > 0) {
-          // Missed a full day, reset streak
-          newStreak = 0;
-          needsUpdate = true;
-        }
-
-        if (daysDiff > 3) {
-          // Decay towards 50 by 1 point per missed day past 3
-          const decay = daysDiff - 3;
-          if (newScore > 50) {
-            newScore = Math.max(50, newScore - decay);
-            needsUpdate = true;
-          } else if (newScore < 50) {
-            newScore = Math.min(50, newScore + decay);
-            needsUpdate = true;
-          }
-        }
-      }
-
-      if (needsUpdate || p.xp === undefined) {
-        const updatedProfile = { 
-          ...p, 
-          flagScore: newScore, 
-          streak: newStreak, 
-          bestStreak: p.bestStreak || 0,
-          xp: p.xp || 0,
-          level: p.level || 1,
-          coins: p.coins || 0
-        };
-        setProfile(updatedProfile);
-        localStorage.setItem('flagged_profile', JSON.stringify(updatedProfile));
-      } else {
-        setProfile(p);
-      }
+      setProfile(p);
     }
     
     // Auto-seed mock data if empty or just 1 day so the calendar looks populated like the mockup
@@ -169,62 +139,11 @@ export default function App() {
     });
 
     if (profile) {
-      // Recalculate flag score based on new log
-      // Just applying the delta of this specific log to current score for now,
-      // but ideally we derive score from all logs if we want true sync.
-      const previousLogImpact = logs[log.date]?.totalFlagImpact || 0;
-      let delta = log.totalFlagImpact - previousLogImpact;
-      
-      // Comeback Multiplier: 1.5x points for positive actions if in Red Flag Era
-      if (profile.flagScore <= 40 && delta > 0) {
-        delta = Math.ceil(delta * 1.5);
+      if (log.totalFlagImpact > 0) {
+        handleAwardXP(15, 5, 'Daily check-in positive');
+      } else {
+        handleAwardXP(5, 0, 'Daily check-in neutral/negative');
       }
-      
-      const newScore = Math.max(0, Math.min(100, profile.flagScore + delta));
-
-      // Streak logic: only increment if this is a new date being logged and it's today or yesterday
-      let newStreak = profile.streak;
-      if (!logs[log.date]) {
-        // It's a new log entry
-        newStreak += 1;
-      }
-      
-      const newBestStreak = Math.max(profile.bestStreak || 0, newStreak);
-
-      let newXp = profile.xp || 0;
-      let newCoins = profile.coins || 0;
-      let newLevel = profile.level || 1;
-      
-      // Award XP and coins based on the net impact of the log
-      if (delta > 0) {
-        newXp += 15; // Base XP for positive actions
-        newCoins += 5;
-        
-        // Trigger confetti!
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
-      } else if (delta < 0) {
-        newXp = Math.max(0, newXp - 5); // Small penalty for negative actions
-      } else if (!logs[log.date]) {
-        // Just logging neutral still gives small XP
-        newXp += 5;
-      }
-      
-      // Level up logic (1000 XP per level)
-      while (newXp >= 1000) {
-        newLevel++;
-        newXp -= 1000;
-      }
-
-      saveProfile({ 
-        ...profile, 
-        flagScore: newScore, 
-        streak: newStreak, 
-        bestStreak: newBestStreak,
-        xp: newXp,
-        level: newLevel,
-        coins: newCoins
-      });
     }
     if (navState.type === 'day_details') {
       setNavState({ type: 'tab', tab: 'home' });
@@ -238,7 +157,7 @@ export default function App() {
   const handleAwardXP = (xpAmount: number, coinsAmount: number, reason: string) => {
     if (!profile) return;
     
-    let newXp = (profile.xp || 0) + xpAmount;
+    let newXp = Math.max(0, (profile.xp || 0) + xpAmount);
     let newCoins = (profile.coins || 0) + coinsAmount;
     let newLevel = profile.level || 1;
     
@@ -254,8 +173,10 @@ export default function App() {
       coins: newCoins
     });
     
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 2000);
+    if (xpAmount > 0) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2000);
+    }
   };
 
   const handleQuickLog = (type: 'green' | 'red') => {
@@ -263,7 +184,7 @@ export default function App() {
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
-    const prevLog = logs[dateStr] || { date: dateStr, activities: [], notes: '', totalFlagImpact: 0 };
+    const prevLog = logs[dateStr] || { date: dateStr, activities: [], notes: '', totalFlagImpact: 0, totalCarbonEstimate: 0 };
     
     const impactDelta = type === 'green' ? 1 : -1;
     const newLog = {
@@ -281,40 +202,13 @@ export default function App() {
       return updated;
     });
 
-    let newXp = profile.xp || 0;
-    let newCoins = profile.coins || 0;
-    let newLevel = profile.level || 1;
-    let newScore = profile.flagScore + impactDelta;
-    newScore = Math.max(0, Math.min(100, newScore));
-    
     if (type === 'green') {
-      newXp += 10;
-      newCoins += 5;
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 2000);
+      handleAwardXP(10, 5, 'Quick Green Action');
     } else {
-      newXp = Math.max(0, newXp - 5);
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 400);
+      handleAwardXP(-5, 0, 'Quick Red Action');
     }
-    
-    while (newXp >= 1000) {
-      newLevel++;
-      newXp -= 1000;
-    }
-    
-    let newStreak = profile.streak;
-    if (!logs[dateStr]) newStreak++;
-    
-    saveProfile({
-      ...profile,
-      flagScore: newScore,
-      xp: newXp,
-      coins: newCoins,
-      level: newLevel,
-      streak: newStreak,
-      bestStreak: Math.max(profile.bestStreak || 0, newStreak)
-    });
   };
 
   const showToastMsg = (msg: string, type?: 'green'|'darkGreen') => {
@@ -322,8 +216,26 @@ export default function App() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  const derivedProfile = useMemo(() => {
+    if (!profile) return null;
+    const { score, streak } = calculateHistoricalScore(profile, logs);
+    
+    // Auto-update best streak silently in profile if the derived streak beats it
+    if (streak > (profile.bestStreak || 0)) {
+       setTimeout(() => {
+         saveProfile({ ...profile, bestStreak: streak });
+       }, 0);
+    }
+    
+    return {
+      ...profile,
+      flagScore: score,
+      streak: streak,
+    };
+  }, [profile, logs]);
+
   if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
-  if (!profile || !profile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
+  if (!derivedProfile || !derivedProfile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
@@ -349,11 +261,11 @@ export default function App() {
         <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
           {navState.type === 'tab' && (
             <>
-              {navState.tab === 'home' && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onQuickLog={handleQuickLog} onNavigate={setNavState} showToastMsg={showToastMsg} />}
-              {navState.tab === 'journey' && <JourneyTab profile={profile} logs={logs} onNavigate={setNavState} />}
-              {navState.tab === 'insights' && <InsightsTab profile={profile} logs={logs} />}
-              {navState.tab === 'community' && <CommunityTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
-              {navState.tab === 'profile' && <ProfileTab profile={profile} logs={logs} onNavigate={setNavState} onAvatarChange={handleAvatarChange} />}
+              {navState.tab === 'home' && <HomeTab profile={derivedProfile} logs={logs} onAwardXP={handleAwardXP} onQuickLog={handleQuickLog} onNavigate={setNavState} showToastMsg={showToastMsg} />}
+              {navState.tab === 'journey' && <JourneyTab profile={derivedProfile} logs={logs} onNavigate={setNavState} />}
+              {navState.tab === 'insights' && <InsightsTab profile={derivedProfile} logs={logs} />}
+              {navState.tab === 'community' && <CommunityTab profile={derivedProfile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
+              {navState.tab === 'profile' && <ProfileTab profile={derivedProfile} logs={logs} onNavigate={setNavState} onAvatarChange={handleAvatarChange} />}
             </>
           )}
         </div>
@@ -366,7 +278,7 @@ export default function App() {
           {navState.type === 'day_details' && (
             <DayDetailsScreen
               key="day_details"
-              profile={profile}
+              profile={derivedProfile}
               date={navState.date}
               existingLog={logs[navState.date]}
               onSave={handleLogSave}
@@ -377,7 +289,7 @@ export default function App() {
             <BadgeDetailsScreen
               key="badge_details"
               badgeId={navState.badgeId}
-              profile={profile}
+              profile={derivedProfile}
               logs={logs}
               onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
             />
