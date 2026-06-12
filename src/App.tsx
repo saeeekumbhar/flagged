@@ -17,8 +17,13 @@ import { CommunityTab } from './components/tabs/CommunityTab';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
+import { auth, db } from './firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [logs, setLogs] = useState<Record<string, DailyLog>>({});
   const [navState, setNavState] = useState<NavState>({ type: 'tab', tab: 'home' });
@@ -28,67 +33,79 @@ export default function App() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem('flagged_profile');
-    const savedLogs = localStorage.getItem('flagged_logs');
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      if (u) {
+        const profRef = doc(db, 'users', u.uid);
+        const pSnap = await getDoc(profRef);
+        
+        let p: UserProfile | null = null;
+        let l: Record<string, DailyLog> = {};
 
-    let p: UserProfile | null = null;
-    let l: Record<string, DailyLog> = {};
-
-    if (savedProfile) {
-      try { p = JSON.parse(savedProfile); }
-      catch (e) { console.error('Failed to parse profile', e); }
-    }
-    
-    if (savedLogs) {
-      try { l = JSON.parse(savedLogs); }
-      catch (e) { console.error('Failed to parse logs', e); }
-    }
-
-    // Migration Step for Comma-Separated Legacy Logs
-    let migrated = false;
-    Object.keys(l).forEach(date => {
-      const log = l[date];
-      ['transport', 'food', 'delivery', 'energyLaptop', 'energyAC', 'shopping'].forEach(key => {
-        const val = log[key as keyof DailyLog];
-        if (typeof val === 'string' && val.includes(',')) {
-          migrated = true;
-          // Just take the first element for safety to clean up impossible multi-selects
-          const fixed = val.split(',').filter(Boolean)[0] || 'none';
-          (log as any)[key] = fixed;
-          console.warn(`Migrated legacy multi-select in log ${date} for ${key}: "${val}" -> "${fixed}"`);
+        if (pSnap.exists()) {
+          p = pSnap.data() as UserProfile;
+          setProfile(p);
+          
+          const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
+          logsSnap.forEach(docSnap => {
+            l[docSnap.id] = docSnap.data() as DailyLog;
+          });
+          setLogs(l);
+        } else {
+          // Migration Step
+          const savedProfile = localStorage.getItem('flagged_profile');
+          const savedLogs = localStorage.getItem('flagged_logs');
+          let didMigrate = false;
+          
+          if (savedProfile) {
+            try { 
+              p = JSON.parse(savedProfile); 
+              if (p) {
+                p.uid = u.uid;
+                p.email = u.email;
+                await setDoc(profRef, p);
+                setProfile(p);
+                didMigrate = true;
+              }
+            } catch(e) {}
+          }
+          if (savedLogs) {
+             try { 
+                l = JSON.parse(savedLogs); 
+                setLogs(l);
+                for (const date in l) {
+                  await setDoc(doc(db, 'users', u.uid, 'dailyLogs', date), l[date]);
+                }
+             } catch(e) {}
+          }
+          if (didMigrate) {
+            localStorage.removeItem('flagged_profile');
+            localStorage.removeItem('flagged_logs');
+          }
         }
-      });
-      if (log.notes === 'Mock entry') {
-        migrated = true;
-        log.notes = '';
-        console.warn(`Cleared mock entry notes in log ${date}`);
+      } else {
+        setProfile(null);
+        setLogs({});
       }
-      
-      if (log.dailyScore === undefined) {
-        migrated = true;
-        log.dailyScore = calculateDailyScore(log);
-        console.warn(`Assigned missing dailyScore to log ${date}: ${log.dailyScore}`);
-      }
+      setIsAuthLoading(false);
     });
-    if (migrated) {
-      localStorage.setItem('flagged_logs', JSON.stringify(l));
-    }
-
-    if (p) {
-      setProfile(p);
-    }
-    
-    setLogs(l);
+    return () => unsubscribe();
   }, []);
 
-  const saveProfile = (p: UserProfile) => {
+  const saveProfile = async (p: UserProfile) => {
     setProfile(p);
-    localStorage.setItem('flagged_profile', JSON.stringify(p));
+    if (user) {
+      await setDoc(doc(db, 'users', user.uid), p, { merge: true });
+    }
   };
 
-  const handleOnboardingComplete = (partialProfile: Partial<UserProfile>) => {
+  const handleOnboardingComplete = async (partialProfile: Partial<UserProfile>) => {
+    if (!user) return;
     const fullProfile: UserProfile = {
-      name: 'Player 1',
+      uid: user.uid,
+      email: user.email,
+      createdAt: Date.now(),
+      name: user.displayName || 'Player 1',
       userType: 'day_scholar',
       commuteMethod: 'walk',
       foodPreferences: 'mess',
@@ -105,15 +122,14 @@ export default function App() {
       coins: 0,
       ...partialProfile,
     };
-    saveProfile(fullProfile);
+    await saveProfile(fullProfile);
   };
 
-  const handleLogSave = (log: DailyLog) => {
-    setLogs(prev => {
-      const updated = { ...prev, [log.date]: log };
-      localStorage.setItem('flagged_logs', JSON.stringify(updated));
-      return updated;
-    });
+  const handleLogSave = async (log: DailyLog) => {
+    setLogs(prev => ({ ...prev, [log.date]: log }));
+    if (user) {
+      await setDoc(doc(db, 'users', user.uid, 'dailyLogs', log.date), log);
+    }
 
     if (profile) {
       if (log.dailyScore && log.dailyScore >= 50) {
@@ -182,7 +198,8 @@ export default function App() {
     };
   }, [profile, logs]);
 
-  if (!hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
+  if (isAuthLoading) return <div className="min-h-screen flex items-center justify-center bg-[#E5D7C4] text-[#354024] font-bold text-xl">Loading...</div>;
+  if (!user || !hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
   if (!derivedProfile || !derivedProfile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
   return (

@@ -1,6 +1,9 @@
 export type UserType = 'day_scholar' | 'hostelier';
 
 export interface UserProfile {
+  uid?: string;
+  email?: string | null;
+  createdAt?: number;
   name: string;
   userType: UserType | null;
   commuteMethod: string | null;

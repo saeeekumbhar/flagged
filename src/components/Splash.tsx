@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
+import { auth, provider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 interface SplashProps {
   onStart: () => void;
@@ -78,6 +80,16 @@ const FLAG_STAGES = [
 export function Splash({ onStart }: SplashProps) {
   const [stage, setStage] = useState(0);
   const [ready, setReady] = useState(false);
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+      // Handled by App.tsx observer
+    } catch (error) {
+      console.error('Login failed', error);
+      onStart(); // Fallback if auth completely breaks
+    }
+  };
 
   useEffect(() => {
     const t1 = setTimeout(() => setStage(1), 900);
@@ -168,12 +180,12 @@ export function Splash({ onStart }: SplashProps) {
         transition={{ duration: 0.5 }}
       >
         <motion.button
-          className="btn-primary text-lg py-5"
-          onClick={onStart}
+          className="btn-primary text-lg py-5 bg-white text-black border border-gray-300 flex items-center justify-center gap-3"
+          onClick={handleSignIn}
           whileTap={{ scale: 0.97 }}
         >
-          <span>🚩</span>
-          Are you a green flag? Let's find out.
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
+          Sign In with Google
         </motion.button>
 
         <p className="text-center text-xs text-[#4C3D19] mt-4">
