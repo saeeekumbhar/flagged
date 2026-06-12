@@ -32,7 +32,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
   const realToday = new Date();
   
   const recentLogs = Object.values(logs)
-    .filter(l => l.transport || l.food || l.delivery || l.energyLaptop || l.energyAC || l.shopping)
+    .filter(l => l.transport || l.food || l.foodSource || l.foodDiet || l.delivery || l.energyLaptop || l.energyAC || l.shopping)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5); // Just show the 5 most recent
 
@@ -111,13 +111,15 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
               </div>
               <div className="flex flex-col gap-1.5 mt-1">
                 {log.transport && log.transport !== 'none' && <div className="text-xs text-[#1A2315]">🚶 Transport: <span className="capitalize font-bold">{log.transport}</span></div>}
+                {log.foodSource && log.foodSource !== 'none' && <div className="text-xs text-[#1A2315]">📍 Source: <span className="capitalize font-bold">{log.foodSource}</span></div>}
+                {log.foodDiet && log.foodDiet !== 'none' && <div className="text-xs text-[#1A2315]">🍱 Diet: <span className="capitalize font-bold">{log.foodDiet}</span></div>}
                 {log.food && log.food !== 'none' && <div className="text-xs text-[#1A2315]">🍱 Food: <span className="capitalize font-bold">{log.food}</span></div>}
                 {log.delivery && <div className="text-xs text-[#1A2315]">🚚 Delivery: <span className="capitalize font-bold">{log.delivery}</span></div>}
                 {log.energyLaptop && log.energyLaptop !== 'none' && <div className="text-xs text-[#1A2315]">💻 Laptop: <span className="font-bold">{log.energyLaptop}</span></div>}
                 {log.energyAC && log.energyAC !== 'none' && <div className="text-xs text-[#1A2315]">❄️ AC: <span className="font-bold">{log.energyAC}</span></div>}
                 {log.shopping && log.shopping !== 'no' && <div className="text-xs text-[#1A2315]">🛍️ Shopping: <span className="capitalize font-bold">{log.shopping}</span></div>}
                 
-                {(!log.transport && !log.food && !log.delivery && !log.energyLaptop && !log.energyAC && !log.shopping) && (
+                {(!log.transport && !log.food && !log.foodSource && !log.foodDiet && !log.delivery && !log.energyLaptop && !log.energyAC && !log.shopping) && (
                   <div className="text-xs text-[#4C3D19] italic">No check-in recorded</div>
                 )}
                 
@@ -141,18 +143,20 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
       </motion.div>
 
       {/* Trends Section */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold drop-shadow-md mb-3 px-1" style={{ color: '#FFFFFF' }}>All-Time Trends</h3>
-        <div className="premium-glass rounded-[24px] p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl drop-shadow-sm">🔥</div>
-            <div>
-              <div className="text-[11px] uppercase tracking-widest text-[#4C3D19] font-semibold">Longest Streak</div>
-              <div className="text-sm font-bold text-[#1A2315]">{profile.bestStreak} Days</div>
+      {Object.keys(logs).length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h3 className="text-sm font-bold drop-shadow-md mb-3 px-1" style={{ color: '#FFFFFF' }}>All-Time Trends</h3>
+          <div className="premium-glass rounded-[24px] p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl drop-shadow-sm">🔥</div>
+              <div>
+                <div className="text-[11px] uppercase tracking-widest text-[#4C3D19] font-semibold">Longest Streak</div>
+                <div className="text-sm font-bold text-[#1A2315]">{profile.bestStreak} {profile.bestStreak === 1 ? 'Day' : 'Days'}</div>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

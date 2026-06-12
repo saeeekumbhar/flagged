@@ -12,10 +12,21 @@ export const calculateDailyScore = (log: Partial<DailyLog>): number => {
 
   // Food (25%)
   let fScore = 100;
-  switch (log.food) {
-    case 'mess': case 'home': case 'veg': case 'none': fScore = 100; break;
-    case 'mixed': fScore = 75; break;
-    case 'nonveg': fScore = 40; break;
+  if (log.foodSource || log.foodDiet) {
+    let sourceScore = 100;
+    if (log.foodSource === 'outside') sourceScore = 50;
+    
+    let dietScore = 100;
+    if (log.foodDiet === 'mixed') dietScore = 75;
+    if (log.foodDiet === 'nonveg') dietScore = 40;
+    
+    fScore = (sourceScore + dietScore) / 2;
+  } else if (log.food) {
+    switch (log.food) {
+      case 'mess': case 'home': case 'veg': case 'none': fScore = 100; break;
+      case 'mixed': fScore = 75; break;
+      case 'nonveg': fScore = 40; break;
+    }
   }
 
   // Delivery (10%)
@@ -123,9 +134,10 @@ export const calculateFlagScore = (logs: Record<string, DailyLog>): number => {
   return totalWeight > 0 ? Math.max(0, Math.min(100, Math.round(finalScore / totalWeight))) : 50;
 };
 
-export const calculateTrend = (logs: Record<string, DailyLog>): { streak: number } => {
+export const calculateTrend = (logs: Record<string, DailyLog>): { streak: number, bestStreak: number } => {
   const dates = Object.keys(logs).sort();
   let streak = 0;
+  let bestStreak = 0;
   let lastLoggedDate: Date | null = null;
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -134,17 +146,24 @@ export const calculateTrend = (logs: Record<string, DailyLog>): { streak: number
     const logDate = new Date(dateStr);
     if (lastLoggedDate) {
       const daysDiff = Math.floor((logDate.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
-      if (daysDiff > 1 && streak > 0) streak = 0;
+      if (daysDiff > 1 && streak > 0) {
+        if (streak > bestStreak) bestStreak = streak;
+        streak = 0;
+      }
     }
     streak += 1;
+    if (streak > bestStreak) bestStreak = streak;
     lastLoggedDate = logDate;
   }
 
   if (lastLoggedDate) {
     const d1 = new Date(todayStr);
     const daysDiff = Math.floor((d1.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
-    if (daysDiff > 1 && streak > 0) streak = 0;
+    if (daysDiff > 1 && streak > 0) {
+       if (streak > bestStreak) bestStreak = streak;
+       streak = 0;
+    }
   }
 
-  return { streak };
+  return { streak, bestStreak };
 };

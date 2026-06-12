@@ -25,8 +25,15 @@ export function calculateFlagDNA(logs: Record<string, DailyLog>): FlagDNA {
     if (log.transport === 'car' || log.transport === 'cab') transportScore -= 0.5;
     
     // Food Trait
-    if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') foodScore += 0.5;
-    if (log.food === 'nonveg' || log.food === 'mixed') foodScore -= 0.5;
+    if (log.foodSource || log.foodDiet) {
+      if (log.foodSource === 'home' || log.foodSource === 'mess') foodScore += 0.25;
+      if (log.foodDiet === 'veg') foodScore += 0.25;
+      if (log.foodSource === 'outside') foodScore -= 0.25;
+      if (log.foodDiet === 'nonveg' || log.foodDiet === 'mixed') foodScore -= 0.25;
+    } else if (log.food) {
+      if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') foodScore += 0.5;
+      if (log.food === 'nonveg' || log.food === 'mixed') foodScore -= 0.5;
+    }
     
     // Energy Trait
     if (log.energyAC === 'none' && (log.energyLaptop === 'none' || log.energyLaptop === '<2h')) energyScore += 0.5;
@@ -108,7 +115,12 @@ export function calculateGlowUp(logs: Record<string, DailyLog>, profile: UserPro
       co2AvoidedKg += baselineCarCO2;
       moneySaved += 50; // ~₹50 saved vs cab
     }
-    if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') {
+    if (log.foodSource || log.foodDiet) {
+      if (log.foodSource === 'home' || log.foodSource === 'mess') {
+        co2AvoidedKg += baselineFoodCO2;
+        moneySaved += 150; // ~₹150 saved vs delivery
+      }
+    } else if (log.food === 'home' || log.food === 'mess' || log.food === 'veg') {
       co2AvoidedKg += baselineFoodCO2;
       moneySaved += 150; // ~₹150 saved vs delivery
     }
@@ -156,7 +168,11 @@ export function generateWeeklyRoast(logs: Record<string, DailyLog>): WeeklyRoast
     if (log.transport === 'cab' || log.transport === 'car') cabs++;
     if (log.energyAC === '6+h' || log.energyAC === '2-6h') ac++;
     if (log.transport === 'walk' || log.transport === 'cycle') walks++;
-    if (log.food === 'home' || log.food === 'mess') homeFood++;
+    if (log.foodSource) {
+      if (log.foodSource === 'home' || log.foodSource === 'mess') homeFood++;
+    } else if (log.food === 'home' || log.food === 'mess') {
+      homeFood++;
+    }
   });
 
   let roast = "You've been too perfect lately, no roast for you.";

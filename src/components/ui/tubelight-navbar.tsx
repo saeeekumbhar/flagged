@@ -51,23 +51,7 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
               {item.name}
             </div>
 
-            {/* The Tubelight Animated Glow */}
-            {isActive && (
-              <motion.div
-                layoutId="lamp"
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-b-full shadow-[0_2px_8px_rgba(255,255,255,0.8)]"
-                initial={false}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 30,
-                }}
-              >
-                <div className="absolute w-12 h-6 bg-white/20 rounded-full blur-md -top-2 -left-2 pointer-events-none" />
-                <div className="absolute w-8 h-6 bg-white/20 rounded-full blur-md -top-1 pointer-events-none" />
-                <div className="absolute w-4 h-4 bg-white/20 rounded-full blur-sm top-0 left-2 pointer-events-none" />
-              </motion.div>
-            )}
+
           </button>
         )
       })}

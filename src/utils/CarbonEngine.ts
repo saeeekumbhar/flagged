@@ -11,12 +11,21 @@ export const calculateDailyEmissions = (log: Partial<DailyLog>): number => {
     case 'car': case 'cab': co2 += 8; break;
   }
 
-  switch (log.food) {
-    case 'mess': case 'home': co2 += 1.5; break;
-    case 'veg': co2 += 2; break;
-    case 'mixed': co2 += 3; break;
-    case 'nonveg': co2 += 6; break;
-    case 'none': co2 += 0; break;
+  if (log.foodSource || log.foodDiet) {
+    if (log.foodSource === 'mess' || log.foodSource === 'home') co2 += 1.5;
+    if (log.foodSource === 'outside') co2 += 3.0;
+    
+    if (log.foodDiet === 'veg') co2 += 0.5;
+    if (log.foodDiet === 'mixed') co2 += 1.5;
+    if (log.foodDiet === 'nonveg') co2 += 4.5;
+  } else if (log.food) {
+    switch (log.food) {
+      case 'mess': case 'home': co2 += 1.5; break;
+      case 'veg': co2 += 2; break;
+      case 'mixed': co2 += 3; break;
+      case 'nonveg': co2 += 6; break;
+      case 'none': co2 += 0; break;
+    }
   }
 
   switch (log.delivery) {

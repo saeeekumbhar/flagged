@@ -19,7 +19,7 @@ import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -52,28 +52,52 @@ export default function App() {
             if (pSnap.exists()) {
               p = pSnap.data() as UserProfile;
               
-              // DEV: Auto-reset mock data points
-              if (p.coins === 1036 || p.coins > 0) {
-                 p.coins = 0;
-                 p.xp = 0;
-                 p.level = 1;
-                 p.streak = 0;
-                 p.bestStreak = 0;
+              const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
+              
+              // DEV: Clean up old mock data (anything before June 12, 2026)
+              let hasDeleted = false;
+              const batchDeletes: Promise<void>[] = [];
+              logsSnap.forEach(docSnap => {
+                const date = docSnap.id;
+                // If it's old mock data, delete it
+                if (date < '2026-06-12') {
+                   batchDeletes.push(deleteDoc(doc(db, 'users', u.uid, 'dailyLogs', date)));
+                   hasDeleted = true;
+                } else {
+                   l[date] = docSnap.data() as DailyLog;
+                }
+              });
+              
+              if (batchDeletes.length > 0) {
+                 await Promise.all(batchDeletes);
+              }
+
+              // Recalculate true points
+              if (hasDeleted || p.coins > 100 || p.coins === 1036 || p.bestStreak > Object.keys(l).length) {
+                 let realCoins = 0;
+                 let realXP = 0;
+                 Object.values(l).forEach(log => {
+                    if (log.dailyScore && log.dailyScore >= 50) {
+                       realCoins += 5;
+                       realXP += 15;
+                    } else if (log.dailyScore) {
+                       realXP += 5;
+                    }
+                 });
+                 p.coins = realCoins;
+                 p.xp = realXP;
+                 p.level = Math.floor(realXP / 1000) + 1;
+                 
+                 // Clear phantom streak data if impossible
+                 if (p.bestStreak > Object.keys(l).length) {
+                   p.streak = 0;
+                   p.bestStreak = 0;
+                 }
+                 
                  await setDoc(profRef, p);
               }
 
               setProfile(p);
-              
-              const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
-              logsSnap.forEach(docSnap => {
-                l[docSnap.id] = docSnap.data() as DailyLog;
-              });
-              
-              // DEV: Clear old mock logs
-              if (Object.keys(l).length > 0 && !l[new Date().toISOString().split('T')[0]]) {
-                 l = {};
-              }
-              
               setLogs(l);
             } else {
             // Migration Step
@@ -217,12 +241,24 @@ export default function App() {
   const derivedProfile = useMemo(() => {
     if (!profile) return null;
     const score = calculateFlagScore(logs);
-    const { streak } = calculateTrend(logs);
+    const { streak, bestStreak: calculatedBestStreak } = calculateTrend(logs);
     
-    // Auto-update best streak silently in profile if the derived streak beats it
-    if (streak > (profile.bestStreak || 0)) {
+    // Determine true best streak. If the profile has a mathematically impossible phantom best streak
+    // (e.g. from deleted mock data), we override it with the calculated true best streak.
+    let trueBestStreak = profile.bestStreak || 0;
+    if (trueBestStreak > Object.keys(logs).length) {
+      trueBestStreak = calculatedBestStreak;
+    }
+
+    // Auto-update best streak silently in profile if the current streak beats it
+    if (streak > trueBestStreak) {
+       trueBestStreak = streak;
+    }
+    
+    // Save to db if our derived trueBestStreak is different than what's stored
+    if (trueBestStreak !== profile.bestStreak) {
        setTimeout(() => {
-         saveProfile({ ...profile, bestStreak: streak });
+         saveProfile({ ...profile, bestStreak: trueBestStreak });
        }, 0);
     }
     
@@ -230,6 +266,7 @@ export default function App() {
       ...profile,
       flagScore: score,
       streak: streak,
+      bestStreak: trueBestStreak
     };
   }, [profile, logs]);
 

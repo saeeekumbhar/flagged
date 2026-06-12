@@ -22,7 +22,11 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
     const logMonth = new Date(log.date).getMonth();
     if (logMonth === currentMonth) {
       if (log.transport === 'walk' || log.transport === 'cycle') walks++;
-      if (log.food === 'home' || log.food === 'mess') homeFood++;
+      if (log.foodSource) {
+        if (log.foodSource === 'home' || log.foodSource === 'mess') homeFood++;
+      } else if (log.food === 'home' || log.food === 'mess') {
+        homeFood++;
+      }
       if (log.energyAC === 'none') noAC++;
       if (log.shopping === 'no') noShopping++;
     }

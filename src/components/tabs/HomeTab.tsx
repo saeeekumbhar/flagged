@@ -30,8 +30,15 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
     const l = logs[todayStr];
     if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') greenToday++;
     if (l.transport === 'car' || l.transport === 'cab') redToday++;
-    if (l.food === 'home' || l.food === 'mess' || l.food === 'veg') greenToday++;
-    if (l.food === 'nonveg' || l.food === 'mixed') redToday++;
+    if (l.foodSource || l.foodDiet) {
+      if (l.foodSource === 'home' || l.foodSource === 'mess') greenToday++;
+      if (l.foodSource === 'outside') redToday++;
+      if (l.foodDiet === 'veg') greenToday++;
+      if (l.foodDiet === 'nonveg') redToday++;
+    } else {
+      if (l.food === 'home' || l.food === 'mess' || l.food === 'veg') greenToday++;
+      if (l.food === 'nonveg' || l.food === 'mixed') redToday++;
+    }
     if (l.energyAC === 'none') greenToday++;
     if (l.energyAC === '6+h' || l.energyAC === '2-6h') redToday++;
     if (l.shopping === 'no') greenToday++;
@@ -59,7 +66,11 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
     const logMonth = new Date(log.date).getMonth();
     if (logMonth === currentMonth) {
       if (log.transport === 'bus' || log.transport === 'metro') hasPublicTransport = true;
-      if (log.food === 'home' || log.food === 'mess') hasHomeFood = true;
+      if (log.foodSource) {
+        if (log.foodSource === 'home' || log.foodSource === 'mess') hasHomeFood = true;
+      } else if (log.food === 'home' || log.food === 'mess') {
+        hasHomeFood = true;
+      }
     }
   });
 
@@ -80,6 +91,18 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
             <span>🟡</span> {Object.keys(logs).length === 0 ? 0 : (profile.coins || 0)} pts
           </div>
         </div>
+      </motion.div>
+
+      {/* ── Welcome Text ── */}
+      <motion.div 
+        className="pl-1 mb-4"
+        initial={{ opacity: 0, y: -10 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.5, delay: 0.05 }}
+      >
+        <h1 className="text-2xl font-bold text-white drop-shadow-md tracking-wide">
+          Welcome, {profile.name ? profile.name.split(' ')[0] : 'Explorer'}!
+        </h1>
       </motion.div>
 
       {/* ── Era & Level Card ── */}
@@ -113,14 +136,21 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
                <AvatarDisplay score={profile.flagScore} size={48} accessories={accessories} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-bold text-white truncate mb-0.5 tracking-wide drop-shadow-md">{flagEvolution.stageName}</p>
-              <p className="text-[10px] font-bold text-[#E4EDE0] mb-1.5 uppercase tracking-wider drop-shadow-sm">Score: {profile.flagScore}</p>
-              {flagEvolution.nextThreshold ? (
-                 <div className="w-full h-1.5 bg-black/20 rounded-full overflow-hidden border border-white/10 shadow-inner">
-                   <div className="h-full bg-[#E4EDE0] rounded-full" style={{ width: `${Math.min(100, (profile.flagScore / flagEvolution.nextThreshold) * 100)}%` }} />
-                 </div>
-              ) : (
-                 <p className="text-[10px] font-bold text-[#F5D990] drop-shadow-md">Legendary Max! 🌟</p>
+              <p className="text-[14px] font-bold text-white truncate mb-0.5 tracking-wide drop-shadow-md">
+                {Object.keys(logs).length === 0 ? "Ready to start?" : flagEvolution.stageName}
+              </p>
+              <p className="text-[10px] font-bold text-[#E4EDE0] mb-1.5 uppercase tracking-wider drop-shadow-sm">
+                {Object.keys(logs).length === 0 ? "Log your first day!" : `Score: ${profile.flagScore}`}
+              </p>
+              
+              {Object.keys(logs).length > 0 && (
+                flagEvolution.nextThreshold ? (
+                   <div className="w-full h-1.5 bg-black/20 rounded-full overflow-hidden border border-white/10 shadow-inner">
+                     <div className="h-full bg-[#E4EDE0] rounded-full" style={{ width: `${Math.min(100, (profile.flagScore / flagEvolution.nextThreshold) * 100)}%` }} />
+                   </div>
+                ) : (
+                   <p className="text-[10px] font-bold text-[#F5D990] drop-shadow-md">Legendary Max! 🌟</p>
+                )
               )}
             </div>
           </div>
@@ -131,8 +161,8 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
           whileTap={{ scale: 0.95 }}
           className="col-span-1 premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center transition-transform"
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>
-          <div className="text-[28px] mb-1 drop-shadow-md">🔥</div>
-          <div className="text-[24px] font-bold text-white leading-none tracking-tight drop-shadow-md">{profile.streak}</div>
+          <div className="text-[28px] mb-1 drop-shadow-md">{Object.keys(logs).length === 0 ? '✨' : '🔥'}</div>
+          <div className="text-[24px] font-bold text-white leading-none tracking-tight drop-shadow-md">{Object.keys(logs).length === 0 ? '-' : profile.streak}</div>
           <div className="text-[8px] font-bold text-white/70 uppercase tracking-widest mt-1.5">Streak</div>
         </motion.button>
       </div>

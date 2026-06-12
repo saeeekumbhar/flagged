@@ -52,7 +52,10 @@ export interface DailyLog {
 
   // New Structured Fields
   transport?: 'walk' | 'cycle' | 'bus' | 'metro' | 'auto' | 'car' | 'cab' | 'none';
+  /** @deprecated use foodSource and foodDiet instead */
   food?: 'mess' | 'home' | 'veg' | 'mixed' | 'nonveg' | 'none';
+  foodSource?: 'mess' | 'home' | 'outside' | 'none';
+  foodDiet?: 'veg' | 'mixed' | 'nonveg' | 'none';
   delivery?: 'no' | 'once' | 'multiple';
   energyLaptop?: '<2h' | '2-4h' | '4-8h' | '8+h' | 'none';
   energyAC?: 'none' | '<2h' | '2-6h' | '6+h';
