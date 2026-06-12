@@ -79,10 +79,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
               else if (log.dailyScore < 40) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
               else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
             } else if (log) {
-              // Legacy Fallback
-              if (log.totalFlagImpact > 0) { bgColor = '#EAF3EA'; textColor = '#1A2315'; fontWeight = 'bold'; }
-              else if (log.totalFlagImpact < 0) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
-              else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
+              bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold';
             }
 
             return (
@@ -130,7 +127,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
                   </div>
                 ) : (
                   <div className="text-xs font-bold mt-2 text-[#354024] bg-black/5 self-start px-3 py-1 rounded-full">
-                    Flag Impact: {log.totalFlagImpact > 0 ? '+' : ''}{log.totalFlagImpact}
+                    Legacy Log
                   </div>
                 )}
               </div>
@@ -138,7 +135,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             </div>
           ))}
           {recentLogs.length === 0 && (
-            <div className="text-center text-white/80 drop-shadow-sm text-sm py-6 font-medium">No recent activities.</div>
+            <div className="text-center text-white/80 drop-shadow-sm text-sm py-6 font-medium">No recent check-ins.</div>
           )}
         </div>
       </motion.div>

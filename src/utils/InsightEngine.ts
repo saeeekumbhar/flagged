@@ -162,7 +162,7 @@ export function generateWeeklyRoast(logs: Record<string, DailyLog>): WeeklyRoast
   let roast = "You've been too perfect lately, no roast for you.";
   let realityCheck = "Keep it up!";
   let oneFix = "Try a new challenge.";
-  let oneWin = "You logged your activities.";
+  let oneWin = "You logged your daily check-ins.";
 
   const maxRed = Math.max(deliveries, cabs, ac);
 

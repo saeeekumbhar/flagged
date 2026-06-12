@@ -30,6 +30,9 @@ export interface ActivityDefinition {
   flagValue: number;
 }
 
+/**
+ * @deprecated Legacy activity object, use structured DailyLog fields instead.
+ */
 export interface LoggedActivity {
   activityId: string;
   count: number;
@@ -39,7 +42,8 @@ export interface DailyLog {
   date: string; // ISO string 'YYYY-MM-DD'
   
   // Legacy
-  activities: LoggedActivity[];
+  /** @deprecated Do not use or write. Use structured fields instead. */
+  activities?: LoggedActivity[];
 
   // New Structured Fields
   transport?: 'walk' | 'cycle' | 'bus' | 'metro' | 'auto' | 'car' | 'cab' | 'none';
@@ -51,7 +55,8 @@ export interface DailyLog {
   reflection?: 'rough' | 'mixed' | 'green';
 
   dailyScore?: number; // 0-100 Daily Sustainability Score
-  totalFlagImpact: number; // Deprecated: legacy cumulative impact delta
+  /** @deprecated legacy cumulative impact delta, use dailyScore instead. */
+  totalFlagImpact?: number;
   totalCarbonEstimate: number;
   notes: string;
 }

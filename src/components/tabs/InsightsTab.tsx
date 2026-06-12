@@ -72,7 +72,7 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
         </motion.div>
       ) : (
         <div className="premium-glass rounded-[32px] p-6 text-center text-[#4C3D19] font-bold">
-          Log some activities to receive your first roast!
+          Log some check-ins to receive your first roast!
         </div>
       )}
 

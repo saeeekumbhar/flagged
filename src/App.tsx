@@ -91,11 +91,9 @@ export default function App() {
          const isGreen = mockPattern[6 - i] > 0;
          l[dateStr] = {
            date: dateStr,
-           activities: [], // Legacy compat
            transport: isGreen ? 'walk' : 'car',
            food: isGreen ? 'home' : 'delivery',
            dailyScore: isGreen ? 85 : 30,
-           totalFlagImpact: isGreen ? 10 : -5,
            totalCarbonEstimate: isGreen ? 0.5 : 12,
            notes: ''
          };
@@ -153,7 +151,7 @@ export default function App() {
     });
 
     if (profile) {
-      if (log.totalFlagImpact > 0) {
+      if (log.dailyScore && log.dailyScore >= 50) {
         handleAwardXP(15, 5, 'Daily check-in positive');
       } else {
         handleAwardXP(5, 0, 'Daily check-in neutral/negative');
@@ -194,9 +192,6 @@ export default function App() {
   };
 
   // handleQuickLog was removed as it relied on the legacy action-spam system.
-      handleAwardXP(-5, 0, 'Quick Red Action');
-    }
-  };
 
   const showToastMsg = (msg: string, type?: 'green'|'darkGreen') => {
     setToast({msg, type});
