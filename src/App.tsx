@@ -49,16 +49,33 @@ export default function App() {
           let p: UserProfile | null = null;
           let l: Record<string, DailyLog> = {};
 
-          if (pSnap.exists()) {
-            p = pSnap.data() as UserProfile;
-            setProfile(p);
-            
-            const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
-            logsSnap.forEach(docSnap => {
-              l[docSnap.id] = docSnap.data() as DailyLog;
-            });
-            setLogs(l);
-          } else {
+            if (pSnap.exists()) {
+              p = pSnap.data() as UserProfile;
+              
+              // DEV: Auto-reset mock data points
+              if (p.coins === 1036 || p.coins > 0) {
+                 p.coins = 0;
+                 p.xp = 0;
+                 p.level = 1;
+                 p.streak = 0;
+                 p.bestStreak = 0;
+                 await setDoc(profRef, p);
+              }
+
+              setProfile(p);
+              
+              const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
+              logsSnap.forEach(docSnap => {
+                l[docSnap.id] = docSnap.data() as DailyLog;
+              });
+              
+              // DEV: Clear old mock logs
+              if (Object.keys(l).length > 0 && !l[new Date().toISOString().split('T')[0]]) {
+                 l = {};
+              }
+              
+              setLogs(l);
+            } else {
             // Migration Step
             const savedProfile = localStorage.getItem('flagged_profile');
             const savedLogs = localStorage.getItem('flagged_logs');
