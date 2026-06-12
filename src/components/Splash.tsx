@@ -80,14 +80,16 @@ const FLAG_STAGES = [
 export function Splash({ onStart }: SplashProps) {
   const [stage, setStage] = useState(0);
   const [ready, setReady] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSignIn = async () => {
     try {
+      setErrorMsg(null);
       await signInWithPopup(auth, provider);
       // Handled by App.tsx observer
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed', error);
-      onStart(); // Fallback if auth completely breaks
+      setErrorMsg(error.message || 'Authentication failed. Check console.');
     }
   };
 
@@ -187,6 +189,12 @@ export function Splash({ onStart }: SplashProps) {
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
           Sign In with Google
         </motion.button>
+        
+        {errorMsg && (
+          <div className="mt-3 text-red-600 text-sm text-center font-semibold bg-red-100/50 p-2 rounded">
+            {errorMsg}
+          </div>
+        )}
 
         <p className="text-center text-xs text-[#4C3D19] mt-4">
           Track your footprint. Lower your impact. Live greener.
