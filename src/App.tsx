@@ -52,6 +52,20 @@ export default function App() {
             if (pSnap.exists()) {
               p = pSnap.data() as UserProfile;
               
+              // Auto-sync Google profile info if missing or default
+              let needsUpdate = false;
+              if (u.displayName && (p.name === 'Player 1' || !p.name)) {
+                 p.name = u.displayName;
+                 needsUpdate = true;
+              }
+              if (u.photoURL && !p.photoURL) {
+                 p.photoURL = u.photoURL;
+                 needsUpdate = true;
+              }
+              if (needsUpdate) {
+                 setDoc(profRef, p);
+              }
+              
               const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
               
               // DEV: Clean up old mock data (anything before June 12, 2026)
