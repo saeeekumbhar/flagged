@@ -146,30 +146,42 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
 
       {/* ── Forecast & Daily Stats ── */}
       <div className="flex flex-col gap-2.5 w-full shrink-0">
-        <motion.div 
-          className="premium-glass rounded-[20px] p-3.5 flex items-start gap-3"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-          <div className="text-2xl drop-shadow-md shrink-0">🔮</div>
-          <div className="flex-1">
-            <h4 className="text-[9px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
-            <p className="text-[13px] font-bold text-white leading-tight mb-1 drop-shadow-md">{forecast.prediction}</p>
-            <p className="text-[11px] text-[#E4EDE0] leading-tight font-medium drop-shadow-sm">{forecast.opportunity}</p>
-          </div>
-        </motion.div>
-        
-        <div className="grid grid-cols-2 gap-2.5">
-          <motion.div className="premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-            <div className="text-[32px] font-bold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] tracking-tighter leading-none">{greenToday}</div>
-            <div className="text-[9px] text-white/80 font-bold uppercase tracking-widest leading-tight drop-shadow-md mt-0.5">Green<br/>Flags</div>
+        {Object.keys(logs).length === 0 ? (
+          <motion.div 
+            className="premium-glass rounded-[20px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+            <div className="text-[32px] drop-shadow-md mb-2">🌱</div>
+            <h3 className="text-[15px] font-bold text-white tracking-wide leading-tight drop-shadow-md mb-1">No journey started yet</h3>
+            <p className="text-[11px] text-[#E4EDE0] font-medium drop-shadow-sm">Complete your first check-in</p>
           </motion.div>
-          
-          <motion.div className="premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-            <div className="text-[32px] font-bold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] tracking-tighter leading-none">{redToday}</div>
-            <div className="text-[9px] text-[#FDECEE]/80 font-bold uppercase tracking-widest leading-tight drop-shadow-md mt-0.5">Red<br/>Flags</div>
-          </motion.div>
-        </div>
+        ) : (
+          <>
+            <motion.div 
+              className="premium-glass rounded-[20px] p-3.5 flex items-start gap-3"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+              <div className="text-2xl drop-shadow-md shrink-0">🔮</div>
+              <div className="flex-1">
+                <h4 className="text-[9px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
+                <p className="text-[13px] font-bold text-white leading-tight mb-1 drop-shadow-md">{forecast.prediction}</p>
+                <p className="text-[11px] text-[#E4EDE0] leading-tight font-medium drop-shadow-sm">{forecast.opportunity}</p>
+              </div>
+            </motion.div>
+            
+            <div className="grid grid-cols-2 gap-2.5">
+              <motion.div className="premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                <div className="text-[32px] font-bold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] tracking-tighter leading-none">{greenToday}</div>
+                <div className="text-[9px] text-white/80 font-bold uppercase tracking-widest leading-tight drop-shadow-md mt-0.5">Green<br/>Flags</div>
+              </motion.div>
+              
+              <motion.div className="premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                <div className="text-[32px] font-bold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] tracking-tighter leading-none">{redToday}</div>
+                <div className="text-[9px] text-[#FDECEE]/80 font-bold uppercase tracking-widest leading-tight drop-shadow-md mt-0.5">Red<br/>Flags</div>
+              </motion.div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Action CTA ── */}
