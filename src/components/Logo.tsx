@@ -18,9 +18,9 @@ export function Logo({ className = '', size = 'md', hideText = false }: LogoProp
   return (
     <div className={`flex items-center ${gap} ${className}`}>
       <img 
-        src="/title_logo.png" 
+        src="/title_logo_transparent.png" 
         alt="Logo" 
-        className={`${svg} shrink-0 object-contain mix-blend-multiply`} 
+        className={`${svg} shrink-0 object-contain`} 
       />
       
       {!hideText && (

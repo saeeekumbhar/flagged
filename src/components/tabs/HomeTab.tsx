@@ -77,15 +77,8 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
         <Logo size="sm" />
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 premium-pill px-3 py-1.5 text-xs font-bold text-white border-white/60">
-            <span>🟡</span> {profile.coins || 0} pts
+            <span>🟡</span> {Object.keys(logs).length === 0 ? 0 : (profile.coins || 0)} pts
           </div>
-          <motion.button 
-            onClick={() => onNavigate({ type: 'tab', tab: 'profile' })}
-            whileTap={{ scale: 0.9 }}
-            className="w-8 h-8 premium-pill flex items-center justify-center transition-transform border-white/60"
-          >
-            <span className="text-white">👤</span>
-          </motion.button>
         </div>
       </motion.div>
 
