@@ -66,6 +66,12 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
           {days.map(({ day, dateStr, log }) => {
             const isToday = dateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
             
+            const dateObj = new Date(dateStr);
+            dateObj.setHours(0,0,0,0);
+            const todayObj = new Date(realToday);
+            todayObj.setHours(0,0,0,0);
+            const isFuture = dateObj.getTime() > todayObj.getTime();
+
             let bgColor = 'transparent';
             let textColor = '#1A2315';
             let fontWeight = '600';
@@ -85,9 +91,9 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             return (
               <motion.button
                 key={day}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => onNavigate({ type: 'day_details', date: dateStr })}
-                className="relative aspect-square flex items-center justify-center rounded-[14px] transition-colors"
+                whileTap={isFuture ? {} : { scale: 0.9 }}
+                onClick={() => !isFuture && onNavigate({ type: 'day_details', date: dateStr })}
+                className={`relative aspect-square flex items-center justify-center rounded-[14px] transition-colors ${isFuture ? 'opacity-30 cursor-not-allowed' : ''}`}
                 style={{ background: bgColor, color: textColor, fontWeight: fontWeight as any }}
               >
                 <span className="text-[13px]">{day}</span>

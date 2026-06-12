@@ -161,16 +161,11 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <h3 className="text-sm font-bold text-[#1A2315] mb-1">Glow-Up Stats</h3>
         <p className="text-[10px] text-[#4C3D19] mb-4">Since joining FLAGGED</p>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 gap-3 mb-3">
           <div className="bg-[#E4EDE0] rounded-[24px] p-4 flex flex-col justify-center border border-white/60 shadow-inner">
             <div className="text-xl mb-1">🌲</div>
             <div className="text-lg font-bold text-[#1A2315]">{glowUp.treesEquivalent}</div>
             <div className="text-[9px] text-[#2D5D2D] font-bold uppercase tracking-wide leading-tight">Trees worth of CO₂</div>
-          </div>
-          <div className="premium-glass rounded-[24px] p-4 flex flex-col justify-center">
-            <div className="text-xl mb-1">💸</div>
-            <div className="text-lg font-bold text-[#1A2315]">₹{glowUp.moneySaved}</div>
-            <div className="text-[9px] text-[#4C3D19] font-bold uppercase tracking-wide leading-tight">Estimated savings</div>
           </div>
         </div>
         <div className="flex flex-col gap-2">
