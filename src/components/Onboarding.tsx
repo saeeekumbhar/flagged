@@ -63,22 +63,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const nextStep = () => setCurrentStep(p => Math.min(p + 1, STEPS.length - 1));
 
   const handleFinish = () => {
-    let score = 50;
-    if (profile.commuteMethod === 'walk') score += 20;
-    if (profile.commuteMethod === 'bus') score += 10;
-    if (profile.commuteMethod === 'car') score -= 15;
-    if (profile.acPreference === 'none') score += 15;
-    if (profile.acPreference === 'goblin') score -= 20;
-    if (profile.foodPreferences === 'mess' || profile.foodPreferences === 'home') score += 10;
-    if (profile.foodPreferences === 'eat_out') score -= 5;
-    const df = profile.deliveryFrequency || 0;
-    if (df === 0) score += 10;
-    else if (df > 2 && df <= 4) score -= 10;
-    else if (df > 4) score -= 20;
-    if (profile.chargerHabit === false) score += 5;
-    if (profile.chargerHabit === true) score -= 5;
-    score = Math.max(0, Math.min(100, score));
-    onComplete({ ...profile, avatarId: selectedAvatar, flagScore: score });
+    onComplete({ ...profile, avatarId: selectedAvatar });
   };
 
   const firstName = profile.name?.split(' ')[0] || 'you';

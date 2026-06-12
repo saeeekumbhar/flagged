@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, DailyLog, NavState } from './types';
-import { calculateHistoricalScore, calculateDailyScore } from './utils/ScoreEngine';
+import { calculateFlagScore, calculateTrend, calculateDailyScore } from './utils/ScoreEngine';
 import { Splash } from './components/Splash';
 import { Onboarding } from './components/Onboarding';
 import { Confetti } from './components/Confetti';
@@ -165,7 +165,8 @@ export default function App() {
 
   const derivedProfile = useMemo(() => {
     if (!profile) return null;
-    const { score, streak } = calculateHistoricalScore(profile, logs);
+    const score = calculateFlagScore(logs);
+    const { streak } = calculateTrend(logs);
     
     // Auto-update best streak silently in profile if the derived streak beats it
     if (streak > (profile.bestStreak || 0)) {
