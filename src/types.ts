@@ -5,8 +5,10 @@ export interface UserProfile {
   email?: string | null;
   createdAt?: number;
   name: string;
+  photoURL?: string | null;
   userType: UserType | null;
   commuteMethod: string | null;
+  commuteDistance?: '<2 km' | '2-5 km' | '5-10 km' | '10+ km' | null;
   foodPreferences: string | null;
   acPreference: string | null;
   deliveryFrequency: number;

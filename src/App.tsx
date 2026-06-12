@@ -29,59 +29,70 @@ export default function App() {
   const [navState, setNavState] = useState<NavState>({ type: 'tab', tab: 'home' });
   const [toast, setToast] = useState<{msg: string, type?: 'green'|'darkGreen'} | null>(null);
   const [isShaking, setIsShaking] = useState(false);
-  const [hasSeenSplash, setHasSeenSplash] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        const profRef = doc(db, 'users', u.uid);
-        const pSnap = await getDoc(profRef);
-        
-        let p: UserProfile | null = null;
-        let l: Record<string, DailyLog> = {};
+        try {
+          // Timeout to release loading state if Firestore hangs
+          const timer = setTimeout(() => {
+            setIsAuthLoading(false);
+          }, 4000);
 
-        if (pSnap.exists()) {
-          p = pSnap.data() as UserProfile;
-          setProfile(p);
+          const profRef = doc(db, 'users', u.uid);
+          const pSnap = await getDoc(profRef);
           
-          const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
-          logsSnap.forEach(docSnap => {
-            l[docSnap.id] = docSnap.data() as DailyLog;
-          });
-          setLogs(l);
-        } else {
-          // Migration Step
-          const savedProfile = localStorage.getItem('flagged_profile');
-          const savedLogs = localStorage.getItem('flagged_logs');
-          let didMigrate = false;
+          clearTimeout(timer);
           
-          if (savedProfile) {
-            try { 
-              p = JSON.parse(savedProfile); 
-              if (p) {
-                p.uid = u.uid;
-                p.email = u.email;
-                await setDoc(profRef, p);
-                setProfile(p);
-                didMigrate = true;
-              }
-            } catch(e) {}
-          }
-          if (savedLogs) {
-             try { 
-                l = JSON.parse(savedLogs); 
-                setLogs(l);
-                for (const date in l) {
-                  await setDoc(doc(db, 'users', u.uid, 'dailyLogs', date), l[date]);
+          let p: UserProfile | null = null;
+          let l: Record<string, DailyLog> = {};
+
+          if (pSnap.exists()) {
+            p = pSnap.data() as UserProfile;
+            setProfile(p);
+            
+            const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
+            logsSnap.forEach(docSnap => {
+              l[docSnap.id] = docSnap.data() as DailyLog;
+            });
+            setLogs(l);
+          } else {
+            // Migration Step
+            const savedProfile = localStorage.getItem('flagged_profile');
+            const savedLogs = localStorage.getItem('flagged_logs');
+            let didMigrate = false;
+            
+            if (savedProfile) {
+              try { 
+                p = JSON.parse(savedProfile); 
+                if (p) {
+                  p.uid = u.uid;
+                  p.email = u.email;
+                  await setDoc(profRef, p);
+                  setProfile(p);
+                  didMigrate = true;
                 }
-             } catch(e) {}
+              } catch(e) {}
+            }
+            if (savedLogs) {
+               try { 
+                  l = JSON.parse(savedLogs); 
+                  setLogs(l);
+                  for (const date in l) {
+                    await setDoc(doc(db, 'users', u.uid, 'dailyLogs', date), l[date]);
+                  }
+               } catch(e) {}
+            }
+            if (didMigrate) {
+              localStorage.removeItem('flagged_profile');
+              localStorage.removeItem('flagged_logs');
+            }
           }
-          if (didMigrate) {
-            localStorage.removeItem('flagged_profile');
-            localStorage.removeItem('flagged_logs');
-          }
+        } catch (error: any) {
+          console.warn("Firestore sync failed, falling back to local memory mode:", error);
+          // Don't crash the app, let it run in memory
         }
       } else {
         setProfile(null);
@@ -95,7 +106,11 @@ export default function App() {
   const saveProfile = async (p: UserProfile) => {
     setProfile(p);
     if (user) {
-      await setDoc(doc(db, 'users', user.uid), p, { merge: true });
+      try {
+        await setDoc(doc(db, 'users', user.uid), p, { merge: true });
+      } catch (e) {
+        console.warn("Failed to save to Firestore (local mode fallback)");
+      }
     }
   };
 
@@ -106,6 +121,7 @@ export default function App() {
       email: user.email,
       createdAt: Date.now(),
       name: user.displayName || 'Player 1',
+      photoURL: user.photoURL || null,
       userType: 'day_scholar',
       commuteMethod: 'walk',
       foodPreferences: 'mess',
@@ -114,7 +130,7 @@ export default function App() {
       chargerHabit: false,
       flagScore: 50,
       completedOnboarding: true,
-      avatarId: 'av1',
+      avatarId: 'av1', // fallback
       streak: 0,
       bestStreak: 0,
       xp: 0,
@@ -128,7 +144,9 @@ export default function App() {
   const handleLogSave = async (log: DailyLog) => {
     setLogs(prev => ({ ...prev, [log.date]: log }));
     if (user) {
-      await setDoc(doc(db, 'users', user.uid, 'dailyLogs', log.date), log);
+      try {
+        await setDoc(doc(db, 'users', user.uid, 'dailyLogs', log.date), log);
+      } catch (e) {}
     }
 
     if (profile) {
@@ -199,7 +217,7 @@ export default function App() {
   }, [profile, logs]);
 
   if (isAuthLoading) return <div className="min-h-screen flex items-center justify-center bg-[#E5D7C4] text-[#354024] font-bold text-xl">Loading...</div>;
-  if (!user || !hasSeenSplash) return <Splash onStart={() => setHasSeenSplash(true)} />;
+  if (!user) return <Splash onStart={() => {}} />;
   if (!derivedProfile || !derivedProfile.completedOnboarding) return <Onboarding onComplete={handleOnboardingComplete} />;
 
   return (

@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { UserProfile, calculateEra } from '../types';
 import { getFlagEvolutionStage } from '../avatars';
 import { AvatarDisplay } from './AvatarDisplay';
-import { FlagDNA } from '../utils/growthEngine';
+import { FlagDNA } from '../utils/InsightEngine';
 
 interface FlagDNACardProps {
   profile: UserProfile;

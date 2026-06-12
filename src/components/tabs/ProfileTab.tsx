@@ -5,6 +5,9 @@ import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
 import { calculateFlagDNA, calculateGlowUp } from '../../utils/InsightEngine';
 import { FlagDNACard } from '../FlagDNACard';
+import { auth, db } from '../../firebase';
+import { signOut } from 'firebase/auth';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 interface ProfileTabProps {
   profile: UserProfile;
@@ -48,15 +51,42 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
   
   const formatShortDate = (dStr: string) => dStr === 'N/A' ? 'N/A' : new Date(dStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleReset = async () => {
+    if (window.confirm("Are you sure you want to reset your profile? This will delete your current onboarding data so you can start over.")) {
+      try {
+        localStorage.clear();
+        if (auth.currentUser) {
+           await deleteDoc(doc(db, 'users', auth.currentUser.uid));
+        }
+        window.location.reload();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-display text-2xl font-bold drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Profile</h2>
-        <button className="w-10 h-10 rounded-full premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform text-xl">
-          ⚙️
-        </button>
+        <div className="flex gap-2">
+          <button onClick={handleReset} className="h-10 px-3 rounded-xl premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform text-xs font-bold text-red-800">
+            Reset
+          </button>
+          <button onClick={handleSignOut} className="h-10 px-3 rounded-xl premium-glass flex items-center justify-center shadow-sm active:scale-95 transition-transform text-xs font-bold text-[#1A2315]">
+            Sign Out
+          </button>
+        </div>
       </div>
 
       {/* Flag DNA Share Card */}

@@ -1,313 +1,212 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { UserProfile } from '../types';
-import { AVATARS } from '../avatars';
-import { AvatarDisplay } from './AvatarDisplay';
+import { UserProfile, DailyLog } from '../types';
+import { calculateDailyScore } from '../utils/ScoreEngine';
 
 interface OnboardingProps {
   onComplete: (profile: Partial<UserProfile>) => void;
 }
 
-type Step = 'welcome' | 'name' | 'commute' | 'food' | 'delivery' | 'device' | 'avatar' | 'reveal';
-const STEPS: Step[] = ['welcome', 'name', 'commute', 'food', 'delivery', 'device', 'avatar', 'reveal'];
+type Step = 'student_type' | 'commute_method' | 'commute_distance' | 'food_habits' | 'energy_habits' | 'score_reveal';
 
-function ProgressDots({ current, total }: { current: number; total: number }) {
+function ChoiceBtn({ emoji, label, desc, onClick }: { emoji: string; label: string; desc?: string; onClick: () => void }) {
   return (
-    <div className="flex gap-2 items-center justify-center py-2">
-      {Array.from({ length: total }).map((_, i) => (
-        <motion.div key={i} className="h-2 rounded-full"
-          animate={{
-            width: i === current ? 24 : 8,
-            backgroundColor: i < current ? '#889063' : i === current ? '#889063' : 'rgba(196,217,188,0.4)',
-          }}
-          transition={{ duration: 0.3 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ChoiceBtn({ emoji, label, desc, onClick, selected }: {
-  emoji: string; label: string; desc?: string; onClick: () => void; selected?: boolean;
-}) {
-  return (
-    <motion.button whileTap={{ scale: 0.97 }}
-      className={`btn-choice text-left flex items-center gap-4 ${selected ? 'selected' : ''}`}
+    <motion.button 
+      whileTap={{ scale: 0.97 }}
+      className="w-full bg-white border border-[#E5D7C4] rounded-2xl p-5 flex items-center gap-5 shadow-sm active:shadow-none transition-shadow text-left"
       onClick={onClick}
     >
       <span className="text-3xl flex-shrink-0">{emoji}</span>
       <div>
-        <div className="font-semibold text-[#354024]">{label}</div>
-        {desc && <div className="text-sm text-[#4C3D19] mt-0.5">{desc}</div>}
+        <div className="font-bold text-[#354024] text-lg">{label}</div>
+        {desc && <div className="text-sm text-[#5A8070] mt-0.5 font-medium">{desc}</div>}
       </div>
     </motion.button>
   );
 }
 
 export function Onboarding({ onComplete }: OnboardingProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<Step>('student_type');
+  
   const [profile, setProfile] = useState<Partial<UserProfile>>({
-    name: '',
     userType: null,
     commuteMethod: null,
-    acPreference: null,
+    commuteDistance: null,
     foodPreferences: null,
-    deliveryFrequency: 0,
-    chargerHabit: null,
-    flagScore: 50,
-    avatarId: 'av1',
+    acPreference: null,
   });
-  const [selectedAvatar, setSelectedAvatar] = useState('av1');
 
-  const step = STEPS[currentStep];
-  const nextStep = () => setCurrentStep(p => Math.min(p + 1, STEPS.length - 1));
+  const nextStep = (step: Step) => setCurrentStep(step);
 
   const handleFinish = () => {
-    onComplete({ ...profile, avatarId: selectedAvatar });
+    // We map answers to a mock DailyLog to generate a realistic initial flagScore via ScoreEngine.
+    let mappedTransport = profile.commuteMethod as any;
+    if (mappedTransport === 'train') mappedTransport = 'metro';
+    if (mappedTransport === 'bike') mappedTransport = 'auto';
+
+    let mappedFood = profile.foodPreferences as any;
+    let mappedDelivery: any = 'no';
+    if (mappedFood === 'delivery') {
+        mappedDelivery = 'multiple';
+        mappedFood = 'mixed';
+    } else if (mappedFood === 'canteen') {
+        mappedFood = 'mixed';
+        mappedDelivery = 'once';
+    }
+
+    const mockLog: Partial<DailyLog> = {
+      transport: mappedTransport || 'none',
+      food: mappedFood || 'none',
+      energyAC: profile.acPreference as any || 'none',
+      delivery: mappedDelivery,
+      shopping: 'no',
+      energyLaptop: 'none'
+    };
+    
+    const initialScore = calculateDailyScore(mockLog);
+    
+    onComplete({ 
+      ...profile, 
+      flagScore: initialScore,
+      completedOnboarding: true 
+    });
   };
 
-  const firstName = profile.name?.split(' ')[0] || 'you';
-  const showDots = !['welcome', 'reveal'].includes(step);
-  const dotIndex = Math.max(0, currentStep - 1);
-  const chosenAvatar = AVATARS.find(a => a.id === selectedAvatar) ?? AVATARS[0];
-
   const renderStep = () => {
-    switch (step) {
-      case 'welcome':
+    switch (currentStep) {
+      case 'student_type':
         return (
-          <div className="flex flex-col items-center text-center gap-8">
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 200 }}
-              className="relative w-40 h-40 flex items-center justify-center"
-            >
-              <div className="absolute inset-0 rounded-full glow-pulse"
-                style={{ background: 'radial-gradient(circle, rgba(90,143,90,0.2) 0%, transparent 70%)' }} />
-              <div className="w-36 h-36 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #E5D7C4 100%)', boxShadow: '0 8px 32px rgba(90,143,90,0.2)' }}>
-                <span className="text-7xl plant-float">🚩</span>
-              </div>
-            </motion.div>
-            <div>
-              <h1 className="text-display text-4xl font-bold text-[#354024] mb-3 leading-tight">
-                Are you a green flag?<br />Let's find out.
-              </h1>
-              <p className="text-[#5A8070] text-base leading-relaxed">
-                Track your footprint. Lower your impact. Live greener.
-              </p>
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
+            <h2 className="text-[28px] leading-tight font-bold text-[#354024] px-2">What type of student are you?</h2>
+            <div className="flex flex-col gap-4">
+              <ChoiceBtn emoji="🎒" label="Day Scholar" desc="Travel to campus daily"
+                onClick={() => { setProfile({ ...profile, userType: 'day_scholar' }); nextStep('commute_method'); }} />
+              <ChoiceBtn emoji="🏠" label="Hosteller" desc="Living on campus"
+                onClick={() => { setProfile({ ...profile, userType: 'hostelier' }); nextStep('commute_method'); }} />
             </div>
-            <motion.button className="btn-primary text-lg py-5" onClick={nextStep} whileTap={{ scale: 0.97 }}>
-              <span>🚩</span> Begin My Journey
-            </motion.button>
           </div>
         );
 
-      case 'name':
+      case 'commute_method':
+        const isDay = profile.userType === 'day_scholar';
         return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">✨</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">What should we call you?</h2>
-              <p className="text-[#4C3D19] text-sm">Your journey will be uniquely yours.</p>
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
+            <h2 className="text-[28px] leading-tight font-bold text-[#354024] px-2">
+              {isDay ? "How do you usually reach campus?" : "How do you usually move around campus?"}
+            </h2>
+            <div className="flex flex-col gap-3 h-[60vh] overflow-y-auto no-scrollbar pb-10">
+              <ChoiceBtn emoji="🚶" label="Walk" onClick={() => { setProfile({ ...profile, commuteMethod: 'walk' }); nextStep(isDay ? 'commute_distance' : 'food_habits'); }} />
+              <ChoiceBtn emoji="🚲" label="Cycle" onClick={() => { setProfile({ ...profile, commuteMethod: 'cycle' }); nextStep(isDay ? 'commute_distance' : 'food_habits'); }} />
+              <ChoiceBtn emoji="🚌" label={isDay ? "Bus" : "Campus Bus"} onClick={() => { setProfile({ ...profile, commuteMethod: 'bus' }); nextStep(isDay ? 'commute_distance' : 'food_habits'); }} />
+              {isDay && <ChoiceBtn emoji="🚇" label="Metro" onClick={() => { setProfile({ ...profile, commuteMethod: 'metro' }); nextStep('commute_distance'); }} />}
+              {isDay && <ChoiceBtn emoji="🚆" label="Local Train" onClick={() => { setProfile({ ...profile, commuteMethod: 'train' }); nextStep('commute_distance'); }} />}
+              {!isDay && <ChoiceBtn emoji="🏍️" label="Bike" onClick={() => { setProfile({ ...profile, commuteMethod: 'bike' }); nextStep('food_habits'); }} />}
+              <ChoiceBtn emoji="🛺" label="Auto" onClick={() => { setProfile({ ...profile, commuteMethod: 'auto' }); nextStep(isDay ? 'commute_distance' : 'food_habits'); }} />
+              {isDay && <ChoiceBtn emoji="🚗" label="Car" onClick={() => { setProfile({ ...profile, commuteMethod: 'car' }); nextStep('commute_distance'); }} />}
+              {isDay && <ChoiceBtn emoji="🚕" label="Cab" onClick={() => { setProfile({ ...profile, commuteMethod: 'cab' }); nextStep('commute_distance'); }} />}
             </div>
-            <input type="text" className="soft-input text-center text-lg"
-              placeholder="Your name"
-              value={profile.name || ''}
-              onChange={e => setProfile({ ...profile, name: e.target.value })}
-              autoFocus
-            />
-            {profile.name && (
-              <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="text-center text-[#889063] font-semibold">
-                Hi {profile.name?.split(' ')[0]}! Let's see your flag 🚩
-              </motion.p>
-            )}
-            <motion.button className="btn-primary py-4" onClick={nextStep}
-              disabled={!profile.name} style={{ opacity: profile.name ? 1 : 0.5 }} whileTap={{ scale: 0.97 }}>
-              Continue
-            </motion.button>
           </div>
         );
 
-
-
-      case 'commute':
+      case 'commute_distance':
         return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🛤️</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How do you move?</h2>
-              <p className="text-[#4C3D19] text-sm">Your commute affects your footprint.</p>
-            </div>
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
+            <h2 className="text-[28px] leading-tight font-bold text-[#354024] px-2">How far is your daily commute?</h2>
             <div className="flex flex-col gap-3">
-              <ChoiceBtn emoji="🚶" label="Walk or cycle" desc="Zero emissions 🌿"
-                onClick={() => { setProfile({ ...profile, commuteMethod: 'walk' }); nextStep(); }} />
-              <ChoiceBtn emoji="🚌" label="College bus" desc="Smart and shared"
-                onClick={() => { setProfile({ ...profile, commuteMethod: 'bus' }); nextStep(); }} />
-              <ChoiceBtn emoji="🚇" label="Public transport" desc="Every shared ride helps"
-                onClick={() => { setProfile({ ...profile, commuteMethod: 'public' }); nextStep(); }} />
-              <ChoiceBtn emoji="🛵" label="Car or scooty" desc="Every journey still counts"
-                onClick={() => { setProfile({ ...profile, commuteMethod: 'car' }); nextStep(); }} />
+              <ChoiceBtn emoji="📍" label="< 2 km" onClick={() => { setProfile({ ...profile, commuteDistance: '<2 km' }); nextStep('food_habits'); }} />
+              <ChoiceBtn emoji="🗺️" label="2 - 5 km" onClick={() => { setProfile({ ...profile, commuteDistance: '2-5 km' }); nextStep('food_habits'); }} />
+              <ChoiceBtn emoji="🛣️" label="5 - 10 km" onClick={() => { setProfile({ ...profile, commuteDistance: '5-10 km' }); nextStep('food_habits'); }} />
+              <ChoiceBtn emoji="🌍" label="10+ km" onClick={() => { setProfile({ ...profile, commuteDistance: '10+ km' }); nextStep('food_habits'); }} />
             </div>
           </div>
         );
 
-      case 'food':
+      case 'food_habits':
         return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🍱</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">What's your food vibe?</h2>
-            </div>
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
+            <h2 className="text-[28px] leading-tight font-bold text-[#354024] px-2">What's your food routine?</h2>
             <div className="flex flex-col gap-3">
-              <ChoiceBtn emoji="🏠" label="Home cooked" desc="Lowest footprint, highest love"
-                onClick={() => { setProfile({ ...profile, foodPreferences: 'home' }); nextStep(); }} />
-              <ChoiceBtn emoji="🍽️" label="Mess / Canteen" desc="Community and consistent"
-                onClick={() => { setProfile({ ...profile, foodPreferences: 'mess' }); nextStep(); }} />
-              <ChoiceBtn emoji="👨‍🍳" label="Cook my own" desc="Self-sufficient and mindful"
-                onClick={() => { setProfile({ ...profile, foodPreferences: 'cook' }); nextStep(); }} />
-              <ChoiceBtn emoji="🥡" label="Eat outside" desc="Balanced, adventurous"
-                onClick={() => { setProfile({ ...profile, foodPreferences: 'eat_out' }); nextStep(); }} />
+              <ChoiceBtn emoji="🍽️" label="Mess" onClick={() => { setProfile({ ...profile, foodPreferences: 'mess' }); nextStep('energy_habits'); }} />
+              <ChoiceBtn emoji="🍱" label="Home food" onClick={() => { setProfile({ ...profile, foodPreferences: 'home' }); nextStep('energy_habits'); }} />
+              <ChoiceBtn emoji="🥪" label="Canteen" onClick={() => { setProfile({ ...profile, foodPreferences: 'canteen' }); nextStep('energy_habits'); }} />
+              <ChoiceBtn emoji="🛵" label="Delivery" onClick={() => { setProfile({ ...profile, foodPreferences: 'delivery' }); nextStep('energy_habits'); }} />
+              <ChoiceBtn emoji="🥗" label="Mixed" onClick={() => { setProfile({ ...profile, foodPreferences: 'mixed' }); nextStep('energy_habits'); }} />
             </div>
           </div>
         );
 
-      case 'delivery':
+      case 'energy_habits':
         return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">📦</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">How often does delivery call?</h2>
-              <p className="text-[#4C3D19] text-sm">Packaging waste adds up — be honest.</p>
-            </div>
-            <div className="soft-card p-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-3xl font-mono font-bold text-[#889063]">{profile.deliveryFrequency}×</span>
-                <span className="text-sm text-[#4C3D19]">per week</span>
-              </div>
-              <input type="range" min="0" max="7" value={profile.deliveryFrequency || 0}
-                onChange={e => setProfile({ ...profile, deliveryFrequency: parseInt(e.target.value) })}
-                className="w-full" />
-              <div className="flex justify-between mt-2 text-xs text-[#4C3D19]">
-                <span>Never 🌿</span><span>Every day 📦</span>
-              </div>
-            </div>
-            <motion.button className="btn-primary py-4" onClick={nextStep} whileTap={{ scale: 0.97 }}>Continue</motion.button>
-          </div>
-        );
-
-      case 'device':
-        return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🔌</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2 leading-tight">
-                Leave chargers plugged in when empty?
-              </h2>
-            </div>
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
+            <h2 className="text-[28px] leading-tight font-bold text-[#354024] px-2">Your room setup?</h2>
             <div className="flex flex-col gap-3">
-              <ChoiceBtn emoji="✅" label="No, I unplug them" desc="Saves phantom energy 🌿"
-                onClick={() => { setProfile({ ...profile, chargerHabit: false }); nextStep(); }} />
-              <ChoiceBtn emoji="😅" label="Yep, all the time" desc="We'll work on it together"
-                onClick={() => { setProfile({ ...profile, chargerHabit: true }); nextStep(); }} />
+              <ChoiceBtn emoji="🎐" label="Fan only" onClick={() => { 
+                setProfile({ ...profile, acPreference: 'none' }); 
+                nextStep('score_reveal'); 
+              }} />
+              <ChoiceBtn emoji="❄️" label="Fan + occasional AC" onClick={() => { 
+                setProfile({ ...profile, acPreference: '<2h' }); 
+                nextStep('score_reveal'); 
+              }} />
+              <ChoiceBtn emoji="🥶" label="Daily AC" onClick={() => { 
+                setProfile({ ...profile, acPreference: '6+h' }); 
+                nextStep('score_reveal'); 
+              }} />
             </div>
           </div>
         );
 
-      case 'avatar':
+      case 'score_reveal':
+        let mappedTransport = profile.commuteMethod as any;
+        if (mappedTransport === 'train') mappedTransport = 'metro';
+        if (mappedTransport === 'bike') mappedTransport = 'auto';
+
+        let mappedFood = profile.foodPreferences as any;
+        let mappedDelivery: any = 'no';
+        if (mappedFood === 'delivery') {
+            mappedDelivery = 'multiple';
+            mappedFood = 'mixed';
+        } else if (mappedFood === 'canteen') {
+            mappedFood = 'mixed';
+            mappedDelivery = 'once';
+        }
+
+        const tempLog: Partial<DailyLog> = {
+          transport: mappedTransport || 'none',
+          food: mappedFood || 'none',
+          energyAC: profile.acPreference as any || 'none',
+          delivery: mappedDelivery, shopping: 'no', energyLaptop: 'none'
+        };
+        const initialScore = calculateDailyScore(tempLog);
+
         return (
-          <div className="flex flex-col gap-6">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🪞</div>
-              <h2 className="text-display text-3xl font-bold text-[#354024] mb-2">Pick your avatar</h2>
-              <p className="text-[#4C3D19] text-sm">This will represent you across the app.</p>
-            </div>
-
-            <div className="grid grid-cols-5 gap-3">
-              {AVATARS.map(av => (
-                <motion.button key={av.id} whileTap={{ scale: 0.93 }}
-                  onClick={() => setSelectedAvatar(av.id)}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-3xl transition-all overflow-hidden"
-                    style={{
-                      background: selectedAvatar === av.id
-                        ? 'linear-gradient(135deg, #C4D9BC, #E4EDE0)'
-                        : 'rgba(253,250,245,0.9)',
-                      border: selectedAvatar === av.id
-                        ? '2.5px solid #889063'
-                        : '2px solid rgba(196,217,188,0.4)',
-                      boxShadow: selectedAvatar === av.id
-                        ? '0 4px 16px rgba(90,143,90,0.25)'
-                        : '0 2px 8px rgba(30,26,22,0.06)',
-                    }}
-                  >
-                    <AvatarDisplay avatar={av} size={56} />
-                  </div>
-                  <span className="text-[10px] font-semibold text-[#5A8070] text-center leading-tight">
-                    {av.tag}
-                  </span>
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Preview */}
-            <div className="soft-card p-4 flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                <AvatarDisplay avatar={chosenAvatar} size={48} />
-              </div>
-              <div>
-                <p className="font-bold text-[#354024]">{profile.name?.split(' ')[0] || 'You'}</p>
-                <p className="text-xs text-[#4C3D19]">{chosenAvatar.tag} · {chosenAvatar.label}</p>
-              </div>
-              <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                className="ml-auto text-[#889063] text-xl">✓</motion.span>
-            </div>
-
-            <motion.button className="btn-primary py-4" onClick={nextStep} whileTap={{ scale: 0.97 }}>
-              Looks good! Continue
-            </motion.button>
-          </div>
-        );
-
-      case 'reveal':
-        return (
-          <div className="flex flex-col items-center text-center gap-8">
+          <div className="flex flex-col items-center text-center gap-8 w-full max-w-[390px] mx-auto">
             <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-              className="relative"
+              className="relative w-48 h-48 rounded-full flex items-center justify-center flex-col"
+              style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #E5D7C4 100%)', boxShadow: '0 12px 40px rgba(90,143,90,0.25)', border: '3px solid rgba(196,217,188,0.6)' }}
             >
-              <div className="absolute inset-0 rounded-full glow-pulse"
-                style={{ background: 'radial-gradient(circle, rgba(90,143,90,0.3) 0%, transparent 70%)' }} />
-              <div className="w-40 h-40 rounded-full overflow-hidden relative"
-                style={{ background: 'linear-gradient(135deg, #E4EDE0 0%, #E5D7C4 100%)', boxShadow: '0 12px 40px rgba(90,143,90,0.25)', border: '3px solid rgba(196,217,188,0.6)' }}>
-                <AvatarDisplay avatar={chosenAvatar} size={160} />
-              </div>
+              <div className="text-6xl font-black text-[#354024]">{initialScore}</div>
+              <div className="text-sm font-bold text-[#5A8070] uppercase tracking-widest mt-2">/ 100</div>
             </motion.div>
 
             <div>
-              <motion.p className="text-sm font-semibold text-[#889063] uppercase tracking-widest mb-2"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                Welcome to <span className="font-logo text-[15px]">FLAGGED</span>,
-              </motion.p>
-              <motion.h1 className="text-display text-4xl font-bold text-[#354024] mb-4"
-                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-                {firstName} 🚩
-              </motion.h1>
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}
-                className="inline-flex items-center gap-2 era-badge-mixed px-4 py-2 text-base">
-                <span>🔥</span> Glow Up Era
-              </motion.div>
-              <motion.p className="text-[#4C3D19] text-sm mt-4 leading-relaxed"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}>
-                Your footprint journey starts now.<br />Every green flag you earn lowers your impact.
+              <motion.h2 className="text-[28px] leading-tight font-bold text-[#354024] mb-2"
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                Your first Flag Score
+              </motion.h2>
+              <motion.p className="text-[#5A8070] text-lg font-medium"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+                Your journey starts here.
               </motion.p>
             </div>
 
-            <motion.button className="btn-primary text-lg py-5 w-full" onClick={handleFinish}
-              whileTap={{ scale: 0.97 }} initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
-              <span>{chosenAvatar.emoji}</span> Enter <span className="font-logo ml-1">FLAGGED</span>
+            <motion.button className="w-full bg-[#354024] text-white rounded-2xl py-4 text-lg font-bold shadow-md active:scale-95 transition-transform mt-8" 
+              onClick={handleFinish}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+            >
+              Enter App
             </motion.button>
           </div>
         );
@@ -317,19 +216,16 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 overflow-hidden"
-      style={{ background: 'radial-gradient(ellipse 100% 60% at 50% 0%, rgba(196,217,188,0.35) 0%, transparent 65%), #E5D7C4' }}>
-      {showDots && <div className="mb-6"><ProgressDots current={dotIndex} total={STEPS.length - 2} /></div>}
-      {!showDots && <div className="h-8" />}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-sm">
-          <AnimatePresence mode="wait">
-            <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+    <div className="min-h-[100dvh] flex flex-col p-6 overflow-hidden bg-[#FDFBF7]">
+      <div className="flex-1 flex items-center justify-center w-full">
+        <AnimatePresence mode="wait">
+          <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}
+            className="w-full"
+          >
+            {renderStep()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
