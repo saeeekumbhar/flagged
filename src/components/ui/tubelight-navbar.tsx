@@ -42,12 +42,12 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
             className="relative flex flex-col items-center justify-center flex-1 h-full active:scale-95 transition-transform"
           >
             {/* The icon */}
-            <div className={cn("text-xl mb-0.5 transition-all z-10", isActive ? "scale-110 drop-shadow-sm opacity-100 text-[#5A8F5A]" : "opacity-60 scale-90 text-[#889063]")}>
+            <div className={cn("text-xl mb-0.5 transition-all z-10", isActive ? "scale-110 drop-shadow-md opacity-100 text-white" : "opacity-50 scale-90 text-white")}>
               <Icon size={20} strokeWidth={2.5} />
             </div>
             
             {/* The text label */}
-            <div className={cn("text-[9px] font-bold transition-colors z-10", isActive ? "text-[#5A8F5A]" : "text-[#889063]")}>
+            <div className={cn("text-[9px] font-bold transition-colors z-10", isActive ? "text-white drop-shadow-md" : "text-white opacity-50")}>
               {item.name}
             </div>
 
@@ -55,7 +55,7 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
             {isActive && (
               <motion.div
                 layoutId="lamp"
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-[#889063] rounded-b-full shadow-[0_2px_8px_rgba(136,144,99,0.8)]"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-b-full shadow-[0_2px_8px_rgba(255,255,255,0.8)]"
                 initial={false}
                 transition={{
                   type: "spring",
@@ -63,9 +63,9 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
                   damping: 30,
                 }}
               >
-                <div className="absolute w-12 h-6 bg-[#889063]/30 rounded-full blur-md -top-2 -left-2 pointer-events-none" />
-                <div className="absolute w-8 h-6 bg-[#889063]/30 rounded-full blur-md -top-1 pointer-events-none" />
-                <div className="absolute w-4 h-4 bg-[#889063]/30 rounded-full blur-sm top-0 left-2 pointer-events-none" />
+                <div className="absolute w-12 h-6 bg-white/20 rounded-full blur-md -top-2 -left-2 pointer-events-none" />
+                <div className="absolute w-8 h-6 bg-white/20 rounded-full blur-md -top-1 pointer-events-none" />
+                <div className="absolute w-4 h-4 bg-white/20 rounded-full blur-sm top-0 left-2 pointer-events-none" />
               </motion.div>
             )}
           </button>
