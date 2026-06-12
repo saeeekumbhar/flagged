@@ -216,7 +216,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col p-6 overflow-hidden bg-[#FDFBF7]">
+    <div className="h-full w-full flex flex-col p-6 overflow-hidden relative z-10 font-logo">
       <div className="flex-1 flex items-center justify-center w-full">
         <AnimatePresence mode="wait">
           <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}

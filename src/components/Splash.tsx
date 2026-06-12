@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Logo } from './Logo';
 import { auth, provider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 
@@ -20,35 +19,62 @@ export function Splash() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-between p-6 bg-[#FDFBF7] text-[#354024]">
+    <div className="h-full w-full flex flex-col items-center justify-between p-6 text-[#1A2315] font-sans relative z-10">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-[390px] mx-auto text-center">
         <AnimatePresence mode="wait">
           {view === 'splash' ? (
             <motion.div key="splash"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="flex flex-col items-center w-full"
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center w-full px-6 py-8 relative z-10"
             >
-              <Logo size="lg" />
-              <h1 className="text-3xl font-bold mt-12 mb-4 tracking-tight leading-tight">Green flag behavior<br />starts here.</h1>
-              <p className="text-[#5A8070] text-lg leading-relaxed">
-                Track your habits.<br />Reduce your impact.
+              <img 
+                src="/logo.png" 
+                alt="FLAGGED" 
+                className="w-48 h-48 object-contain drop-shadow-2xl mb-4" 
+                style={{ clipPath: 'circle(47%)' }} 
+              />
+              <h1 
+                className="font-display text-[44px] mt-2 mb-4 tracking-tight leading-[1.05] text-white"
+                style={{ textShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
+              >
+                Green flag behavior<br />starts here.
+              </h1>
+              <p 
+                className="text-white text-xl font-medium leading-relaxed max-w-[280px] opacity-90 drop-shadow-md"
+              >
+                Find your green flags.<br />Reduce your footprint.
               </p>
             </motion.div>
           ) : (
             <motion.div key="auth"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center w-full"
+              className="flex flex-col items-center justify-center w-full px-8 py-12 relative z-10"
             >
-              <Logo size="md" />
-              <h2 className="text-2xl font-bold mt-8 mb-2">Join the Movement</h2>
-              <p className="text-[#5A8070] mb-8">Sign in to start tracking.</p>
+              <h2 
+                className="font-display text-[44px] mb-4 text-white leading-[1.1] text-center tracking-tight"
+                style={{ textShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
+              >
+                Are you a<br />green flag?
+              </h2>
+              <p 
+                className="text-white text-xl font-medium mb-12 opacity-90 text-center drop-shadow-md"
+              >
+                Let's find out.
+              </p>
               
               <button
-                className="w-full bg-white border border-gray-300 rounded-xl py-4 flex items-center justify-center gap-3 text-lg font-semibold shadow-sm active:scale-95 transition-transform"
+                className="w-full text-[#1A2315] rounded-[24px] py-4 flex items-center justify-center gap-3 text-lg font-bold active:scale-95 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 100%)',
+                  backdropFilter: 'blur(30px)',
+                  WebkitBackdropFilter: 'blur(30px)',
+                  border: '1px solid rgba(255,255,255,0.6)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), inset 0 4px 16px rgba(255, 255, 255, 0.8), inset 0 -4px 16px rgba(0, 0, 0, 0.05)'
+                }}
                 onClick={handleSignIn}
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
@@ -56,7 +82,7 @@ export function Splash() {
               </button>
               
               {errorMsg && (
-                <div className="mt-4 text-red-600 text-sm font-semibold bg-red-100/50 p-3 rounded-lg w-full">
+                <div className="mt-4 text-red-800 text-sm font-semibold bg-red-100/80 backdrop-blur-md p-3 rounded-xl w-full">
                   {errorMsg}
                 </div>
               )}
@@ -65,15 +91,23 @@ export function Splash() {
         </AnimatePresence>
       </div>
 
-      <div className="w-full max-w-[390px] mx-auto pb-4">
+      <div className="w-full max-w-[390px] mx-auto pb-6">
         {view === 'splash' && (
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-[#354024] text-white rounded-xl py-4 text-lg font-bold shadow-md active:scale-95 transition-transform"
+            className="w-full text-[#1A2315] py-4 text-xl font-bold active:scale-95 transition-transform"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 100%)',
+              backdropFilter: 'blur(30px)',
+              WebkitBackdropFilter: 'blur(30px)',
+              borderRadius: '24px',
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), inset 0 4px 16px rgba(255, 255, 255, 0.8), inset 0 -4px 16px rgba(0, 0, 0, 0.05)'
+            }}
             onClick={() => setView('auth')}
           >
-            Continue
+            Get Started
           </motion.button>
         )}
       </div>
