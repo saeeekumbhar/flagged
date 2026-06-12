@@ -260,7 +260,7 @@ export default function App() {
             </div>
 
             {/* Bottom Navigation */}
-            <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(t) => setNavState({ type: 'tab', t })} />
+            <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(tab) => setNavState({ type: 'tab', tab })} />
 
             {/* Detail Screens */}
             <AnimatePresence>

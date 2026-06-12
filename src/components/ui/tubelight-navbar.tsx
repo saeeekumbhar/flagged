@@ -42,12 +42,12 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
             className="relative flex flex-col items-center justify-center flex-1 h-full active:scale-95 transition-transform"
           >
             {/* The icon */}
-            <div className={cn("text-xl mb-0.5 transition-all z-10", isActive ? "scale-110 drop-shadow-sm opacity-100 text-[#354024]" : "opacity-40 scale-90 text-[#354024]")}>
+            <div className={cn("text-xl mb-0.5 transition-all z-10", isActive ? "scale-110 drop-shadow-sm opacity-100 text-[#5A8F5A]" : "opacity-60 scale-90 text-[#889063]")}>
               <Icon size={20} strokeWidth={2.5} />
             </div>
             
             {/* The text label */}
-            <div className={cn("text-[9px] font-bold transition-colors z-10", isActive ? "text-[#354024]" : "text-[#354024]/40")}>
+            <div className={cn("text-[9px] font-bold transition-colors z-10", isActive ? "text-[#5A8F5A]" : "text-[#889063]")}>
               {item.name}
             </div>
 
