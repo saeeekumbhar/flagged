@@ -25,7 +25,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           const { getToken } = await import('firebase/messaging');
           const { doc, setDoc } = await import('firebase/firestore');
           // In production, configure vapidKey inside getToken()
-          const token = await getToken(messaging);
+          const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY || 'BAOQPeWSjnJfGv1JSmMxc3rF9DRQjP1ny4dJYs80z550kYEiVXu9c3_81TiQB2eyW0fydy0JKsmvY4RPmN06JLM';
+          const token = await getToken(messaging, { vapidKey });
           if (token) {
             await setDoc(doc(db, 'users', auth.currentUser.uid), {
               fcmToken: token,
