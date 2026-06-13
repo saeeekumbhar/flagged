@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, auth, functions } from '../firebase';
 import { UserProfile, DailyLog } from '../types';
 
 export const FirebaseService = {
@@ -27,9 +28,10 @@ export const FirebaseService = {
     return logs;
   },
 
-  saveLog: async (uid: string, log: DailyLog): Promise<void> => {
-    const logRef = doc(db, 'users', uid, 'dailyLogs', log.date);
-    await setDoc(logRef, log, { merge: true });
+  saveLog: async (uid: string, log: Partial<DailyLog>): Promise<{ success: boolean; log: DailyLog; updates: any }> => {
+    const submitDailyLog = httpsCallable<{ log: Partial<DailyLog> }, { success: boolean; log: DailyLog; updates: any }>(functions, 'submitDailyLog');
+    const result = await submitDailyLog({ log });
+    return result.data;
   },
 
   deleteLog: async (uid: string, date: string): Promise<void> => {

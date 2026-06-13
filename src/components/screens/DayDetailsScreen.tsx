@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { DailyLog, UserProfile } from '../../types';
-import { calculateDailyEmissions } from '../../services/CarbonService';
-import { calculateDailyScore } from '../../utils/ScoreEngine';
 
 interface DayDetailsScreenProps {
   key?: string;
   date: string; // YYYY-MM-DD
   existingLog?: DailyLog;
   profile: UserProfile;
-  onSave: (log: DailyLog) => void;
+  onSave: (log: Partial<DailyLog>) => void;
   onCancel: () => void;
 }
 
@@ -24,19 +22,6 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
 
   const handleSave = () => {
     const logData: Partial<DailyLog> = {
-      transport: transport as any,
-      foodSource: foodSource as any,
-      foodDiet: foodDiet as any,
-      delivery: delivery as any,
-      energyLaptop: energyLaptop as any,
-      energyAC: energyAC as any,
-      shopping: shopping as any
-    };
-
-    const carbonEstimate = calculateDailyEmissions(logData);
-    const dailyScore = calculateDailyScore(logData);
-
-    onSave({
       date,
       transport: transport as any,
       foodSource: foodSource as any,
@@ -45,10 +30,10 @@ export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel 
       energyLaptop: energyLaptop as any,
       energyAC: energyAC as any,
       shopping: shopping as any,
-      dailyScore,
-      totalCarbonEstimate: carbonEstimate,
       notes: existingLog?.notes || ''
-    });
+    };
+
+    onSave(logData);
   };
 
   const displayDate = new Date(date).toLocaleDateString('en-US', {

@@ -28,15 +28,18 @@ export default function App() {
   const [isShaking, setIsShaking] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const handleLogSave = async (log: DailyLog) => {
-    await addLog(log);
-    if (log.dailyScore && log.dailyScore >= 50) {
-      await awardXP(15, 'Daily check-in positive');
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 2000);
-    } else {
-      await awardXP(5, 'Daily check-in neutral/negative');
+  const handleLogSave = async (log: Partial<DailyLog>) => {
+    const result = await addLog(log);
+    
+    if (result && result.updates) {
+      updateProfile(result.updates);
+      
+      if (result.log.dailyScore && result.log.dailyScore >= 50) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 2000);
+      }
     }
+
     if (navState.type === 'day_details') {
       setNavState({ type: 'tab', tab: 'home' });
     }

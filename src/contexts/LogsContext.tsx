@@ -5,7 +5,7 @@ import { FirebaseService } from '../services/FirebaseService';
 
 interface LogsContextType {
   logs: Record<string, DailyLog>;
-  addLog: (log: DailyLog) => Promise<void>;
+  addLog: (log: Partial<DailyLog>) => Promise<{ success: boolean; log: DailyLog; updates: any } | null>;
   isLogsLoading: boolean;
   setLogs: React.Dispatch<React.SetStateAction<Record<string, DailyLog>>>;
 }
@@ -43,15 +43,19 @@ export const LogsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { isMounted = false; };
   }, [user]);
 
-  const addLog = async (log: DailyLog) => {
-    setLogs(prev => ({ ...prev, [log.date]: log }));
+  const addLog = async (log: Partial<DailyLog>) => {
     if (user) {
       try {
-        await FirebaseService.saveLog(user.uid, log);
+        const result = await FirebaseService.saveLog(user.uid, log);
+        if (result && result.success) {
+          setLogs(prev => ({ ...prev, [result.log.date]: result.log }));
+          return result;
+        }
       } catch (e) {
-        console.warn("Failed to save log:", e);
+        console.warn("Failed to save log via Function:", e);
       }
     }
+    return null;
   };
 
   return (

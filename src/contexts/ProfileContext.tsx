@@ -1,14 +1,12 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserProfile } from '../types';
 import { useAuth } from './AuthContext';
 import { useLogs } from './LogsContext';
 import { FirebaseService } from '../services/FirebaseService';
-import { calculateFlagScore, calculateTrend } from '../utils/ScoreEngine';
 
 interface ProfileContextType {
   profile: UserProfile | null;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
-  awardXP: (amount: number, reason: string) => Promise<{ newLevel: boolean; newCoins: number }>;
   completeOnboarding: (baseProfile: Partial<UserProfile>) => Promise<void>;
   isProfileLoading: boolean;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
@@ -18,9 +16,9 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, setIsAuthLoading } = useAuth();
-  const { logs, setLogs, isLogsLoading } = useLogs();
+  const { setLogs, isLogsLoading } = useLogs();
   
-  const [baseProfile, setBaseProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
 
   // Load Profile and handle local storage migration
@@ -28,7 +26,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     let isMounted = true;
     const fetchProfile = async () => {
       if (!user) {
-        setBaseProfile(null);
+        setProfile(null);
         setIsProfileLoading(false);
         setIsAuthLoading(false);
         return;
@@ -47,7 +45,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
         
         if (isMounted) {
-          setBaseProfile(p);
+          setProfile(p);
           setIsProfileLoading(false);
         }
       } catch (e) {
@@ -60,36 +58,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => { isMounted = false; };
   }, [user, setLogs, setIsAuthLoading]);
 
-  // Derived State Rule: Daily logs are the source of truth for streak and score.
-  const profile = useMemo(() => {
-    if (!baseProfile) return null;
-    
-    const derivedScore = calculateFlagScore(logs);
-    const { streak, bestStreak } = calculateTrend(logs);
-    
-    // Check if derived states differ from base profile. If so, update base profile asynchronously
-    const isMismatched = 
-      baseProfile.flagScore !== derivedScore || 
-      baseProfile.streak !== streak || 
-      baseProfile.bestStreak !== Math.max(bestStreak, baseProfile.bestStreak);
-
-    if (isMismatched && user) {
-      // Background sync to keep Firebase updated with derived state
-      FirebaseService.saveProfile(user.uid, {
-        flagScore: derivedScore,
-        streak: streak,
-        bestStreak: Math.max(bestStreak, baseProfile.bestStreak)
-      });
-    }
-
-    return {
-      ...baseProfile,
-      flagScore: derivedScore,
-      streak: streak,
-      bestStreak: Math.max(bestStreak, baseProfile.bestStreak)
-    };
-  }, [baseProfile, logs, user]);
-
   // Once both profile and logs are done loading, we can unblock the Auth Loading screen
   useEffect(() => {
     if (!isProfileLoading && !isLogsLoading) {
@@ -98,9 +66,13 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [isProfileLoading, isLogsLoading, setIsAuthLoading]);
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
-    setBaseProfile(prev => prev ? { ...prev, ...updates } : null);
+    setProfile(prev => prev ? { ...prev, ...updates } : null);
     if (user) {
-      await FirebaseService.saveProfile(user.uid, updates);
+      try {
+        await FirebaseService.saveProfile(user.uid, updates);
+      } catch (e) {
+        console.warn("Update profile rejected by security rules:", e);
+      }
     }
   };
 
@@ -126,29 +98,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       coins: 0,
     };
     
-    setBaseProfile(newProfile);
+    setProfile(newProfile);
     await FirebaseService.saveProfile(user.uid, newProfile);
   };
 
-  const awardXP = async (amount: number, reason: string) => {
-    if (!profile || !user) return { newLevel: false, newCoins: 0 };
-
-    const newXP = profile.xp + amount;
-    const newCoins = profile.coins + Math.floor(amount / 3);
-    const newLevel = Math.floor(newXP / 1000) + 1;
-    const levelUp = newLevel > profile.level;
-
-    await updateProfile({
-      xp: newXP,
-      coins: newCoins,
-      level: newLevel
-    });
-
-    return { newLevel: levelUp, newCoins: Math.floor(amount / 3) };
-  };
-
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, awardXP, completeOnboarding, isProfileLoading, setProfile: setBaseProfile }}>
+    <ProfileContext.Provider value={{ profile, updateProfile, completeOnboarding, isProfileLoading, setProfile }}>
       {children}
     </ProfileContext.Provider>
   );
