@@ -12,6 +12,12 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const [permissionStatus, setPermissionStatus] = useState<string>('');
 
   const requestNotificationPermission = async () => {
+    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+    if (!vapidKey) {
+      setPermissionStatus('missing_config');
+      return false;
+    }
+
     if (!('Notification' in window)) {
       setPermissionStatus('Not supported');
       return false;
@@ -25,7 +31,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           const { getToken } = await import('firebase/messaging');
           const { doc, setDoc } = await import('firebase/firestore');
           // In production, configure vapidKey inside getToken()
-          const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY || 'BAOQPeWSjnJfGv1JSmMxc3rF9DRQjP1ny4dJYs80z550kYEiVXu9c3_81TiQB2eyW0fydy0JKsmvY4RPmN06JLM';
           const token = await getToken(messaging, { vapidKey });
           if (token) {
             await setDoc(doc(db, 'users', auth.currentUser.uid), {
@@ -187,6 +192,9 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           </div>
           {permissionStatus === 'denied' && (
             <p className="text-xs text-[#D4614A] mt-2 px-2">Notifications are blocked by your browser. Please enable them in settings.</p>
+          )}
+          {permissionStatus === 'missing_config' && (
+            <p className="text-xs text-[#D4614A] mt-2 px-2">Push notifications are currently disabled by the server configuration.</p>
           )}
         </section>
 

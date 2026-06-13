@@ -23,12 +23,11 @@ export const submitDailyLog = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("invalid-argument", "Log date is required.");
   }
 
-  // Prevent future dates
-  const logDate = new Date(logData.date);
-  logDate.setHours(0,0,0,0);
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  if (logDate > today) {
+  // Prevent future dates (allow +1 day for UTC timezone offsets)
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  if (logData.date > tomorrowStr) {
     throw new functions.https.HttpsError("invalid-argument", "Cannot log future dates.");
   }
 

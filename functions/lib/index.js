@@ -33,17 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateAIInsights = exports.submitDailyLog = void 0;
+exports.awardManualXP = exports.generateAIInsights = exports.submitDailyLog = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const genai_1 = require("@google/genai");
+const params_1 = require("firebase-functions/params");
 const ScoreEngine_1 = require("./utils/ScoreEngine");
 const CarbonService_1 = require("./utils/CarbonService");
 admin.initializeApp();
 const db = admin.firestore();
-// Initialize Gemini. In production, use Firebase Secrets or env vars.
-const geminiApiKey = process.env.GEMINI_API_KEY || "YOUR_FALLBACK_API_KEY";
-const ai = new genai_1.GoogleGenAI({ apiKey: geminiApiKey });
+// Define Gemini API Key Secret
+const geminiApiKey = (0, params_1.defineSecret)("GEMINI_API_KEY");
 exports.submitDailyLog = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
@@ -123,7 +123,7 @@ exports.submitDailyLog = functions.https.onCall(async (data, context) => {
         return { success: true, log: finalLog, updates: null };
     }
 });
-exports.generateAIInsights = functions.https.onCall(async (data, context) => {
+exports.generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
     }
@@ -137,20 +137,15 @@ exports.generateAIInsights = functions.https.onCall(async (data, context) => {
     let cachedData = iSnap.exists ? iSnap.data() : null;
     // Check cache validity
     let needsWeeklyUpdate = false;
-    let needsDailyUpdate = false;
     if (!cachedData) {
         needsWeeklyUpdate = true;
-        needsDailyUpdate = true;
     }
     else {
         if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > SEVEN_DAYS)) {
             needsWeeklyUpdate = true;
         }
-        if (forceRefresh || !cachedData.updatedAt || (now - cachedData.updatedAt > ONE_DAY)) {
-            needsDailyUpdate = true;
-        }
     }
-    if (!needsWeeklyUpdate && !needsDailyUpdate) {
+    if (!needsWeeklyUpdate && !forceRefresh) {
         return cachedData;
     }
     // Fetch logs and profile for context
@@ -188,31 +183,29 @@ exports.generateAIInsights = functions.https.onCall(async (data, context) => {
     
     Generate a JSON response EXACTLY in this format, with NO markdown formatting, just raw JSON:
     {
-      ${needsWeeklyUpdate ? `
+      "personalizedRecommendations": {
+        "biggestRedFlag": "Short specific bad habit you noticed",
+        "biggestGreenFlag": "Short specific good habit you noticed",
+        "improvementAction": "One highly specific, easy action to improve"
+      },
+      "weeklyReport": {
+        "improvementSummary": "1-2 sentences summarizing their performance compared to ideal",
+        "biggestWin": "The most significant green achievement this week",
+        "nextGoal": "A measurable goal for the upcoming week"
+      },
       "flagDNA": {
         "primaryTrait": "A catchy 2-3 word title (e.g. Eco Explorer, Thrift Legend, Cab Addict)",
-        "description": "One sentence explaining their vibe.",
-        "scores": { "transport": 1-5, "food": 1-5, "energy": 1-5, "shopping": 1-5, "community": 1-5 }
+        "identityExplanation": "Why they got this identity based on their actual logs."
       },
-      "weeklyRoast": {
-        "roast": "A slightly sassy, funny comment about their bad habits.",
-        "realityCheck": "A factual statement about the impact of their worst habit.",
-        "oneFix": "One highly specific, easy action to improve.",
-        "oneWin": "Praise for their best green habit."
-      },
-      "forecast": {
-        "prediction": "A short prediction of next week's score based on trends.",
-        "opportunity": "What they are missing out on.",
-        "suggestedChallenge": "A short actionable task."
-      },
-      ` : ''}
-      ${needsDailyUpdate ? `
-      "dailyInsight": "A short 1-sentence nudge based on today."
-      ` : ''}
+      "weeklyForecast": {
+        "likelyWeakArea": "A habit they might struggle with next week",
+        "suggestedChallenge": "A short actionable task to overcome the weak area"
+      }
     }
   `;
     let newInsights = {};
     try {
+        const ai = new genai_1.GoogleGenAI({ apiKey: geminiApiKey.value() });
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt,
@@ -232,8 +225,51 @@ exports.generateAIInsights = functions.https.onCall(async (data, context) => {
         }
         return cachedData; // fallback to cache silently
     }
-    const updatedData = Object.assign(Object.assign(Object.assign({}, cachedData), newInsights), { updatedAt: now, generatedAt: needsWeeklyUpdate ? now : ((cachedData === null || cachedData === void 0 ? void 0 : cachedData.generatedAt) || now) });
+    const updatedData = Object.assign(Object.assign(Object.assign({}, cachedData), newInsights), { updatedAt: now, generatedAt: now });
     await insightsRef.set(updatedData, { merge: true });
     return updatedData;
+});
+exports.awardManualXP = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
+    }
+    const uid = context.auth.uid;
+    const actionType = data.actionType;
+    if (!actionType) {
+        throw new functions.https.HttpsError("invalid-argument", "Action type is required.");
+    }
+    let xpAward = 0;
+    let coinsAward = 0;
+    if (actionType === 'streak_bonus') {
+        xpAward = 30;
+        coinsAward = 50;
+    }
+    else if (actionType === 'challenge_completed') {
+        xpAward = 20;
+        coinsAward = 10;
+    }
+    else {
+        throw new functions.https.HttpsError("invalid-argument", "Unknown action type.");
+    }
+    const profRef = db.collection("users").doc(uid);
+    const pSnap = await profRef.get();
+    if (!pSnap.exists) {
+        throw new functions.https.HttpsError("not-found", "User profile not found.");
+    }
+    const profile = pSnap.data();
+    let newXp = (profile.xp || 0) + xpAward;
+    let newCoins = (profile.coins || 0) + coinsAward;
+    let newLevel = profile.level || 1;
+    while (newXp >= 1000) {
+        newLevel++;
+        newXp -= 1000;
+    }
+    const updates = {
+        xp: newXp,
+        coins: newCoins,
+        level: newLevel
+    };
+    await profRef.set(updates, { merge: true });
+    return { success: true, updates };
 });
 //# sourceMappingURL=index.js.map
