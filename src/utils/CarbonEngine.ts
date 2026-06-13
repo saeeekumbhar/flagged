@@ -1,59 +1,47 @@
 import { DailyLog } from '../types';
+import {
+  TRANSPORT_EMISSIONS,
+  FOOD_SOURCE_EMISSIONS,
+  FOOD_DIET_EMISSIONS,
+  LEGACY_FOOD_EMISSIONS,
+  DELIVERY_EMISSIONS,
+  ENERGY_LAPTOP_EMISSIONS,
+  ENERGY_AC_EMISSIONS,
+  SHOPPING_EMISSIONS
+} from './EmissionFactors';
 
 export const calculateDailyEmissions = (log: Partial<DailyLog>): number => {
   let co2 = 0;
 
-  switch (log.transport) {
-    case 'walk': case 'cycle': case 'none': co2 += 0; break;
-    case 'metro': co2 += 1; break;
-    case 'bus': co2 += 1.5; break;
-    case 'auto': co2 += 3; break;
-    case 'car': case 'cab': co2 += 8; break;
+  if (log.transport && TRANSPORT_EMISSIONS[log.transport] !== undefined) {
+    co2 += TRANSPORT_EMISSIONS[log.transport];
   }
 
   if (log.foodSource || log.foodDiet) {
-    if (log.foodSource === 'mess' || log.foodSource === 'home') co2 += 1.5;
-    if (log.foodSource === 'outside') co2 += 3.0;
-    
-    if (log.foodDiet === 'veg') co2 += 0.5;
-    if (log.foodDiet === 'mixed') co2 += 1.5;
-    if (log.foodDiet === 'nonveg') co2 += 4.5;
-  } else if (log.food) {
-    switch (log.food) {
-      case 'mess': case 'home': co2 += 1.5; break;
-      case 'veg': co2 += 2; break;
-      case 'mixed': co2 += 3; break;
-      case 'nonveg': co2 += 6; break;
-      case 'none': co2 += 0; break;
+    if (log.foodSource && FOOD_SOURCE_EMISSIONS[log.foodSource] !== undefined) {
+      co2 += FOOD_SOURCE_EMISSIONS[log.foodSource];
     }
+    if (log.foodDiet && FOOD_DIET_EMISSIONS[log.foodDiet] !== undefined) {
+      co2 += FOOD_DIET_EMISSIONS[log.foodDiet];
+    }
+  } else if (log.food && LEGACY_FOOD_EMISSIONS[log.food] !== undefined) {
+    co2 += LEGACY_FOOD_EMISSIONS[log.food];
   }
 
-  switch (log.delivery) {
-    case 'no': co2 += 0; break;
-    case 'once': co2 += 2; break;
-    case 'multiple': co2 += 5; break;
+  if (log.delivery && DELIVERY_EMISSIONS[log.delivery] !== undefined) {
+    co2 += DELIVERY_EMISSIONS[log.delivery];
   }
 
-  switch (log.energyLaptop) {
-    case '<2h': co2 += 0.1; break;
-    case '2-4h': co2 += 0.3; break;
-    case '4-8h': co2 += 0.6; break;
-    case '8+h': co2 += 1.0; break;
-    case 'none': co2 += 0; break;
+  if (log.energyLaptop && ENERGY_LAPTOP_EMISSIONS[log.energyLaptop] !== undefined) {
+    co2 += ENERGY_LAPTOP_EMISSIONS[log.energyLaptop];
   }
 
-  switch (log.energyAC) {
-    case 'none': co2 += 0; break;
-    case '<2h': co2 += 1.5; break;
-    case '2-6h': co2 += 4; break;
-    case '6+h': co2 += 8; break;
+  if (log.energyAC && ENERGY_AC_EMISSIONS[log.energyAC] !== undefined) {
+    co2 += ENERGY_AC_EMISSIONS[log.energyAC];
   }
 
-  switch (log.shopping) {
-    case 'no': co2 += 0; break;
-    case 'small': co2 += 2; break;
-    case 'medium': co2 += 5; break;
-    case 'large': co2 += 15; break;
+  if (log.shopping && SHOPPING_EMISSIONS[log.shopping] !== undefined) {
+    co2 += SHOPPING_EMISSIONS[log.shopping];
   }
 
   return Number(co2.toFixed(2));

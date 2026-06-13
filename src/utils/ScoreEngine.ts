@@ -1,67 +1,62 @@
 import { DailyLog, UserProfile } from '../types';
+import {
+  TRANSPORT_SCORES,
+  FOOD_SOURCE_SCORES,
+  FOOD_DIET_SCORES,
+  LEGACY_FOOD_SCORES,
+  DELIVERY_SCORES,
+  SHOPPING_SCORES,
+  ENERGY_LAPTOP_SCORES,
+  ENERGY_AC_SCORES
+} from './EmissionFactors';
 
 export const calculateDailyScore = (log: Partial<DailyLog>): number => {
   // Transport (35%)
   let tScore = 100;
-  switch (log.transport) {
-    case 'walk': case 'cycle': case 'none': tScore = 100; break;
-    case 'bus': case 'metro': tScore = 85; break;
-    case 'auto': tScore = 65; break;
-    case 'car': case 'cab': tScore = 35; break;
+  if (log.transport && TRANSPORT_SCORES[log.transport] !== undefined) {
+    tScore = TRANSPORT_SCORES[log.transport];
   }
 
   // Food (25%)
   let fScore = 100;
   if (log.foodSource || log.foodDiet) {
     let sourceScore = 100;
-    if (log.foodSource === 'outside') sourceScore = 50;
+    if (log.foodSource && FOOD_SOURCE_SCORES[log.foodSource] !== undefined) {
+      sourceScore = FOOD_SOURCE_SCORES[log.foodSource];
+    }
     
     let dietScore = 100;
-    if (log.foodDiet === 'mixed') dietScore = 75;
-    if (log.foodDiet === 'nonveg') dietScore = 40;
+    if (log.foodDiet && FOOD_DIET_SCORES[log.foodDiet] !== undefined) {
+      dietScore = FOOD_DIET_SCORES[log.foodDiet];
+    }
     
     fScore = (sourceScore + dietScore) / 2;
-  } else if (log.food) {
-    switch (log.food) {
-      case 'mess': case 'home': case 'veg': case 'none': fScore = 100; break;
-      case 'mixed': fScore = 75; break;
-      case 'nonveg': fScore = 40; break;
-    }
+  } else if (log.food && LEGACY_FOOD_SCORES[log.food] !== undefined) {
+    fScore = LEGACY_FOOD_SCORES[log.food];
   }
 
   // Delivery (10%)
   let dScore = 100;
-  switch (log.delivery) {
-    case 'no': dScore = 100; break;
-    case 'once': dScore = 60; break;
-    case 'multiple': dScore = 20; break;
+  if (log.delivery && DELIVERY_SCORES[log.delivery] !== undefined) {
+    dScore = DELIVERY_SCORES[log.delivery];
   }
 
   // Shopping (10%)
   let sScore = 100;
-  switch (log.shopping) {
-    case 'no': sScore = 100; break;
-    case 'small': sScore = 80; break;
-    case 'medium': sScore = 50; break;
-    case 'large': sScore = 20; break;
+  if (log.shopping && SHOPPING_SCORES[log.shopping] !== undefined) {
+    sScore = SHOPPING_SCORES[log.shopping];
   }
 
   // Energy - Laptop (10%)
   let elScore = 100;
-  switch (log.energyLaptop) {
-    case '<2h': case 'none': elScore = 100; break;
-    case '2-4h': elScore = 80; break;
-    case '4-8h': elScore = 60; break;
-    case '8+h': elScore = 40; break;
+  if (log.energyLaptop && ENERGY_LAPTOP_SCORES[log.energyLaptop] !== undefined) {
+    elScore = ENERGY_LAPTOP_SCORES[log.energyLaptop];
   }
 
   // Energy - AC (10%)
   let eaScore = 100;
-  switch (log.energyAC) {
-    case 'none': eaScore = 100; break;
-    case '<2h': eaScore = 80; break;
-    case '2-6h': eaScore = 50; break;
-    case '6+h': eaScore = 20; break;
+  if (log.energyAC && ENERGY_AC_SCORES[log.energyAC] !== undefined) {
+    eaScore = ENERGY_AC_SCORES[log.energyAC];
   }
 
   return Math.round(
