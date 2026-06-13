@@ -7,10 +7,11 @@ import { FlagDNA } from '../services/AnalyticsService';
 
 interface FlagDNACardProps {
   profile: UserProfile;
-  dna: FlagDNA;
+  dna?: FlagDNA;
+  isLoading?: boolean;
 }
 
-export function FlagDNACard({ profile, dna }: FlagDNACardProps) {
+export function FlagDNACard({ profile, dna, isLoading }: FlagDNACardProps) {
   const era = calculateEra(profile.flagScore);
   const evolution = getFlagEvolutionStage(profile.flagScore);
 
@@ -35,7 +36,14 @@ export function FlagDNACard({ profile, dna }: FlagDNACardProps) {
     >
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#E4EDE0] to-transparent opacity-50 pointer-events-none" />
       
-      <div className="flex items-center justify-between mb-6 relative z-10">
+      {isLoading || !dna ? (
+        <div className="flex flex-col items-center justify-center min-h-[200px] gap-3 relative z-10">
+          <div className="w-8 h-8 rounded-full border-2 border-[#889063] border-t-transparent animate-spin"></div>
+          <p className="text-sm font-bold text-[#354024] animate-pulse">Gemini sequencing DNA...</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between mb-6 relative z-10">
         <div>
           <h3 className="text-[11px] font-bold text-[#4C3D19] uppercase tracking-wider mb-1">Flag DNA</h3>
           <div className="text-xl font-bold text-[#354024]">{dna.primaryTrait}</div>
@@ -86,6 +94,8 @@ export function FlagDNACard({ profile, dna }: FlagDNACardProps) {
       <button className="w-full mt-4 bg-[#354024] text-white rounded-xl py-3 text-sm font-bold active:scale-95 transition-transform flex items-center justify-center gap-2">
         <span>📸</span> Share to Story
       </button>
+      </>
+      )}
     </motion.div>
   );
 }

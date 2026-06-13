@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
-import { generateWeeklyRoast } from '../../services/AnalyticsService';
+import { useAIInsights } from '../../hooks';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;
@@ -9,7 +9,8 @@ interface InsightsTabProps {
 }
 
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
-  const roast = generateWeeklyRoast(logs);
+  const { insights, isLoading } = useAIInsights();
+  const roast = insights?.weeklyRoast;
 
   let walks = 0;
   let homeFood = 0;
@@ -54,7 +55,12 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
       <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Insights</h2>
 
       {/* Weekly Roast Card */}
-      {roast ? (
+      {isLoading ? (
+        <motion.div className="premium-glass rounded-[32px] p-6 flex flex-col items-center justify-center text-center gap-3 min-h-[160px]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="w-8 h-8 rounded-full border-2 border-[#889063] border-t-transparent animate-spin"></div>
+          <p className="text-sm font-bold text-[#354024] animate-pulse">Gemini is analyzing your week...</p>
+        </motion.div>
+      ) : roast ? (
         <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">🔥</span>

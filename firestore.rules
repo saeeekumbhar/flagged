@@ -12,6 +12,12 @@ service cloud.firestore {
         // Frontend cannot write logs anymore; must use Cloud Function
         allow write: if false;
       }
+
+      match /aiInsights/{insightId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        // Frontend cannot write insights; must use Cloud Function
+        allow write: if false;
+      }
     }
   }
 }

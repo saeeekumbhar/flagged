@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
-import { generateFlagForecast } from '../../services/AnalyticsService';
+import { useAIInsights } from '../../hooks';
 import { Logo } from '../Logo';
 
 interface HomeTabProps {
@@ -16,10 +16,11 @@ interface HomeTabProps {
 
 export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) {
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
+  const { insights, isLoading } = useAIInsights();
 
   const era = calculateEra(profile.flagScore);
   const flagEvolution = getFlagEvolutionStage(profile.flagScore);
-  const forecast = generateFlagForecast(logs, profile);
+  const forecast = insights?.forecast;
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -179,16 +180,25 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
           </motion.div>
         ) : (
           <>
-            <motion.div 
-              className="premium-glass rounded-[20px] p-3.5 flex items-start gap-3"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
-              <div className="text-2xl drop-shadow-md shrink-0">🔮</div>
-              <div className="flex-1">
-                <h4 className="text-[9px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
-                <p className="text-[13px] font-bold text-white leading-tight mb-1 drop-shadow-md">{forecast.prediction}</p>
-                <p className="text-[11px] text-[#E4EDE0] leading-tight font-medium drop-shadow-sm">{forecast.opportunity}</p>
-              </div>
-            </motion.div>
+            {isLoading ? (
+              <motion.div 
+                className="premium-glass rounded-[20px] p-3.5 flex items-center justify-center gap-3"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+                <div className="w-5 h-5 rounded-full border-2 border-white/50 border-t-white animate-spin"></div>
+                <p className="text-[11px] text-white/80 font-medium">Gemini forecasting...</p>
+              </motion.div>
+            ) : forecast ? (
+              <motion.div 
+                className="premium-glass rounded-[20px] p-3.5 flex items-start gap-3"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+                <div className="text-2xl drop-shadow-md shrink-0">🔮</div>
+                <div className="flex-1">
+                  <h4 className="text-[9px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
+                  <p className="text-[13px] font-bold text-white leading-tight mb-1 drop-shadow-md">{forecast.prediction}</p>
+                  <p className="text-[11px] text-[#E4EDE0] leading-tight font-medium drop-shadow-sm">{forecast.opportunity}</p>
+                </div>
+              </motion.div>
+            ) : null}
             
             <div className="grid grid-cols-2 gap-2.5">
               <motion.div className="premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>

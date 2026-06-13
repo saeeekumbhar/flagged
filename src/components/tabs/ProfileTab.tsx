@@ -3,11 +3,12 @@ import { motion } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
-import { calculateFlagDNA, calculateGlowUp } from '../../services/AnalyticsService';
+import { calculateGlowUp } from '../../services/AnalyticsService';
 import { FlagDNACard } from '../FlagDNACard';
 import { auth, db } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
+import { useAIInsights } from '../../hooks';
 
 interface ProfileTabProps {
   profile: UserProfile;
@@ -23,9 +24,11 @@ const BADGES = [
 ];
 
 export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
+  const { insights, isLoading } = useAIInsights();
+  const dna = insights?.flagDNA;
+
   const era = calculateEra(profile.flagScore);
   const flagEvolution = getFlagEvolutionStage(profile.flagScore);
-  const dna = calculateFlagDNA(logs);
   const glowUp = calculateGlowUp(logs, profile);
 
   const logValues = Object.values(logs).filter(l => l.dailyScore !== undefined).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -105,7 +108,7 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       </div>
 
       {/* Flag DNA Share Card */}
-      <FlagDNACard profile={profile} dna={dna} />
+      <FlagDNACard profile={profile} dna={dna} isLoading={isLoading} />
 
       {/* Evolution Status */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

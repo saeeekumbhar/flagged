@@ -1,0 +1,80 @@
+import { useState, useEffect } from 'react';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
+import { calculateFlagDNA, generateWeeklyRoast, generateFlagForecast } from '../services/AnalyticsService';
+import { useLogs } from '../contexts/LogsContext';
+import { useProfile } from '../contexts/ProfileContext';
+
+export interface AIInsights {
+  flagDNA?: any;
+  weeklyRoast?: any;
+  forecast?: any;
+  dailyInsight?: string;
+}
+
+export function useAIInsights() {
+  const { user } = useAuth();
+  const { logs } = useLogs();
+  const { profile } = useProfile();
+  
+  const [insights, setInsights] = useState<AIInsights | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!user || !profile) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchInsights = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
+        // Do not force refresh by default, let the backend handle the 7-day/1-day cache logic
+        const result = await generateAIInsights({});
+        
+        if (isMounted) {
+          setInsights(result.data);
+          setIsLoading(false);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch AI insights, falling back to local AnalyticsService", err);
+        if (isMounted) {
+          // Graceful fallback to existing hardcoded logic
+          setInsights({
+            flagDNA: calculateFlagDNA(logs),
+            weeklyRoast: generateWeeklyRoast(logs),
+            forecast: generateFlagForecast(logs, profile),
+            dailyInsight: "Your eco-journey continues."
+          });
+          setError(err);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchInsights();
+
+    return () => { isMounted = false; };
+  }, [user, profile?.flagScore]); // re-run if profile score changes or user changes (which implies new logs might exist)
+
+  const refreshInsights = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
+      const result = await generateAIInsights({ forceRefresh: true });
+      setInsights(result.data);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { insights, isLoading, error, refreshInsights };
+}
