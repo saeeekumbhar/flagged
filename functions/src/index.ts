@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { GoogleGenAI } from "@google/genai";
+import { defineSecret } from "firebase-functions/params";
 import { DailyLog, UserProfile } from "./types";
 import { calculateDailyScore, calculateFlagScore, calculateTrend } from "./utils/ScoreEngine";
 import { calculateDailyEmissions } from "./utils/CarbonService";
@@ -8,9 +9,8 @@ import { calculateDailyEmissions } from "./utils/CarbonService";
 admin.initializeApp();
 const db = admin.firestore();
 
-// Initialize Gemini. In production, use Firebase Secrets or env vars.
-const geminiApiKey = process.env.GEMINI_API_KEY || "YOUR_FALLBACK_API_KEY";
-const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+// Define Gemini API Key Secret
+const geminiApiKey = defineSecret("GEMINI_API_KEY");
 
 export const submitDailyLog = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
@@ -104,7 +104,7 @@ export const submitDailyLog = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const generateAIInsights = functions.https.onCall(async (data, context) => {
+export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
   }
@@ -122,21 +122,16 @@ export const generateAIInsights = functions.https.onCall(async (data, context) =
 
   // Check cache validity
   let needsWeeklyUpdate = false;
-  let needsDailyUpdate = false;
 
   if (!cachedData) {
     needsWeeklyUpdate = true;
-    needsDailyUpdate = true;
   } else {
     if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > SEVEN_DAYS)) {
       needsWeeklyUpdate = true;
     }
-    if (forceRefresh || !cachedData.updatedAt || (now - cachedData.updatedAt > ONE_DAY)) {
-      needsDailyUpdate = true;
-    }
   }
 
-  if (!needsWeeklyUpdate && !needsDailyUpdate) {
+  if (!needsWeeklyUpdate && !forceRefresh) {
     return cachedData;
   }
 
@@ -174,33 +169,31 @@ export const generateAIInsights = functions.https.onCall(async (data, context) =
     
     Generate a JSON response EXACTLY in this format, with NO markdown formatting, just raw JSON:
     {
-      ${needsWeeklyUpdate ? `
+      "personalizedRecommendations": {
+        "biggestRedFlag": "Short specific bad habit you noticed",
+        "biggestGreenFlag": "Short specific good habit you noticed",
+        "improvementAction": "One highly specific, easy action to improve"
+      },
+      "weeklyReport": {
+        "improvementSummary": "1-2 sentences summarizing their performance compared to ideal",
+        "biggestWin": "The most significant green achievement this week",
+        "nextGoal": "A measurable goal for the upcoming week"
+      },
       "flagDNA": {
         "primaryTrait": "A catchy 2-3 word title (e.g. Eco Explorer, Thrift Legend, Cab Addict)",
-        "description": "One sentence explaining their vibe.",
-        "scores": { "transport": 1-5, "food": 1-5, "energy": 1-5, "shopping": 1-5, "community": 1-5 }
+        "identityExplanation": "Why they got this identity based on their actual logs."
       },
-      "weeklyRoast": {
-        "roast": "A slightly sassy, funny comment about their bad habits.",
-        "realityCheck": "A factual statement about the impact of their worst habit.",
-        "oneFix": "One highly specific, easy action to improve.",
-        "oneWin": "Praise for their best green habit."
-      },
-      "forecast": {
-        "prediction": "A short prediction of next week's score based on trends.",
-        "opportunity": "What they are missing out on.",
-        "suggestedChallenge": "A short actionable task."
-      },
-      ` : ''}
-      ${needsDailyUpdate ? `
-      "dailyInsight": "A short 1-sentence nudge based on today."
-      ` : ''}
+      "weeklyForecast": {
+        "likelyWeakArea": "A habit they might struggle with next week",
+        "suggestedChallenge": "A short actionable task to overcome the weak area"
+      }
     }
   `;
 
   let newInsights: any = {};
 
   try {
+    const ai = new GoogleGenAI({ apiKey: geminiApiKey.value() });
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
@@ -225,7 +218,7 @@ export const generateAIInsights = functions.https.onCall(async (data, context) =
     ...cachedData,
     ...newInsights,
     updatedAt: now,
-    generatedAt: needsWeeklyUpdate ? now : (cachedData?.generatedAt || now)
+    generatedAt: now
   };
 
   await insightsRef.set(updatedData, { merge: true });

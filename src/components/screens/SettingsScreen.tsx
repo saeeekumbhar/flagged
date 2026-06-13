@@ -18,6 +18,25 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     }
     const perm = await Notification.requestPermission();
     setPermissionStatus(perm);
+    if (perm === 'granted') {
+      try {
+        const { messaging, auth, db } = await import('../../firebase');
+        if (messaging && auth.currentUser) {
+          const { getToken } = await import('firebase/messaging');
+          const { doc, setDoc } = await import('firebase/firestore');
+          // In production, configure vapidKey inside getToken()
+          const token = await getToken(messaging);
+          if (token) {
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+              fcmToken: token,
+              fcmTokenUpdatedAt: new Date().toISOString()
+            }, { merge: true });
+          }
+        }
+      } catch (e) {
+        console.warn('FCM token generation failed', e);
+      }
+    }
     return perm === 'granted';
   };
 

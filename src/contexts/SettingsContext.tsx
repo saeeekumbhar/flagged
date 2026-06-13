@@ -58,6 +58,28 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   // Save settings on change
   useEffect(() => {
     localStorage.setItem('flagged_settings', JSON.stringify(settings));
+
+    // Sync notification preferences to Firestore if logged in
+    const syncPreferences = async () => {
+      try {
+        const { auth, db } = await import('../../firebase');
+        const { doc, setDoc } = await import('firebase/firestore');
+        const user = auth.currentUser;
+        if (user) {
+          await setDoc(doc(db, 'users', user.uid), {
+            notificationPreferences: {
+              dailyReminder: settings.dailyReminder,
+              weeklyReport: settings.weeklyReport,
+              achievements: settings.achievementSounds, // mapping for achievements
+              reminderTime: settings.reminderTime
+            }
+          }, { merge: true });
+        }
+      } catch (e) {
+        console.warn('Failed to sync notification preferences', e);
+      }
+    };
+    syncPreferences();
   }, [settings]);
 
   // Apply Theme

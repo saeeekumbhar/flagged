@@ -34,6 +34,9 @@ export function App() {
     if (result && result.updates) {
       updateProfile(result.updates);
       
+      const { logAnalyticsEvent } = await import('./firebase');
+      logAnalyticsEvent('daily_log_created', { score: result.log.dailyScore });
+      
       if (result.log.dailyScore && result.log.dailyScore >= 50) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 2000);
@@ -52,8 +55,18 @@ export function App() {
   const handleAwardXP = async (xpAmount: number, coinsAmount: number, reason: string) => {
     await awardXP(xpAmount, reason);
     if (xpAmount > 0) {
+      const { logAnalyticsEvent } = await import('./firebase');
+      logAnalyticsEvent('achievement_unlocked', { reason, xpAmount });
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
+    }
+  };
+
+  const handleNavChange = async (newState: NavState) => {
+    setNavState(newState);
+    if (newState.type === 'tab' && newState.tab === 'insights') {
+      const { logAnalyticsEvent } = await import('./firebase');
+      logAnalyticsEvent('insight_opened');
     }
   };
 
@@ -105,17 +118,17 @@ export function App() {
             <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
               {navState.type === 'tab' && (
                 <>
-                  {navState.tab === 'home' && profile && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onNavigate={setNavState} showToastMsg={showToastMsg} />}
-                  {navState.tab === 'journey' && profile && <JourneyTab profile={profile} logs={logs} onNavigate={setNavState} />}
+                  {navState.tab === 'home' && profile && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onNavigate={handleNavChange} showToastMsg={showToastMsg} />}
+                  {navState.tab === 'journey' && profile && <JourneyTab profile={profile} logs={logs} onNavigate={handleNavChange} />}
                   {navState.tab === 'insights' && profile && <InsightsTab profile={profile} logs={logs} />}
                   {navState.tab === 'community' && profile && <CommunityTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
-                  {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={setNavState} onAvatarChange={handleAvatarChange} />}
+                  {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} />}
                 </>
               )}
             </div>
 
             {/* Bottom Navigation */}
-            <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(tab) => setNavState({ type: 'tab', tab })} />
+            <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(tab) => handleNavChange({ type: 'tab', tab })} />
 
             {/* Detail Screens */}
             <AnimatePresence>
@@ -126,7 +139,7 @@ export function App() {
                   date={navState.date}
                   existingLog={logs[navState.date]}
                   onSave={handleLogSave}
-                  onCancel={() => setNavState({ type: 'tab', tab: 'journey' })}
+                  onCancel={() => handleNavChange({ type: 'tab', tab: 'journey' })}
                 />
               )}
               {navState.type === 'badge_details' && profile && (
@@ -135,13 +148,13 @@ export function App() {
                   badgeId={navState.badgeId}
                   profile={profile}
                   logs={logs}
-                  onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
+                  onBack={() => handleNavChange({ type: 'tab', tab: 'profile' })}
                 />
               )}
               {navState.type === 'settings' && (
                 <SettingsScreen
                   key="settings"
-                  onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
+                  onBack={() => handleNavChange({ type: 'tab', tab: 'profile' })}
                 />
               )}
             </AnimatePresence>

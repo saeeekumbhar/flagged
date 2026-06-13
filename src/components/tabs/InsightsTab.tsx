@@ -55,78 +55,97 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
       {/* Header */}
       <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Insights</h2>
 
-      {/* Weekly Roast Card */}
+      {/* Weekly Report Card */}
       {isLoading ? (
         <motion.div className="premium-glass rounded-[32px] p-6 flex flex-col items-center justify-center text-center gap-3 min-h-[160px]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="w-8 h-8 rounded-full border-2 border-[#889063] border-t-transparent animate-spin"></div>
           <p className="text-sm font-bold text-[#354024] animate-pulse">Gemini is analyzing your week...</p>
         </motion.div>
-      ) : roast ? (
+      ) : insights?.weeklyReport ? (
         <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🔥</span>
-              <h3 className="text-[13px] font-bold text-[#1A2315] uppercase tracking-wider">This Week's Roast</h3>
+              <span className="text-2xl">📊</span>
+              <h3 className="text-[13px] font-bold text-[#1A2315] uppercase tracking-wider">Weekly Report</h3>
             </div>
             {isSupported && (
               <button 
-                onClick={() => isPlaying ? stop() : speak(`${roast.roast}. ${roast.realityCheck}. Your fix: ${roast.oneFix}. Your win: ${roast.oneWin}.`)}
+                onClick={() => isPlaying ? stop() : speak(`${insights.weeklyReport!.improvementSummary}. Your biggest win: ${insights.weeklyReport!.biggestWin}. Next goal: ${insights.weeklyReport!.nextGoal}.`)}
                 className="w-8 h-8 rounded-full bg-white/50 border border-[#CFBB99] flex items-center justify-center text-[#354024] active:scale-95 transition-transform"
               >
                 {isPlaying ? '⏹️' : '▶️'}
               </button>
             )}
           </div>
-          <p className="text-lg font-bold text-[#1A2315] mb-2 leading-snug">"{roast.roast}"</p>
-          <p className="text-sm text-[#4C3D19] italic mb-5">{roast.realityCheck}</p>
+          <p className="text-lg font-bold text-[#1A2315] mb-5 leading-snug">"{insights.weeklyReport.improvementSummary}"</p>
           
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-[#FDECEE] rounded-xl p-3 border border-[#F4B2B8]">
-              <div className="text-[10px] uppercase font-bold text-[#A03030] mb-1">One Fix</div>
-              <div className="text-xs font-semibold text-[#354024] leading-snug">{roast.oneFix}</div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-[#EAF3EA] rounded-xl p-3 border border-[#BEE0BE]">
+              <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-1">Biggest Win</div>
+              <div className="text-xs font-semibold text-[#354024] leading-snug">{insights.weeklyReport.biggestWin}</div>
             </div>
-            <div className="bg-[#CFBB99] rounded-xl p-3 border border-[#BEE0BE]">
-              <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-1">One Win</div>
-              <div className="text-xs font-semibold text-[#354024] leading-snug">{roast.oneWin}</div>
+            <div className="bg-[#CFBB99] rounded-xl p-3 border border-[#BEE0BE] opacity-90">
+              <div className="text-[10px] uppercase font-bold text-[#4C3D19] mb-1">Next Goal</div>
+              <div className="text-xs font-semibold text-[#354024] leading-snug">{insights.weeklyReport.nextGoal}</div>
             </div>
           </div>
         </motion.div>
       ) : (
         <div className="premium-glass rounded-[32px] p-6 text-center text-[#4C3D19] font-bold">
-          Log some check-ins to receive your first roast!
+          Log some check-ins to receive your first weekly report!
         </div>
       )}
 
-      {/* Best Habit Card */}
-      <motion.div className="bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-3xl rounded-[32px] p-6 shadow-lg shadow-black/5 border border-white/60 relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <div className="flex items-start gap-4 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-white/60 backdrop-blur-xl/50 flex items-center justify-center text-3xl shadow-inner border border-white/50 shrink-0">
-            {topHabitEmoji}
+      {/* Forecast Card */}
+      {insights?.weeklyForecast && (
+        <motion.div className="bg-gradient-to-br from-[#1A2315] to-[#354024] rounded-[32px] p-6 shadow-lg relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-xl/50 flex items-center justify-center text-3xl shadow-inner border border-white/20 shrink-0">
+              🔮
+            </div>
+            <div className="flex-1">
+              <h4 className="text-[11px] font-bold text-[#CFBB99] uppercase tracking-wider mb-1">AI Forecast</h4>
+              <p className="text-[14px] font-medium text-white/90 leading-snug mb-3">
+                {insights.weeklyForecast.likelyWeakArea}
+              </p>
+              <div className="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div className="text-[10px] uppercase font-bold text-[#BEE0BE] mb-1">Suggested Challenge</div>
+                <div className="text-xs font-semibold text-white leading-snug">{insights.weeklyForecast.suggestedChallenge}</div>
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <h4 className="text-[11px] font-bold text-[#4C3D19] uppercase tracking-wider mb-1">Top Habit</h4>
-            <p className="text-[15px] font-bold text-[#354024] leading-snug">
-              {topHabitText}
-            </p>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
-      {/* Recommendations / Chat Mockup */}
-      <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="text-sm font-bold text-[#354024] mb-4">Quick Questions</h3>
-        <div className="flex flex-col gap-2">
-          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
-            "How can I improve my transport score?"
-          </button>
-          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
-            "What's the carbon footprint of my AC?"
-          </button>
-          <button className="text-left w-full premium-glass rounded-full p-4 text-sm font-semibold text-[#1A2315] active:scale-95 transition-transform">
-            "Suggest a weekend challenge for me."
-          </button>
-        </div>
-      </motion.div>
+      {/* Personalized Recommendations */}
+      {insights?.personalizedRecommendations && (
+        <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h3 className="text-sm font-bold text-[#354024] mb-4">Coach's Corner</h3>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start gap-3 bg-white/40 p-3 rounded-2xl">
+              <div className="text-xl">🔴</div>
+              <div>
+                <div className="text-xs font-bold text-[#A03030]">Red Flag</div>
+                <div className="text-sm font-medium text-[#1A2315]">{insights.personalizedRecommendations.biggestRedFlag}</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-white/40 p-3 rounded-2xl">
+              <div className="text-xl">🟢</div>
+              <div>
+                <div className="text-xs font-bold text-[#2D5D2D]">Green Flag</div>
+                <div className="text-sm font-medium text-[#1A2315]">{insights.personalizedRecommendations.biggestGreenFlag}</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-white/40 p-3 rounded-2xl">
+              <div className="text-xl">💡</div>
+              <div>
+                <div className="text-xs font-bold text-[#4C3D19]">Improvement Action</div>
+                <div className="text-sm font-medium text-[#1A2315]">{insights.personalizedRecommendations.improvementAction}</div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
     </div>
   );

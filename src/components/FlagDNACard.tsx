@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
-import { UserProfile, calculateEra } from '../types';
+import { UserProfile, calculateEra, DailyLog } from '../types';
 import { getFlagEvolutionStage } from '../avatars';
 import { AvatarDisplay } from './AvatarDisplay';
-import { FlagDNA } from '../services/AnalyticsService';
+import { calculateFlagDNA } from '../services/AnalyticsService';
 
 interface FlagDNACardProps {
   profile: UserProfile;
-  dna?: FlagDNA;
+  logs: Record<string, DailyLog>;
+  dna?: { primaryTrait: string; identityExplanation: string };
   isLoading?: boolean;
 }
 
-export function FlagDNACard({ profile, dna, isLoading }: FlagDNACardProps) {
+export function FlagDNACard({ profile, logs, dna, isLoading }: FlagDNACardProps) {
+  const localDNA = useMemo(() => calculateFlagDNA(logs), [logs]);
   const era = calculateEra(profile.flagScore);
   const evolution = getFlagEvolutionStage(profile.flagScore);
 
@@ -65,29 +67,29 @@ export function FlagDNACard({ profile, dna, isLoading }: FlagDNACardProps) {
       </div>
 
       <p className="text-[13px] text-[#354024] italic mb-5 relative z-10 px-2 border-l-2 border-[#889063]">
-        "{dna.description}"
+        "{dna.identityExplanation}"
       </p>
 
       <div className="space-y-3 relative z-10 bg-[#E5D7C4] p-4 rounded-2xl border border-[#CFBB99]">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#354024]">Transport</span>
-          {renderDots(dna.scores.transport)}
+          {renderDots(localDNA.scores.transport)}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#354024]">Food</span>
-          {renderDots(dna.scores.food)}
+          {renderDots(localDNA.scores.food)}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#354024]">Energy</span>
-          {renderDots(dna.scores.energy)}
+          {renderDots(localDNA.scores.energy)}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#354024]">Shopping</span>
-          {renderDots(dna.scores.shopping)}
+          {renderDots(localDNA.scores.shopping)}
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-[#354024]">Community</span>
-          {renderDots(dna.scores.community)}
+          {renderDots(localDNA.scores.community)}
         </div>
       </div>
 

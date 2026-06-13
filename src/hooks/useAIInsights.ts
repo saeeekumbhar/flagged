@@ -7,10 +7,24 @@ import { useLogs } from '../contexts/LogsContext';
 import { useProfile } from '../contexts/ProfileContext';
 
 export interface AIInsights {
-  flagDNA?: any;
-  weeklyRoast?: any;
-  forecast?: any;
-  dailyInsight?: string;
+  personalizedRecommendations?: {
+    biggestRedFlag: string;
+    biggestGreenFlag: string;
+    improvementAction: string;
+  };
+  weeklyReport?: {
+    improvementSummary: string;
+    biggestWin: string;
+    nextGoal: string;
+  };
+  flagDNA?: {
+    primaryTrait: string;
+    identityExplanation: string;
+  };
+  weeklyForecast?: {
+    likelyWeakArea: string;
+    suggestedChallenge: string;
+  };
 }
 
 export function useAIInsights() {
@@ -44,12 +58,30 @@ export function useAIInsights() {
       } catch (err: any) {
         console.error("Failed to fetch AI insights, falling back to local AnalyticsService", err);
         if (isMounted) {
-          // Graceful fallback to existing hardcoded logic
+          // Graceful fallback to existing hardcoded logic, mapping to new schema
+          const localRoast = generateWeeklyRoast(logs);
+          const localForecast = generateFlagForecast(logs, profile);
+          const localDNA = calculateFlagDNA(logs);
+          
           setInsights({
-            flagDNA: calculateFlagDNA(logs),
-            weeklyRoast: generateWeeklyRoast(logs),
-            forecast: generateFlagForecast(logs, profile),
-            dailyInsight: "Your eco-journey continues."
+            personalizedRecommendations: {
+              biggestRedFlag: localRoast.realityCheck,
+              biggestGreenFlag: localRoast.oneWin,
+              improvementAction: localRoast.oneFix
+            },
+            weeklyReport: {
+              improvementSummary: localRoast.roast,
+              biggestWin: localRoast.oneWin,
+              nextGoal: localRoast.oneFix
+            },
+            flagDNA: {
+              primaryTrait: localDNA.primaryTrait,
+              identityExplanation: localDNA.description
+            },
+            weeklyForecast: {
+              likelyWeakArea: localForecast.opportunity,
+              suggestedChallenge: localForecast.suggestedChallenge
+            }
           });
           setError(err);
           setIsLoading(false);
