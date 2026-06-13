@@ -76,16 +76,33 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             let textColor = '#1A2315';
             let fontWeight = '600';
 
-            if (isToday) {
-              bgColor = '#347346';
-              textColor = '#FFFFFF';
-              fontWeight = 'bold';
-            } else if (log && log.dailyScore !== undefined) {
-              if (log.dailyScore >= 70) { bgColor = '#EAF3EA'; textColor = '#1A2315'; fontWeight = 'bold'; }
-              else if (log.dailyScore < 40) { bgColor = '#FDECEE'; textColor = '#A03030'; fontWeight = 'bold'; }
-              else { bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold'; }
+            if (isFuture) {
+              bgColor = 'transparent';
+              textColor = '#1A2315';
+              fontWeight = '600';
             } else if (log) {
-              bgColor = '#E5D7C4'; textColor = '#1A2315'; fontWeight = 'bold';
+              // Already logged in
+              if (log.dailyScore !== undefined) {
+                if (log.dailyScore >= 50) { 
+                  bgColor = '#347346'; // Green
+                  textColor = '#FFFFFF'; 
+                  fontWeight = 'bold'; 
+                } else { 
+                  bgColor = '#A03030'; // Red
+                  textColor = '#FFFFFF'; 
+                  fontWeight = 'bold'; 
+                }
+              } else {
+                // Legacy logs without score default to green
+                bgColor = '#347346'; 
+                textColor = '#FFFFFF'; 
+                fontWeight = 'bold';
+              }
+            } else {
+              // Not logged in (past or today)
+              bgColor = '#FFFFFF';
+              textColor = '#1A2315';
+              fontWeight = 'bold';
             }
 
             return (
