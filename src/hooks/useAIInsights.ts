@@ -47,6 +47,9 @@ export function useAIInsights() {
       setIsLoading(true);
       setError(null);
       try {
+        if (import.meta.env.DEV) {
+          throw new Error("DEV MODE: Bypassing generateAIInsights to prevent CORS errors");
+        }
         const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
         // Do not force refresh by default, let the backend handle the 7-day/1-day cache logic
         const result = await generateAIInsights({});
@@ -56,7 +59,9 @@ export function useAIInsights() {
           setIsLoading(false);
         }
       } catch (err: any) {
-        console.error("Failed to fetch AI insights, falling back to local AnalyticsService", err);
+        if (!import.meta.env.DEV) {
+          console.error("Failed to fetch AI insights, falling back to local AnalyticsService", err);
+        }
         if (isMounted) {
           // Graceful fallback to existing hardcoded logic, mapping to new schema
           const localRoast = generateWeeklyRoast(logs);
@@ -78,11 +83,11 @@ export function useAIInsights() {
               primaryTrait: localDNA.primaryTrait,
               identityExplanation: localDNA.description
             },
-            weeklyForecast: {
-              likelyWeakArea: localForecast.opportunity,
-              suggestedChallenge: localForecast.suggestedChallenge
+            forecast: {
+              prediction: localForecast.prediction,
+              opportunity: localForecast.opportunity
             }
-          });
+          } as any);
           setError(err);
           setIsLoading(false);
         }
@@ -98,11 +103,16 @@ export function useAIInsights() {
     if (!user) return;
     setIsLoading(true);
     try {
+      if (import.meta.env.DEV) {
+        throw new Error("DEV MODE: Bypassing generateAIInsights to prevent CORS errors");
+      }
       const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
       const result = await generateAIInsights({ forceRefresh: true });
       setInsights(result.data);
     } catch (err: any) {
-      console.error(err);
+      if (!import.meta.env.DEV) {
+        console.error(err);
+      }
     } finally {
       setIsLoading(false);
     }

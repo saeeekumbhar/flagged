@@ -90,11 +90,12 @@ export function AvatarDisplay({ avatar, score = 50, size = 96, accessories = [],
           <motion.path 
             d="M 31 15 Q 55 5 85 20 L 75 55 Q 50 40 31 50 Z" 
             fill={visual.color}
-            animate={{ d: [
-              "M 31 15 Q 55 5 85 20 L 75 55 Q 50 40 31 50 Z",
-              "M 31 15 Q 60 25 85 10 L 75 45 Q 50 50 31 50 Z",
-              "M 31 15 Q 55 5 85 20 L 75 55 Q 50 40 31 50 Z"
-            ] }}
+            animate={{ 
+              scaleY: [1, 1.05, 1],
+              scaleX: [1, 1.02, 1],
+              rotate: [0, 2, 0]
+            }}
+            style={{ transformOrigin: "31px 15px" }}
             transition={{ ...transitionConfig, duration: transitionConfig.duration * 0.8 }}
           />
         )}
@@ -109,7 +110,6 @@ export function AvatarDisplay({ avatar, score = 50, size = 96, accessories = [],
           <circle cx="53" cy="35" r="8" fill="#FFF" opacity="0.6" />
         )}
         
-        {/* Ribbons */}
         {visual.hasRibbons && (
           <motion.path 
             d="M 28 15 Q 10 30 15 50" 
@@ -117,7 +117,8 @@ export function AvatarDisplay({ avatar, score = 50, size = 96, accessories = [],
             strokeWidth="3" 
             fill="none" 
             strokeLinecap="round"
-            animate={{ d: ["M 28 15 Q 10 30 15 50", "M 28 15 Q 5 25 20 55", "M 28 15 Q 10 30 15 50"] }}
+            animate={{ rotate: [0, 5, 0] }}
+            style={{ transformOrigin: "28px 15px" }}
             transition={transitionConfig}
           />
         )}

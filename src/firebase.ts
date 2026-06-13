@@ -23,13 +23,7 @@ export const db = initializeFirestore(app, {
 });
 export const functions = getFunctions(app);
 
-// Use local emulator if in development
-if (import.meta.env.DEV) {
-  import('firebase/functions').then(({ connectFunctionsEmulator }) => {
-    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-    console.log("Connected to Firebase Functions Emulator");
-  });
-}
+
 
 let messaging: any = null;
 isMessagingSupported().then(supported => {

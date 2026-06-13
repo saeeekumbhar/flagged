@@ -8,14 +8,14 @@
   "theme_color": "#E5D7C4",
   "icons": [
     {
-      "src": "/vite.svg",
+      "src": "/title_logo.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "/vite.svg",
+      "src": "/title_logo.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
