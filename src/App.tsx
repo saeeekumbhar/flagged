@@ -33,6 +33,7 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (u) setIsAuthLoading(true);
       setUser(u);
       if (u) {
         try {
@@ -68,26 +69,13 @@ export default function App() {
               
               const logsSnap = await getDocs(collection(db, 'users', u.uid, 'dailyLogs'));
               
-              // DEV: Clean up old mock data (anything before June 12, 2026)
-              let hasDeleted = false;
-              const batchDeletes: Promise<void>[] = [];
               logsSnap.forEach(docSnap => {
                 const date = docSnap.id;
-                // If it's old mock data, delete it
-                if (date < '2026-06-12') {
-                   batchDeletes.push(deleteDoc(doc(db, 'users', u.uid, 'dailyLogs', date)));
-                   hasDeleted = true;
-                } else {
-                   l[date] = docSnap.data() as DailyLog;
-                }
+                l[date] = docSnap.data() as DailyLog;
               });
-              
-              if (batchDeletes.length > 0) {
-                 await Promise.all(batchDeletes);
-              }
 
               // Recalculate true points
-              if (hasDeleted || p.coins > 100 || p.coins === 1036 || p.bestStreak > Object.keys(l).length) {
+              if (p.coins > 100 || p.coins === 1036 || p.bestStreak > Object.keys(l).length) {
                  let realCoins = 0;
                  let realXP = 0;
                  Object.values(l).forEach(log => {
@@ -152,6 +140,11 @@ export default function App() {
       } else {
         setProfile(null);
         setLogs({});
+        setNavState({ type: 'tab', tab: 'home' });
+      }
+      // Force navigation to home tab on successful login load
+      if (u) {
+        setNavState({ type: 'tab', tab: 'home' });
       }
       setIsAuthLoading(false);
     });
@@ -194,6 +187,7 @@ export default function App() {
       ...partialProfile,
     };
     await saveProfile(fullProfile);
+    setNavState({ type: 'tab', tab: 'home' });
   };
 
   const handleLogSave = async (log: DailyLog) => {
