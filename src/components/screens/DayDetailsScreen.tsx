@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { DailyLog, UserProfile } from '../../types';
-import { calculateDailyEmissions } from '../../utils/CarbonEngine';
+import { calculateDailyEmissions } from '../../services/CarbonService';
 import { calculateDailyScore } from '../../utils/ScoreEngine';
 
 interface DayDetailsScreenProps {

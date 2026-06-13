@@ -8,7 +8,7 @@ import {
   ENERGY_LAPTOP_EMISSIONS,
   ENERGY_AC_EMISSIONS,
   SHOPPING_EMISSIONS
-} from './EmissionFactors';
+} from '../utils/EmissionFactors';
 
 export const calculateDailyEmissions = (log: Partial<DailyLog>): number => {
   let co2 = 0;

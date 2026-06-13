@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
-import { calculateFlagDNA, calculateGlowUp } from '../../utils/InsightEngine';
+import { calculateFlagDNA, calculateGlowUp } from '../../services/AnalyticsService';
 import { FlagDNACard } from '../FlagDNACard';
 import { auth, db } from '../../firebase';
 import { signOut } from 'firebase/auth';

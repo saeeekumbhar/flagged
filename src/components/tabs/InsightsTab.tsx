@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
-import { generateWeeklyRoast } from '../../utils/InsightEngine';
+import { generateWeeklyRoast } from '../../services/AnalyticsService';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;

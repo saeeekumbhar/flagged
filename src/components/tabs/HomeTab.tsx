@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
-import { generateFlagForecast } from '../../utils/InsightEngine';
+import { generateFlagForecast } from '../../services/AnalyticsService';
 import { Logo } from '../Logo';
 
 interface HomeTabProps {
