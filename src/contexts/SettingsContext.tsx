@@ -62,7 +62,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     // Sync notification preferences to Firestore if logged in
     const syncPreferences = async () => {
       try {
-        const { auth, db } = await import('../../firebase');
+        const { auth, db } = await import('../firebase');
         const { doc, setDoc } = await import('firebase/firestore');
         const user = auth.currentUser;
         if (user) {

@@ -225,3 +225,56 @@ export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] })
 
   return updatedData;
 });
+
+export const awardManualXP = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
+  }
+  const uid = context.auth.uid;
+  const actionType = data.actionType;
+
+  if (!actionType) {
+    throw new functions.https.HttpsError("invalid-argument", "Action type is required.");
+  }
+
+  let xpAward = 0;
+  let coinsAward = 0;
+
+  if (actionType === 'streak_bonus') {
+    xpAward = 30;
+    coinsAward = 50;
+  } else if (actionType === 'challenge_completed') {
+    xpAward = 20;
+    coinsAward = 10;
+  } else {
+    throw new functions.https.HttpsError("invalid-argument", "Unknown action type.");
+  }
+
+  const profRef = db.collection("users").doc(uid);
+  const pSnap = await profRef.get();
+
+  if (!pSnap.exists) {
+    throw new functions.https.HttpsError("not-found", "User profile not found.");
+  }
+
+  const profile = pSnap.data() as UserProfile;
+
+  let newXp = (profile.xp || 0) + xpAward;
+  let newCoins = (profile.coins || 0) + coinsAward;
+  let newLevel = profile.level || 1;
+
+  while (newXp >= 1000) {
+    newLevel++;
+    newXp -= 1000;
+  }
+
+  const updates = {
+    xp: newXp,
+    coins: newCoins,
+    level: newLevel
+  };
+
+  await profRef.set(updates, { merge: true });
+
+  return { success: true, updates };
+});

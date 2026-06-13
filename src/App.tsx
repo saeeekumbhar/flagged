@@ -20,7 +20,7 @@ import { useAuth, useProfile, useLogs } from './hooks';
 
 export function App() {
   const { user, isAuthLoading } = useAuth();
-  const { profile, updateProfile, awardXP, completeOnboarding, isProfileLoading } = useProfile();
+  const { profile, updateProfile, completeOnboarding, isProfileLoading } = useProfile();
   const { logs, addLog, isLogsLoading } = useLogs();
   
   const [navState, setNavState] = useState<NavState>({ type: 'tab', tab: 'home' });
@@ -53,12 +53,28 @@ export function App() {
   };
 
   const handleAwardXP = async (xpAmount: number, coinsAmount: number, reason: string) => {
-    await awardXP(xpAmount, reason);
-    if (xpAmount > 0) {
-      const { logAnalyticsEvent } = await import('./firebase');
-      logAnalyticsEvent('achievement_unlocked', { reason, xpAmount });
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 2000);
+    // Map the reason to the allowed action types on the backend
+    let actionType = '';
+    if (reason === 'Streak bonus!') actionType = 'streak_bonus';
+    else if (reason === 'Challenge done!') actionType = 'challenge_completed';
+    else actionType = reason; // Fallback
+
+    try {
+      const { functions } = await import('./firebase');
+      const { httpsCallable } = await import('firebase/functions');
+      const awardManualXP = httpsCallable<{actionType: string}, any>(functions, 'awardManualXP');
+      
+      const result = await awardManualXP({ actionType });
+      if (result.data?.updates) {
+        updateProfile(result.data.updates);
+        
+        const { logAnalyticsEvent } = await import('./firebase');
+        logAnalyticsEvent('achievement_unlocked', { reason: actionType });
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 2000);
+      }
+    } catch (e) {
+      console.error('Failed to award manual XP', e);
     }
   };
 
