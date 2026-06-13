@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
-import { useAIInsights } from '../../hooks';
+import { useAIInsights, useSpeech } from '../../hooks';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;
@@ -10,6 +10,7 @@ interface InsightsTabProps {
 
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
+  const { speak, stop, isPlaying, isSupported } = useSpeech();
   const roast = insights?.weeklyRoast;
 
   let walks = 0;
@@ -62,9 +63,19 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
         </motion.div>
       ) : roast ? (
         <motion.div className="premium-glass rounded-[32px] p-6" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🔥</span>
-            <h3 className="text-[13px] font-bold text-[#1A2315] uppercase tracking-wider">This Week's Roast</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🔥</span>
+              <h3 className="text-[13px] font-bold text-[#1A2315] uppercase tracking-wider">This Week's Roast</h3>
+            </div>
+            {isSupported && (
+              <button 
+                onClick={() => isPlaying ? stop() : speak(`${roast.roast}. ${roast.realityCheck}. Your fix: ${roast.oneFix}. Your win: ${roast.oneWin}.`)}
+                className="w-8 h-8 rounded-full bg-white/50 border border-[#CFBB99] flex items-center justify-center text-[#354024] active:scale-95 transition-transform"
+              >
+                {isPlaying ? '⏹️' : '▶️'}
+              </button>
+            )}
           </div>
           <p className="text-lg font-bold text-[#1A2315] mb-2 leading-snug">"{roast.roast}"</p>
           <p className="text-sm text-[#4C3D19] italic mb-5">{roast.realityCheck}</p>

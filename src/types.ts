@@ -80,4 +80,5 @@ export type TabType = 'home' | 'journey' | 'insights' | 'community' | 'profile';
 export type NavState = 
   | { type: 'tab'; tab: TabType }
   | { type: 'day_details'; date: string }
-  | { type: 'badge_details'; badgeId: string };
+  | { type: 'badge_details'; badgeId: string }
+  | { type: 'settings' };

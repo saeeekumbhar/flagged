@@ -1,0 +1,176 @@
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { useSettings, TextSize, ThemeMode, MotionMode } from '../../hooks';
+import { SoundService } from '../../services/SoundService';
+
+interface SettingsScreenProps {
+  onBack: () => void;
+}
+
+export function SettingsScreen({ onBack }: SettingsScreenProps) {
+  const { settings, updateSetting } = useSettings();
+  const [permissionStatus, setPermissionStatus] = useState<string>('');
+
+  const requestNotificationPermission = async () => {
+    if (!('Notification' in window)) {
+      setPermissionStatus('Not supported');
+      return false;
+    }
+    const perm = await Notification.requestPermission();
+    setPermissionStatus(perm);
+    return perm === 'granted';
+  };
+
+  const handleToggle = (key: keyof typeof settings) => {
+    const newValue = !settings[key as keyof typeof settings];
+    updateSetting(key as any, newValue);
+    
+    if (settings.buttonSounds) SoundService.playBoop();
+
+    if (key === 'ambientMusic') {
+      if (newValue) SoundService.startAmbient();
+      else SoundService.stopAmbient();
+    }
+  };
+
+  const handleSelect = (key: keyof typeof settings, value: string) => {
+    updateSetting(key as any, value);
+    if (settings.buttonSounds) SoundService.playBoop();
+  };
+
+  return (
+    <motion.div 
+      initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      className="fixed inset-0 z-50 bg-[#F4F1EC] flex flex-col pointer-events-auto overflow-y-auto"
+    >
+      <div className="sticky top-0 z-10 bg-[#F4F1EC]/90 backdrop-blur-md px-4 py-4 flex items-center gap-3 border-b border-[#CFBB99]">
+        <button onClick={() => { if(settings.buttonSounds) SoundService.playBoop(); onBack(); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 border border-[#CFBB99] text-[#4C3D19] active:scale-95 transition-transform">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <h1 className="text-xl font-bold text-[#1A2315] font-display">Settings</h1>
+      </div>
+
+      <div className="p-4 flex flex-col gap-6 pb-24">
+        
+        {/* Appearance & Accessibility */}
+        <section>
+          <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Appearance & Accessibility</h2>
+          <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
+            
+            <div className="p-4 border-b border-[#E5D7C4]">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-semibold text-[#1A2315]">Text Size</span>
+              </div>
+              <div className="flex gap-2">
+                {(['small', 'default', 'large', 'xlarge'] as TextSize[]).map((size) => (
+                  <button 
+                    key={size}
+                    onClick={() => handleSelect('textSize', size)}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${settings.textSize === size ? 'bg-[#354024] text-white border-[#354024]' : 'bg-[#F4F1EC] text-[#4C3D19] border-[#CFBB99]'}`}
+                  >
+                    {size.charAt(0).toUpperCase() + size.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 border-b border-[#E5D7C4]">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-semibold text-[#1A2315]">Theme</span>
+              </div>
+              <div className="flex gap-2">
+                {(['light', 'dark', 'system'] as ThemeMode[]).map((theme) => (
+                  <button 
+                    key={theme}
+                    onClick={() => handleSelect('theme', theme)}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${settings.theme === theme ? 'bg-[#354024] text-white border-[#354024]' : 'bg-[#F4F1EC] text-[#4C3D19] border-[#CFBB99]'}`}
+                  >
+                    {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-[#1A2315]">Reduced Motion</div>
+                <div className="text-xs text-[#889063]">Disable animations & confetti</div>
+              </div>
+              <div className="flex bg-[#F4F1EC] rounded-xl p-1 border border-[#CFBB99]">
+                <button onClick={() => handleSelect('motion', 'normal')} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${settings.motion === 'normal' ? 'bg-white shadow-sm text-[#1A2315]' : 'text-[#889063]'}`}>Normal</button>
+                <button onClick={() => handleSelect('motion', 'reduced')} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${settings.motion === 'reduced' ? 'bg-white shadow-sm text-[#1A2315]' : 'text-[#889063]'}`}>Reduced</button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Sound & Experience */}
+        <section>
+          <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Sound & Experience</h2>
+          <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-[#1A2315]">Ambient Music</div>
+                <div className="text-xs text-[#889063]">Calm background audio</div>
+              </div>
+              <button onClick={() => handleToggle('ambientMusic')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.ambientMusic ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.ambientMusic ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
+              <div className="font-semibold text-[#1A2315]">Button Sounds</div>
+              <button onClick={() => handleToggle('buttonSounds')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.buttonSounds ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.buttonSounds ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="p-4 flex items-center justify-between">
+              <div className="font-semibold text-[#1A2315]">Achievement Sounds</div>
+              <button onClick={() => handleToggle('achievementSounds')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.achievementSounds ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.achievementSounds ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Notifications */}
+        <section>
+          <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Notifications</h2>
+          <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-[#1A2315]">Daily Reminder</div>
+                <div className="text-xs text-[#889063] flex gap-2 items-center mt-1">
+                  <input type="time" value={settings.reminderTime} onChange={(e) => handleSelect('reminderTime', e.target.value)} className="bg-[#F4F1EC] rounded px-1 text-[#1A2315] font-mono outline-none" />
+                </div>
+              </div>
+              <button onClick={async () => {
+                const granted = settings.dailyReminder ? true : await requestNotificationPermission();
+                if (!settings.dailyReminder && !granted) return;
+                handleToggle('dailyReminder');
+              }} className={`w-12 h-6 rounded-full transition-colors relative ${settings.dailyReminder ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.dailyReminder ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
+              <div className="font-semibold text-[#1A2315]">Weekly Report</div>
+              <button onClick={() => handleToggle('weeklyReport')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.weeklyReport ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.weeklyReport ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            <div className="p-4 flex items-center justify-between">
+              <div className="font-semibold text-[#1A2315]">Challenge Reminders</div>
+              <button onClick={() => handleToggle('challengeReminders')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.challengeReminders ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.challengeReminders ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+          </div>
+          {permissionStatus === 'denied' && (
+            <p className="text-xs text-[#D4614A] mt-2 px-2">Notifications are blocked by your browser. Please enable them in settings.</p>
+          )}
+        </section>
+
+      </div>
+    </motion.div>
+  );
+}

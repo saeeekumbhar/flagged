@@ -18,7 +18,7 @@ import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
 import { useAuth, useProfile, useLogs } from './hooks';
 
-export default function App() {
+export function App() {
   const { user, isAuthLoading } = useAuth();
   const { profile, updateProfile, awardXP, completeOnboarding, isProfileLoading } = useProfile();
   const { logs, addLog, isLogsLoading } = useLogs();
@@ -76,6 +76,7 @@ export default function App() {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
+      <GlobalSoundListener />
       <div 
         className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[url('/bg-green.png')] bg-cover bg-center bg-no-repeat sm:rounded-[40px] sm:border-[8px] sm:border-white/20 sm:shadow-[0_0_40px_rgba(0,0,0,0.2)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
         style={{ contain: 'paint' }}
@@ -137,6 +138,12 @@ export default function App() {
                   onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
                 />
               )}
+              {navState.type === 'settings' && (
+                <SettingsScreen
+                  key="settings"
+                  onBack={() => setNavState({ type: 'tab', tab: 'profile' })}
+                />
+              )}
             </AnimatePresence>
 
             {showConfetti && <Confetti duration={1500} />}
@@ -145,4 +152,41 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+import { SettingsProvider, useSettings } from './contexts/SettingsContext';
+import { SoundService } from './services/SoundService';
+import { SettingsScreen } from './components/screens/SettingsScreen';
+
+export default function AppWrapper() {
+  return (
+    <SettingsProvider>
+      <App />
+    </SettingsProvider>
+  );
+}
+
+function GlobalSoundListener() {
+  const { settings } = useSettings();
+  
+  React.useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (!settings.buttonSounds) return;
+      
+      const target = e.target as HTMLElement;
+      // Check if clicking a button, a element, or anything with role="button"
+      const isClickable = target.closest('button') || target.closest('a') || target.closest('[role="button"]');
+      
+      if (isClickable) {
+        // Prevent double playing if we already played in SettingsScreen explicitly, 
+        // but for simplicity, we just play boop on any global button tap.
+        SoundService.playBoop();
+      }
+    };
+    
+    document.body.addEventListener('click', handleGlobalClick);
+    return () => document.body.removeEventListener('click', handleGlobalClick);
+  }, [settings.buttonSounds]);
+  
+  return null;
 }

@@ -19,6 +19,20 @@
   --color-text-primary: var(--color-kombu);
 }
 
+.dark {
+  /* Invert colors for dark mode */
+  --color-bone: #242820;
+  --color-kombu: #E5D7C4;
+  --color-tan: #3A4332;
+  --color-cafe: #E4EDE0;
+  --color-moss: #A2AB7B;
+}
+
+.reduced-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
