@@ -6,20 +6,11 @@ import { useLogs } from '../contexts/LogsContext';
 import { useProfile } from '../contexts/ProfileContext';
 
 export interface AIInsights {
-  weeklySummary?: string;
-  biggestWin?: string;
-  improvementArea?: string;
-  recommendation?: string;
-  challenge?: string;
-  encouragement?: string;
-  flagDNA?: {
-    primaryTrait: string;
-    identityExplanation: string;
-  };
-  weeklyRoast?: string;
-  forecast?: {
-    prediction: string;
-    opportunity: string;
+  vibeCheck?: string;
+  mainQuest?: string;
+  aura?: {
+    title: string;
+    description: string;
   };
 }
 
@@ -62,20 +53,11 @@ export function useAIInsights() {
           const localDNA = calculateFlagDNA(logs);
           
           setInsights({
-            weeklySummary: localRoast.roast,
-            biggestWin: localRoast.oneWin,
-            improvementArea: localRoast.realityCheck,
-            recommendation: localRoast.oneFix,
-            challenge: localForecast.suggestedChallenge || "Keep logging daily",
-            encouragement: "Stay consistent!",
-            flagDNA: {
-              primaryTrait: localDNA.primaryTrait,
-              identityExplanation: localDNA.description
-            },
-            weeklyRoast: localRoast.roast,
-            forecast: {
-              prediction: localForecast.prediction,
-              opportunity: localForecast.opportunity
+            vibeCheck: localRoast.roast,
+            mainQuest: localForecast.suggestedChallenge || localRoast.oneFix || "Log daily to slay your emissions.",
+            aura: {
+              title: localDNA.primaryTrait,
+              description: localDNA.description
             }
           });
           setError(err);

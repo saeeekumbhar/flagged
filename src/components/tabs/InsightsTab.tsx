@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
-import { useAIInsights, useSpeech, useSettings } from '../../hooks';
+import { useAIInsights, useSpeech } from '../../hooks';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;
@@ -11,175 +11,146 @@ interface InsightsTabProps {
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
   const { speak, stop, playingId, isSupported } = useSpeech();
-  const { settings, updateSettings } = useSettings();
-
-  const handleVoice = (id: string, text: string) => {
-    if (playingId === id) {
-      stop();
-    } else {
-      speak(text, id);
+  
+  // Calculate local stats for the visual bar chart
+  let walks = 0;
+  let homeFood = 0;
+  let deliveries = 0;
+  let cabs = 0;
+  
+  const currentMonth = new Date().getMonth();
+  Object.values(logs).forEach(log => {
+    const logMonth = new Date(log.date).getMonth();
+    if (logMonth === currentMonth) {
+      if (log.transport === 'walk' || log.transport === 'cycle' || log.transport === 'bus') walks++;
+      if (log.transport === 'cab' || log.transport === 'car') cabs++;
+      if (log.foodSource) {
+        if (log.foodSource === 'home' || log.foodSource === 'mess') homeFood++;
+      } else if (log.food === 'home' || log.food === 'mess') {
+        homeFood++;
+      }
+      if (log.delivery === 'once' || log.delivery === 'multiple') deliveries++;
     }
-  };
+  });
 
-  const VoiceButton = ({ id, text }: { id: string, text: string }) => {
-    if (!settings.voiceInsights || !isSupported) return null;
-    const isPlaying = playingId === id;
-    
-    return (
-      <button 
-        onClick={() => handleVoice(id, text)}
-        className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 active:scale-95 transition-all ${isPlaying ? 'bg-[#354024] border-[#354024] text-white' : 'bg-white/50 border-[#CFBB99] text-[#354024] hover:bg-white/70'}`}
-        aria-label={isPlaying ? "Stop reading" : "Listen to insight"}
-      >
-        {isPlaying ? '⏹️' : '🔊'}
-      </button>
-    );
-  };
+  const totalTransport = walks + cabs;
+  const greenTransportPct = totalTransport > 0 ? (walks / totalTransport) * 100 : 0;
+
+  const totalMeals = homeFood + deliveries;
+  const goodFoodPct = totalMeals > 0 ? (homeFood / totalMeals) * 100 : 0;
 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 mb-2">
         <h2 className="text-display text-2xl font-bold text-white drop-shadow-md" style={{ color: '#FFFFFF' }}>Insights</h2>
-        
-        {/* Quick Voice Toggle */}
-        {isSupported && (
-          <button 
-            onClick={() => updateSettings({ voiceInsights: !settings.voiceInsights })}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all ${settings.voiceInsights ? 'bg-[#889063] border-[#889063] text-white shadow-sm' : 'bg-black/20 border-white/20 text-white/70 hover:bg-black/30'}`}
-          >
-            <span>{settings.voiceInsights ? '🔊 Voice ON' : '🔇 Voice OFF'}</span>
-          </button>
-        )}
       </div>
 
       {isLoading ? (
         <motion.div className="premium-glass rounded-[32px] p-8 flex flex-col items-center justify-center text-center gap-4 min-h-[200px]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="w-10 h-10 rounded-full border-4 border-[#889063] border-t-transparent animate-spin" />
-          <p className="text-[15px] font-bold text-[#354024] animate-pulse">Analyzing your week 🌱</p>
+          <p className="text-[15px] font-bold text-[#354024] animate-pulse">Checking the vibes ✨</p>
         </motion.div>
-      ) : !insights || !insights.weeklySummary ? (
+      ) : !insights || !insights.vibeCheck ? (
         <div className="premium-glass rounded-[32px] p-6 text-center text-[#4C3D19] font-bold">
-          Couldn't generate insights right now. Log more check-ins to receive your first weekly report!
+          Not enough data yet. Log some check-ins to unlock your aura!
         </div>
       ) : (
         <>
-          {/* Card 1: AI Weekly Insight */}
-          <motion.div className="premium-glass rounded-[28px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl drop-shadow-sm">🌱</span>
-                <h3 className="text-[14px] font-bold text-[#1A2315] uppercase tracking-wider">Your Week in Green</h3>
-              </div>
-              <VoiceButton id="weekly" text={`${insights.weeklySummary}. Your biggest win was ${insights.biggestWin}. The main area for improvement is ${insights.improvementArea}.`} />
-            </div>
-            <p className="text-[15px] font-semibold text-[#1A2315] leading-snug mb-4">{insights.weeklySummary}</p>
+          {/* Card 1: The Vibe Check */}
+          <motion.div className="premium-glass rounded-[32px] p-6 relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/40 rounded-xl p-3 border border-white/20">
-                <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-1 flex items-center gap-1"><span>📈</span> Top Habit</div>
-                <div className="text-[12px] font-bold text-[#1A2315] leading-tight">{insights.biggestWin}</div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl drop-shadow-sm">✨</span>
+                <h3 className="text-[15px] font-bold text-[#1A2315] uppercase tracking-wider">The Vibe Check</h3>
               </div>
-              <div className="bg-black/5 rounded-xl p-3 border border-black/5">
-                <div className="text-[10px] uppercase font-bold text-[#8A3A3A] mb-1 flex items-center gap-1"><span>📉</span> Focus Area</div>
-                <div className="text-[12px] font-bold text-[#1A2315] leading-tight">{insights.improvementArea}</div>
+              
+              {/* Voice Button ONLY on top card */}
+              {isSupported && (
+                <button 
+                  onClick={() => playingId === 'vibe' ? stop() : speak(`${insights.vibeCheck}. Your main quest: ${insights.mainQuest}.`, 'vibe')}
+                  className={`flex items-center justify-center w-10 h-10 rounded-full shadow-sm transition-all active:scale-95 ${playingId === 'vibe' ? 'bg-[#1A2315] text-[#E4EDE0]' : 'bg-[#E4EDE0] text-[#1A2315] border border-[#CFBB99]'}`}
+                >
+                  {playingId === 'vibe' ? '⏹️' : '🔊'}
+                </button>
+              )}
+            </div>
+
+            <p className="text-[16px] font-semibold text-[#1A2315] leading-snug mb-5 relative z-10">
+              {insights.vibeCheck}
+            </p>
+            
+            {/* Visual Data Representation */}
+            <div className="flex flex-col gap-4 relative z-10">
+              {/* Transport Bar */}
+              <div>
+                <div className="flex justify-between text-[11px] font-bold uppercase tracking-wide text-[#354024] mb-1.5">
+                  <span>Green Transit</span>
+                  <span>{Math.round(greenTransportPct)}%</span>
+                </div>
+                <div className="h-3 w-full bg-black/10 rounded-full overflow-hidden flex shadow-inner">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${greenTransportPct}%` }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                    className="h-full bg-gradient-to-r from-[#889063] to-[#A3AA7B]"
+                  />
+                </div>
+              </div>
+              
+              {/* Food Bar */}
+              <div>
+                <div className="flex justify-between text-[11px] font-bold uppercase tracking-wide text-[#354024] mb-1.5">
+                  <span>Home Cooked</span>
+                  <span>{Math.round(goodFoodPct)}%</span>
+                </div>
+                <div className="h-3 w-full bg-black/10 rounded-full overflow-hidden flex shadow-inner">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${goodFoodPct}%` }}
+                    transition={{ duration: 1, delay: 0.4 }}
+                    className="h-full bg-gradient-to-r from-[#D6A066] to-[#E5B582]"
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Card 2: AI Action Card */}
-          <motion.div className="premium-glass rounded-[28px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl drop-shadow-sm">🎯</span>
-                <h3 className="text-[14px] font-bold text-[#1A2315] uppercase tracking-wider">Your Next Green Move</h3>
-              </div>
-              <VoiceButton id="action" text={insights.recommendation} />
+          {/* Card 2: Main Quest */}
+          <motion.div className="bg-[#1A2315] rounded-[32px] p-6 shadow-xl relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <div className="absolute -bottom-10 -right-10 text-8xl opacity-10 blur-sm pointer-events-none">🎯</div>
+            <div className="flex items-center gap-2 mb-3 relative z-10">
+              <span className="text-2xl drop-shadow-sm">⚔️</span>
+              <h3 className="text-[14px] font-bold text-[#CFBB99] uppercase tracking-wider">Main Quest</h3>
             </div>
-            <p className="text-[15px] font-semibold text-[#1A2315] leading-snug bg-white/30 p-4 rounded-2xl border border-white/20 mt-2">
-              {insights.recommendation}
+            <p className="text-[18px] font-bold text-white leading-snug relative z-10">
+              {insights.mainQuest}
             </p>
           </motion.div>
 
-          {/* Card 3: AI Challenge Card */}
-          <motion.div className="bg-[#354024] rounded-[28px] p-5 shadow-lg relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-            <div className="flex items-start justify-between mb-3 relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl drop-shadow-sm">⚡</span>
-                <h3 className="text-[14px] font-bold text-[#E4EDE0] uppercase tracking-wider">This Week's Challenge</h3>
+          {/* Card 3: Aura & DNA */}
+          {insights.aura && (
+            <motion.div className="bg-[#EAE4DF] border border-[#D1B8A3] rounded-[32px] p-6 shadow-sm flex flex-col items-center text-center" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+              <h3 className="text-[13px] font-bold text-[#8A3A3A] uppercase tracking-widest mb-4">Your Aura</h3>
+              
+              <div className="relative mb-4">
+                <div className="absolute inset-0 bg-[#D6A066] blur-xl opacity-20 rounded-full" />
+                <div className="bg-gradient-to-br from-[#889063] to-[#354024] text-white px-6 py-3 rounded-2xl shadow-lg border-2 border-[#E4EDE0] rotate-[-2deg] relative z-10">
+                  <span className="text-xl font-black uppercase tracking-tight drop-shadow-md">
+                    {insights.aura.title}
+                  </span>
+                </div>
               </div>
-              <VoiceButton id="challenge" text={insights.challenge} />
-            </div>
-            <p className="text-[16px] font-bold text-white leading-snug relative z-10 mb-3">
-              {insights.challenge}
-            </p>
-            <div className="text-[12px] font-medium text-[#CFBB99] relative z-10 italic">
-              {insights.encouragement}
-            </div>
-          </motion.div>
 
-          {/* Card 4: Flag DNA */}
-          {insights.flagDNA && (
-            <motion.div className="premium-glass rounded-[28px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl drop-shadow-sm">🧬</span>
-                  <h3 className="text-[14px] font-bold text-[#1A2315] uppercase tracking-wider">Your Flag DNA</h3>
-                </div>
-                <VoiceButton id="dna" text={`Your primary trait is ${insights.flagDNA.primaryTrait}. ${insights.flagDNA.identityExplanation}`} />
-              </div>
-              <div className="bg-white/40 p-4 rounded-2xl border border-white/20 mt-2 flex flex-col items-center text-center">
-                <div className="text-[20px] font-black text-[#2D5D2D] uppercase tracking-tight leading-none mb-2">
-                  {insights.flagDNA.primaryTrait}
-                </div>
-                <div className="text-[13px] font-medium text-[#354024] leading-snug">
-                  {insights.flagDNA.identityExplanation}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Card 5: Weekly Roast */}
-          {insights.weeklyRoast && (
-            <motion.div className="bg-[#EAE4DF] border border-[#D1B8A3] rounded-[28px] p-5 shadow-sm" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl drop-shadow-sm">🔥</span>
-                  <h3 className="text-[14px] font-bold text-[#8A3A3A] uppercase tracking-wider">Weekly Roast</h3>
-                </div>
-                <VoiceButton id="roast" text={insights.weeklyRoast} />
-              </div>
-              <p className="text-[14px] font-bold text-[#5A2A2A] leading-snug mt-2 italic">
-                "{insights.weeklyRoast}"
+              <p className="text-[15px] font-semibold text-[#4C3D19] leading-snug">
+                {insights.aura.description}
               </p>
             </motion.div>
           )}
 
-          {/* Card 6: Flag Forecast */}
-          {insights.forecast && (
-            <motion.div className="premium-glass rounded-[28px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl drop-shadow-sm">🔮</span>
-                  <h3 className="text-[14px] font-bold text-[#1A2315] uppercase tracking-wider">Flag Forecast</h3>
-                </div>
-                <VoiceButton id="forecast" text={`${insights.forecast.prediction}. ${insights.forecast.opportunity}`} />
-              </div>
-              <div className="flex flex-col gap-3 mt-3">
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-[#4C3D19] mb-0.5">Prediction</div>
-                  <div className="text-[13px] font-bold text-[#1A2315] leading-snug">{insights.forecast.prediction}</div>
-                </div>
-                <div className="w-full h-[1px] bg-black/10" />
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-[#2D5D2D] mb-0.5">Opportunity</div>
-                  <div className="text-[13px] font-bold text-[#1A2315] leading-snug">{insights.forecast.opportunity}</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </>
       )}
 
