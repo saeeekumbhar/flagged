@@ -91,7 +91,7 @@ export const SoundService = {
         
         // Soft attack, very long gentle release
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.5); // Soft volume
+        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.5); // Increased volume significantly to 30%
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 5);
         
         osc.connect(gain);
