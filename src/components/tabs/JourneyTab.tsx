@@ -97,6 +97,7 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
                 key={day}
                 whileTap={isFuture ? {} : { scale: 0.9 }}
                 onClick={() => !isFuture && onNavigate({ type: 'day_details', date: dateStr })}
+                aria-label={isFuture ? `Future date: ${dateStr}` : `Log for ${dateStr}${log && log.dailyScore ? `, score ${log.dailyScore}` : ''}`}
                 className={`relative aspect-square flex items-center justify-center rounded-[14px] transition-colors ${isFuture ? 'opacity-30 cursor-not-allowed' : ''}`}
                 style={{ background: bgColor, color: textColor, fontWeight: fontWeight as any }}
               >

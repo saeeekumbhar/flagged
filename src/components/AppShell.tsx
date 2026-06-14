@@ -96,6 +96,7 @@ export function AppShell() {
                 <motion.div 
                   initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
                   className={`${toast.type === 'darkGreen' ? 'bg-[#889063]' : 'bg-[#889063]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
+                  role="alert" aria-live="assertive"
                 >
                   {toast.msg}
                 </motion.div>

@@ -166,6 +166,7 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
 
         <motion.button 
           onClick={handleStreakClick}
+          aria-label={`View Streak details. Current streak is ${profile.streak} days`}
           whileTap={{ scale: 0.95 }}
           className="col-span-1 premium-glass rounded-[20px] p-3 flex flex-col items-center justify-center transition-transform"
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}>

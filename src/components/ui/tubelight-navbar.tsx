@@ -39,6 +39,8 @@ export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
+            aria-label={item.name}
+            aria-current={isActive ? "page" : undefined}
             className="relative flex flex-col items-center justify-center flex-1 h-full active:scale-95 transition-transform"
           >
             {/* The icon */}
