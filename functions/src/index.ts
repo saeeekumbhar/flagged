@@ -115,7 +115,6 @@ export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] })
   
   const now = Date.now();
   const ONE_DAY = 24 * 60 * 60 * 1000;
-  const SEVEN_DAYS = 7 * ONE_DAY;
 
   let cachedData = iSnap.exists ? iSnap.data() : null;
 
@@ -125,7 +124,7 @@ export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] })
   if (!cachedData) {
     needsWeeklyUpdate = true;
   } else {
-    if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > SEVEN_DAYS)) {
+    if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > ONE_DAY)) {
       needsWeeklyUpdate = true;
     }
   }
@@ -168,23 +167,20 @@ export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] })
     
     Generate a JSON response EXACTLY in this format, with NO markdown formatting, just raw JSON:
     {
-      "personalizedRecommendations": {
-        "biggestRedFlag": "Short specific bad habit you noticed",
-        "biggestGreenFlag": "Short specific good habit you noticed",
-        "improvementAction": "One highly specific, easy action to improve"
-      },
-      "weeklyReport": {
-        "improvementSummary": "1-2 sentences summarizing their performance compared to ideal",
-        "biggestWin": "The most significant green achievement this week",
-        "nextGoal": "A measurable goal for the upcoming week"
-      },
+      "weeklySummary": "1-2 sentences summarizing their performance compared to ideal",
+      "biggestWin": "Short specific good habit",
+      "improvementArea": "Short specific bad habit",
+      "recommendation": "One highly specific, easy action to improve",
+      "challenge": "A short actionable task to overcome a weak area",
+      "encouragement": "A short, positive encouragement sentence",
       "flagDNA": {
         "primaryTrait": "A catchy 2-3 word title (e.g. Eco Explorer, Thrift Legend, Cab Addict)",
         "identityExplanation": "Why they got this identity based on their actual logs."
       },
-      "weeklyForecast": {
-        "likelyWeakArea": "A habit they might struggle with next week",
-        "suggestedChallenge": "A short actionable task to overcome the weak area"
+      "weeklyRoast": "A funny, slightly sarcastic roast about their worst green habit this week.",
+      "forecast": {
+        "prediction": "A prediction of how next week will go.",
+        "opportunity": "An opportunity to save emissions next week."
       }
     }
   `;

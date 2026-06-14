@@ -5,7 +5,7 @@ import { FirebaseService } from '../services/FirebaseService';
 import { calculateDailyScore, calculateTrend, calculateFlagScore } from '../utils/ScoreEngine';
 import { calculateDailyEmissions } from '../../functions/src/utils/CarbonService';
 import { db } from '../firebase';
-import { doc, collection, setDoc, getDoc, getDocs } from 'firebase/firestore';
+import { doc, collection, setDoc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
 
 interface LogsContextType {
   logs: Record<string, DailyLog>;
@@ -115,6 +115,13 @@ export const LogsProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         await setDoc(userRef, updates, { merge: true });
         
+        // Cache invalidation for AI insights
+        try {
+          await deleteDoc(doc(db, "users", user.uid, "aiInsights", "latest"));
+        } catch (e) {
+          console.warn("Could not invalidate AI cache", e);
+        }
+        
         setLogs(prev => ({ ...prev, [finalLog.date]: finalLog }));
         return { success: true, log: finalLog, updates };
       }
@@ -122,6 +129,11 @@ export const LogsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const result = await FirebaseService.saveLog(user.uid, log);
         if (result && result.success) {
+          try {
+            await deleteDoc(doc(db, "users", user.uid, "aiInsights", "latest"));
+          } catch (e) {
+            console.warn("Could not invalidate AI cache", e);
+          }
           setLogs(prev => ({ ...prev, [result.log.date]: result.log }));
           return result;
         }

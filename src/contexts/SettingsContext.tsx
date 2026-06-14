@@ -15,6 +15,7 @@ export interface AppSettings {
   weeklyReport: boolean;
   challengeReminders: boolean;
   reminderTime: string;
+  voiceInsights: boolean;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -28,6 +29,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   weeklyReport: false,
   challengeReminders: false,
   reminderTime: '20:00',
+  voiceInsights: false,
 };
 
 interface SettingsContextType {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export function useSpeech() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [playingId, setPlayingId] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
 
   useEffect(() => {
@@ -10,7 +10,7 @@ export function useSpeech() {
     }
   }, []);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback((text: string, id: string = 'global') => {
     if (!isSupported) return;
     
     // Stop any ongoing speech
@@ -26,23 +26,23 @@ export function useSpeech() {
     utterance.rate = 1.05; // Slightly faster for energy
     utterance.pitch = 1.1; // Slightly higher
     
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
+    utterance.onend = () => setPlayingId(null);
+    utterance.onerror = () => setPlayingId(null);
     
     window.speechSynthesis.speak(utterance);
-    setIsPlaying(true);
+    setPlayingId(id);
   }, [isSupported]);
 
   const stop = useCallback(() => {
     if (!isSupported) return;
     window.speechSynthesis.cancel();
-    setIsPlaying(false);
+    setPlayingId(null);
   }, [isSupported]);
 
   return {
     speak,
     stop,
-    isPlaying,
+    playingId,
     isSupported
   };
 }
