@@ -69,67 +69,44 @@ export const SoundService = {
       const ctx = getAudioContext();
       if (ambientOscillator) return; // already playing
 
-      // We use a node graph to create a beautiful, soft ambient pad
-      const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0, ctx.currentTime);
-      masterGain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 5); // Increased volume from 0.06 to 0.2
-      masterGain.connect(ctx.destination);
+      // Use as a flag to know it's playing
+      ambientOscillator = ctx.createOscillator(); 
 
-      // Create a soft lowpass filter for warmth
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 800; // Increased to let higher frequencies through
-      filter.connect(masterGain);
-
-      // Slow LFO to make the filter "breathe" (foresty/galactic feel)
-      const filterLfo = ctx.createOscillator();
-      filterLfo.type = 'sine';
-      filterLfo.frequency.value = 0.05; // 20 second cycle
-      const filterLfoGain = ctx.createGain();
-      filterLfoGain.gain.value = 300; 
-      filterLfo.connect(filterLfoGain);
-      filterLfoGain.connect(filter.frequency);
-      filterLfo.start();
-
-      // Frequencies for a soothing, spacey chord (Cmaj9: C4, E4, G4, B4)
-      const freqs = [261.63, 329.63, 392.00, 493.88];
-      const oscs: OscillatorNode[] = [];
-      
-      freqs.forEach((freq, i) => {
+      const playChime = () => {
+        if (!ambientOscillator) return; // stopped
+        
+        // C Major Pentatonic frequencies (soothing, never dissonant)
+        // C5, D5, E5, G5, A5, C6
+        const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+        const freq = scale[Math.floor(Math.random() * scale.length)];
+        
         const osc = ctx.createOscillator();
-        osc.type = 'triangle'; // Softer tone
-        osc.frequency.value = freq + (Math.random() * 0.4 - 0.2); // Slight detune
-        
-        // Panner to spread the chord
+        const gain = ctx.createGain();
         const panner = ctx.createStereoPanner();
-        panner.pan.value = (i % 2 === 0 ? 1 : -1) * (Math.random() * 0.5 + 0.2);
-
-        // Individual LFO for volume shimmer
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.1 + Math.random() * 0.1;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 0.4;
-        lfo.connect(lfoGain);
         
-        const voiceGain = ctx.createGain();
-        voiceGain.gain.value = 0.5;
-        lfoGain.connect(voiceGain.gain);
-
-        osc.connect(voiceGain);
-        voiceGain.connect(panner);
-        panner.connect(filter);
+        osc.type = 'sine'; // Pure, sweet tone
+        osc.frequency.value = freq;
+        
+        panner.pan.value = (Math.random() * 2) - 1; // Random left/right panning
+        
+        // Soft attack, very long gentle release
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 0.5); // Soft volume
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 5);
+        
+        osc.connect(gain);
+        gain.connect(panner);
+        panner.connect(ctx.destination);
         
         osc.start();
-        lfo.start();
-        oscs.push(osc);
-      });
+        osc.stop(ctx.currentTime + 5.1);
+        
+        // Schedule next chime randomly between 1.5 and 4 seconds
+        (window as any).__ambientTimer = setTimeout(playChime, 1500 + Math.random() * 2500);
+      };
 
-      // Store references to stop later
-      ambientOscillator = oscs[0]; 
-      ambientGain = masterGain;
-      (window as any).__ambientOscs = oscs;
-      (window as any).__ambientLfo = filterLfo;
+      // Start the loop
+      playChime();
 
     } catch (e) {
       console.warn("Ambient sound failed", e);
@@ -138,22 +115,9 @@ export const SoundService = {
 
   stopAmbient: () => {
     try {
-      if (ambientGain && audioCtx) {
-        // Fade out
-        ambientGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 3);
-        
-        setTimeout(() => {
-          if ((window as any).__ambientOscs) {
-            (window as any).__ambientOscs.forEach((osc: any) => {
-              try { osc.stop(); } catch(e){}
-            });
-          }
-          if ((window as any).__ambientLfo) {
-             try { (window as any).__ambientLfo.stop(); } catch(e){}
-          }
-          ambientOscillator = null;
-          ambientGain = null;
-        }, 3100);
+      ambientOscillator = null;
+      if ((window as any).__ambientTimer) {
+         clearTimeout((window as any).__ambientTimer);
       }
     } catch (e) {
       console.warn("Stop ambient failed", e);
