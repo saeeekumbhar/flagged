@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
 import { useAIInsights, useSpeech } from '../../hooks';
+import { CarbonBreakdownCard } from '../CarbonBreakdownCard';
 
 interface InsightsTabProps {
   logs: Record<string, DailyLog>;
@@ -67,8 +68,11 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
         </div>
       ) : (
         <>
+          {/* Carbon Breakdown (New Feature) */}
+          <CarbonBreakdownCard logs={logs} />
+
           {/* Card 1: The Vibe Check */}
-          <motion.div className="premium-glass rounded-[32px] p-6 relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div className="premium-glass rounded-[32px] p-6 relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
             
             <div className="flex items-center justify-between mb-4 relative z-10">
@@ -119,7 +123,7 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
           </motion.div>
 
           {/* Card 2: Main Quest */}
-          <motion.div className="bg-[#1A2315] rounded-[32px] p-6 shadow-xl relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <motion.div className="bg-[#1A2315] rounded-[32px] p-6 shadow-xl relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <div className="absolute -bottom-10 -right-10 text-8xl opacity-10 blur-sm pointer-events-none">🎯</div>
             <div className="flex items-center gap-2 mb-3 relative z-10">
               <span className="text-2xl drop-shadow-sm">⚔️</span>
@@ -132,7 +136,7 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
 
           {/* Card 3: Aura & DNA */}
           {insights.aura && (
-            <motion.div className="bg-[#EAE4DF] border border-[#D1B8A3] rounded-[32px] p-6 shadow-sm flex flex-col items-center text-center" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className="bg-[#EAE4DF] border border-[#D1B8A3] rounded-[32px] p-6 shadow-sm flex flex-col items-center text-center" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
               <h3 className="text-[13px] font-bold text-[#8A3A3A] uppercase tracking-widest mb-4">Your Aura</h3>
               
               <div className="relative mb-4">
