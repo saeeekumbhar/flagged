@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavState, DailyLog } from './types';
 import { Splash } from './components/Splash';
@@ -27,6 +27,12 @@ export function App() {
   const [toast, setToast] = useState<{msg: string, type?: 'green'|'darkGreen'} | null>(null);
   const [isShaking, setIsShaking] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setNavState({ type: 'tab', tab: 'home' });
+    }
+  }, [user]);
 
   const handleLogSave = async (log: Partial<DailyLog>) => {
     const result = await addLog(log);
