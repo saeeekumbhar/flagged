@@ -231,15 +231,26 @@ function GlobalAmbientMusic({ user }: { user: any }) {
   const { settings } = useSettings();
   
   React.useEffect(() => {
-    // Only play if setting is on and user is fully logged in
+    // Attempt to start immediately
     if (settings.ambientMusic && user) {
       SoundService.startAmbient();
     } else {
       SoundService.stopAmbient();
     }
 
+    // Browsers block audio until the first interaction. 
+    // Listen for the first touch/click to resume the AudioContext if suspended.
+    const unlockAudio = () => {
+      SoundService.resumeContext();
+    };
+
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
+
     return () => {
       SoundService.stopAmbient();
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
     };
   }, [settings.ambientMusic, user]);
 

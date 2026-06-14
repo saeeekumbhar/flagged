@@ -72,13 +72,13 @@ export const SoundService = {
       // We use a node graph to create a beautiful, soft ambient pad
       const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(0, ctx.currentTime);
-      masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 5); // Gentle fade in
+      masterGain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 5); // Increased volume from 0.06 to 0.2
       masterGain.connect(ctx.destination);
 
       // Create a soft lowpass filter for warmth
       const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.value = 350; 
+      filter.frequency.value = 800; // Increased to let higher frequencies through
       filter.connect(masterGain);
 
       // Slow LFO to make the filter "breathe" (foresty/galactic feel)
@@ -86,13 +86,13 @@ export const SoundService = {
       filterLfo.type = 'sine';
       filterLfo.frequency.value = 0.05; // 20 second cycle
       const filterLfoGain = ctx.createGain();
-      filterLfoGain.gain.value = 150; 
+      filterLfoGain.gain.value = 300; 
       filterLfo.connect(filterLfoGain);
       filterLfoGain.connect(filter.frequency);
       filterLfo.start();
 
-      // Frequencies for a soothing, spacey chord (Cmaj9: C3, E3, G3, B3)
-      const freqs = [130.81, 164.81, 196.00, 246.94];
+      // Frequencies for a soothing, spacey chord (Cmaj9: C4, E4, G4, B4)
+      const freqs = [261.63, 329.63, 392.00, 493.88];
       const oscs: OscillatorNode[] = [];
       
       freqs.forEach((freq, i) => {
@@ -157,6 +157,12 @@ export const SoundService = {
       }
     } catch (e) {
       console.warn("Stop ambient failed", e);
+    }
+  },
+
+  resumeContext: () => {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(e => console.warn('Failed to resume audio context', e));
     }
   }
 };
