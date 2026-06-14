@@ -98,10 +98,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       case 'q1':
         return (
           <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-16">
-            <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">Are you a...</h2>
+            <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">What’s your college living arrangement?</h2>
             <div className="flex flex-col gap-4">
-              <ChoiceBtn emoji="🏠" label="Day Scholar" selected={answers.q1 === 'Day Scholar'} onClick={() => selectAnswer('q1', 'Day Scholar')} />
-              <ChoiceBtn emoji="🏡" label="Hosteler / PG" selected={answers.q1 === 'Hosteler'} onClick={() => selectAnswer('q1', 'Hosteler')} />
+              <ChoiceBtn emoji="🏠" label="I commute from home (Day Scholar)" selected={answers.q1 === 'Day Scholar'} onClick={() => selectAnswer('q1', 'Day Scholar')} />
+              <ChoiceBtn emoji="🏡" label="I live in a hostel" selected={answers.q1 === 'Hosteler'} onClick={() => selectAnswer('q1', 'Hosteler')} />
+              <ChoiceBtn emoji="🏢" label="I stay in a PG" selected={answers.q1 === 'PG'} onClick={() => selectAnswer('q1', 'PG')} />
             </div>
           </div>
         );
