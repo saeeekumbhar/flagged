@@ -125,11 +125,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">How do you usually eat during college days?</h2>
             <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar">
-              <ChoiceBtn emoji="🍱" label="Mess food" selected={answers.q3 === 'Mess'} onClick={() => selectAnswer('q3', 'Mess')} />
-              <ChoiceBtn emoji="🏠" label="Home food" selected={answers.q3 === 'Home'} onClick={() => selectAnswer('q3', 'Home')} />
-              <ChoiceBtn emoji="🥗" label="Mostly vegetarian" selected={answers.q3 === 'Veg'} onClick={() => selectAnswer('q3', 'Veg')} />
-              <ChoiceBtn emoji="🍗" label="Mixed diet" selected={answers.q3 === 'Mixed'} onClick={() => selectAnswer('q3', 'Mixed')} />
-              <ChoiceBtn emoji="🍔" label="Frequent outside food" selected={answers.q3 === 'Outside'} onClick={() => selectAnswer('q3', 'Outside')} />
+              <ChoiceBtn emoji="🥗" label="Mess / Home Food (Vegetarian)" selected={answers.q3 === 'Mess/Home Veg'} onClick={() => selectAnswer('q3', 'Mess/Home Veg')} />
+              <ChoiceBtn emoji="🍗" label="Mess / Home Food (Mixed / Non-Veg)" selected={answers.q3 === 'Mess/Home Mixed'} onClick={() => selectAnswer('q3', 'Mess/Home Mixed')} />
+              <ChoiceBtn emoji="🍔" label="Frequent Outside Food / Canteen" selected={answers.q3 === 'Outside'} onClick={() => selectAnswer('q3', 'Outside')} />
             </div>
           </div>
         );
