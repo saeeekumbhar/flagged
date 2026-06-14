@@ -25,7 +25,7 @@ const BADGES = [
 
 export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
   const { insights, isLoading } = useAIInsights();
-  const dna = insights?.flagDNA;
+  const aura = insights?.aura;
 
   const era = calculateEra(profile.flagScore);
   const flagEvolution = getFlagEvolutionStage(profile.flagScore);
@@ -107,7 +107,7 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       </div>
 
       {/* Flag DNA Share Card */}
-      <FlagDNACard profile={profile} logs={logs} dna={dna} isLoading={isLoading} />
+      <FlagDNACard profile={profile} logs={logs} aura={aura} isLoading={isLoading} />
 
       {/* Evolution Status */}
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

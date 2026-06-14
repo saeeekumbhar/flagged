@@ -8,11 +8,11 @@ import { calculateFlagDNA } from '../services/AnalyticsService';
 interface FlagDNACardProps {
   profile: UserProfile;
   logs: Record<string, DailyLog>;
-  dna?: { primaryTrait: string; identityExplanation: string };
+  aura?: { title: string; description: string };
   isLoading?: boolean;
 }
 
-export function FlagDNACard({ profile, logs, dna, isLoading }: FlagDNACardProps) {
+export function FlagDNACard({ profile, logs, aura, isLoading }: FlagDNACardProps) {
   const localDNA = useMemo(() => calculateFlagDNA(logs), [logs]);
   const era = calculateEra(profile.flagScore);
   const evolution = getFlagEvolutionStage(profile.flagScore);
@@ -38,17 +38,17 @@ export function FlagDNACard({ profile, logs, dna, isLoading }: FlagDNACardProps)
     >
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#E4EDE0] to-transparent opacity-50 pointer-events-none" />
       
-      {isLoading || !dna ? (
+      {isLoading || !aura ? (
         <div className="flex flex-col items-center justify-center min-h-[200px] gap-3 relative z-10">
           <div className="w-8 h-8 rounded-full border-2 border-[#889063] border-t-transparent animate-spin"></div>
-          <p className="text-sm font-bold text-[#354024] animate-pulse">Gemini sequencing DNA...</p>
+          <p className="text-sm font-bold text-[#354024] animate-pulse">Checking aura vibe...</p>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-between mb-6 relative z-10">
         <div>
-          <h3 className="text-[11px] font-bold text-[#4C3D19] uppercase tracking-wider mb-1">Flag DNA</h3>
-          <div className="text-xl font-bold text-[#354024]">{dna.primaryTrait}</div>
+          <h3 className="text-[11px] font-bold text-[#4C3D19] uppercase tracking-wider mb-1">Your Aura</h3>
+          <div className="text-xl font-bold text-[#354024]">{aura.title}</div>
         </div>
         <button className="w-8 h-8 rounded-full bg-[#F4F1EC] flex items-center justify-center text-sm border border-[#CFBB99] active:scale-95 transition-transform">
           ↗
@@ -67,7 +67,7 @@ export function FlagDNACard({ profile, logs, dna, isLoading }: FlagDNACardProps)
       </div>
 
       <p className="text-[13px] text-[#354024] italic mb-5 relative z-10 px-2 border-l-2 border-[#889063]">
-        "{dna.identityExplanation}"
+        "{aura.description}"
       </p>
 
       <div className="space-y-3 relative z-10 bg-[#E5D7C4] p-4 rounded-2xl border border-[#CFBB99]">

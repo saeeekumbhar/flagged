@@ -125,18 +125,9 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
                 <button onClick={() => handleSelect('motion', 'normal')} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${settings.motion === 'normal' ? 'bg-white shadow-sm text-[#1A2315]' : 'text-[#889063]'}`}>Normal</button>
                 <button onClick={() => handleSelect('motion', 'reduced')} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${settings.motion === 'reduced' ? 'bg-white shadow-sm text-[#1A2315]' : 'text-[#889063]'}`}>Reduced</button>
               </div>
-            </div>
 
-            <div className="p-4 border-t border-[#E5D7C4] flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-[#1A2315]">Voice Insights</div>
-                <div className="text-xs text-[#889063]">Read AI insights aloud</div>
-              </div>
-              <button onClick={() => handleToggle('voiceInsights')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.voiceInsights ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
-                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.voiceInsights ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
 
+            </div>
           </div>
         </section>
 
