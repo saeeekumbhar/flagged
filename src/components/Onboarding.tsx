@@ -36,7 +36,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleBack = () => {
-    if (currentStepIndex > 1) { // 0 is welcome, 1 is q1.
+    if (currentStepIndex > 0) { 
       setCurrentStepIndex(prev => prev - 1);
     }
   };
@@ -229,8 +229,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           <div className="flex justify-between items-center mb-4">
             <button 
               onClick={handleBack} 
-              disabled={currentStep === 'q1'} 
-              className={`p-2 rounded-full hover:bg-white/10 transition-colors ${currentStep === 'q1' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
             >
               <span className="text-2xl text-white font-bold drop-shadow">←</span>
             </button>
