@@ -199,6 +199,66 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           )}
         </section>
 
+        {/* Account & Legal */}
+        <section>
+          <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Account & Legal</h2>
+          <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
+            <button 
+              onClick={() => {
+                if (settings.buttonSounds) SoundService.playBoop();
+                alert("Privacy Policy coming soon!");
+              }}
+              className="w-full p-4 border-b border-[#E5D7C4] flex items-center justify-between text-left active:bg-[#F4F1EC] transition-colors"
+            >
+              <div className="font-semibold text-[#1A2315]">Privacy Policy</div>
+              <div className="text-[#CFBB99]">→</div>
+            </button>
+            <button 
+              onClick={async () => {
+                if (settings.buttonSounds) SoundService.playBoop();
+                const confirm = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+                if (confirm) {
+                  try {
+                    const { auth } = await import('../../firebase');
+                    if (auth.currentUser) {
+                      await auth.currentUser.delete();
+                      alert("Account deleted successfully.");
+                    }
+                  } catch (e) {
+                    console.error("Account deletion failed", e);
+                    alert("Failed to delete account. You may need to sign in again first.");
+                  }
+                }
+              }}
+              className="w-full p-4 flex items-center justify-between text-left active:bg-[#FDF2F2] transition-colors group"
+            >
+              <div className="font-semibold text-[#D4614A]">Delete Account</div>
+              <div className="text-[#D4614A] opacity-50 group-hover:opacity-100">→</div>
+            </button>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <div className="mt-8 pt-8 border-t border-[#CFBB99] flex flex-col items-center text-center pb-8">
+          <div className="font-display font-bold text-[#1A2315] mb-1">Credits: Saee Kumbhar</div>
+          <div className="text-xs font-bold text-[#889063] uppercase tracking-wider mb-6">All Rights Reserved.</div>
+          
+          <div className="bg-[#E5D7C4]/50 border border-[#CFBB99] rounded-2xl p-4 max-w-sm mb-6">
+            <div className="text-[10px] font-bold text-[#4C3D19] uppercase tracking-wider mb-2">Disclaimer</div>
+            <p className="text-xs text-[#4C3D19] leading-relaxed opacity-80">
+              This platform is for educational and informational purposes only. It is not affiliated with any official environmental authority or government body. 
+            </p>
+          </div>
+
+          <div className="text-sm">
+            <div className="font-bold text-[#1A2315] mb-0.5">Still have questions?</div>
+            <div className="text-[#889063]">Email us at:</div>
+            <a href="mailto:saeeekumbhar@gmail.com" className="font-bold text-[#354024] hover:underline mt-1 inline-block">
+              saeeekumbhar@gmail.com
+            </a>
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );
