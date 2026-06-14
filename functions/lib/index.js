@@ -37,13 +37,10 @@ exports.awardManualXP = exports.generateAIInsights = exports.submitDailyLog = vo
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const genai_1 = require("@google/genai");
-const params_1 = require("firebase-functions/params");
 const ScoreEngine_1 = require("./utils/ScoreEngine");
 const CarbonService_1 = require("./utils/CarbonService");
 admin.initializeApp();
 const db = admin.firestore();
-// Define Gemini API Key Secret
-const geminiApiKey = (0, params_1.defineSecret)("GEMINI_API_KEY");
 exports.submitDailyLog = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
@@ -53,12 +50,11 @@ exports.submitDailyLog = functions.https.onCall(async (data, context) => {
     if (!logData || !logData.date) {
         throw new functions.https.HttpsError("invalid-argument", "Log date is required.");
     }
-    // Prevent future dates
-    const logDate = new Date(logData.date);
-    logDate.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (logDate > today) {
+    // Prevent future dates (allow +1 day for UTC timezone offsets)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    if (logData.date > tomorrowStr) {
         throw new functions.https.HttpsError("invalid-argument", "Cannot log future dates.");
     }
     // Calculate secure metrics
@@ -123,7 +119,7 @@ exports.submitDailyLog = functions.https.onCall(async (data, context) => {
         return { success: true, log: finalLog, updates: null };
     }
 });
-exports.generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).https.onCall(async (data, context) => {
+exports.generateAIInsights = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
     }
@@ -133,7 +129,6 @@ exports.generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).http
     const iSnap = await insightsRef.get();
     const now = Date.now();
     const ONE_DAY = 24 * 60 * 60 * 1000;
-    const SEVEN_DAYS = 7 * ONE_DAY;
     let cachedData = iSnap.exists ? iSnap.data() : null;
     // Check cache validity
     let needsWeeklyUpdate = false;
@@ -141,7 +136,7 @@ exports.generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).http
         needsWeeklyUpdate = true;
     }
     else {
-        if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > SEVEN_DAYS)) {
+        if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > ONE_DAY)) {
             needsWeeklyUpdate = true;
         }
     }
@@ -183,29 +178,29 @@ exports.generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).http
     
     Generate a JSON response EXACTLY in this format, with NO markdown formatting, just raw JSON:
     {
-      "personalizedRecommendations": {
-        "biggestRedFlag": "Short specific bad habit you noticed",
-        "biggestGreenFlag": "Short specific good habit you noticed",
-        "improvementAction": "One highly specific, easy action to improve"
-      },
-      "weeklyReport": {
-        "improvementSummary": "1-2 sentences summarizing their performance compared to ideal",
-        "biggestWin": "The most significant green achievement this week",
-        "nextGoal": "A measurable goal for the upcoming week"
-      },
+      "weeklySummary": "1-2 sentences summarizing their performance compared to ideal",
+      "biggestWin": "Short specific good habit",
+      "improvementArea": "Short specific bad habit",
+      "recommendation": "One highly specific, easy action to improve",
+      "challenge": "A short actionable task to overcome a weak area",
+      "encouragement": "A short, positive encouragement sentence",
       "flagDNA": {
         "primaryTrait": "A catchy 2-3 word title (e.g. Eco Explorer, Thrift Legend, Cab Addict)",
         "identityExplanation": "Why they got this identity based on their actual logs."
       },
-      "weeklyForecast": {
-        "likelyWeakArea": "A habit they might struggle with next week",
-        "suggestedChallenge": "A short actionable task to overcome the weak area"
+      "weeklyRoast": "A funny, slightly sarcastic roast about their worst green habit this week.",
+      "forecast": {
+        "prediction": "A prediction of how next week will go.",
+        "opportunity": "An opportunity to save emissions next week."
       }
     }
   `;
     let newInsights = {};
     try {
-        const ai = new genai_1.GoogleGenAI({ apiKey: geminiApiKey.value() });
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey)
+            throw new Error("Missing GEMINI_API_KEY");
+        const ai = new genai_1.GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt,

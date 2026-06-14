@@ -1,29 +1,25 @@
 import { useState, useEffect } from 'react';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../firebase';
+import { GeminiService } from '../utils/GeminiService';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateFlagDNA, generateWeeklyRoast, generateFlagForecast } from '../services/AnalyticsService';
 import { useLogs } from '../contexts/LogsContext';
 import { useProfile } from '../contexts/ProfileContext';
 
 export interface AIInsights {
-  personalizedRecommendations?: {
-    biggestRedFlag: string;
-    biggestGreenFlag: string;
-    improvementAction: string;
-  };
-  weeklyReport?: {
-    improvementSummary: string;
-    biggestWin: string;
-    nextGoal: string;
-  };
+  weeklySummary?: string;
+  biggestWin?: string;
+  improvementArea?: string;
+  recommendation?: string;
+  challenge?: string;
+  encouragement?: string;
   flagDNA?: {
     primaryTrait: string;
     identityExplanation: string;
   };
-  weeklyForecast?: {
-    likelyWeakArea: string;
-    suggestedChallenge: string;
+  weeklyRoast?: string;
+  forecast?: {
+    prediction: string;
+    opportunity: string;
   };
 }
 
@@ -47,21 +43,18 @@ export function useAIInsights() {
       setIsLoading(true);
       setError(null);
       try {
-        if (import.meta.env.DEV) {
-          throw new Error("DEV MODE: Bypassing generateAIInsights to prevent CORS errors");
-        }
-        const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
-        // Do not force refresh by default, let the backend handle the 7-day/1-day cache logic
-        const result = await generateAIInsights({});
+        const result = await GeminiService.generateInsights(logs, profile);
         
-        if (isMounted) {
-          setInsights(result.data);
-          setIsLoading(false);
+        if (result) {
+          if (isMounted) {
+            setInsights(result);
+            setIsLoading(false);
+          }
+        } else {
+          throw new Error("Gemini returned null");
         }
       } catch (err: any) {
-        if (!import.meta.env.DEV) {
-          console.error("Failed to fetch AI insights, falling back to local AnalyticsService", err);
-        }
+        console.warn("Falling back to local AnalyticsService", err);
         if (isMounted) {
           // Graceful fallback to existing hardcoded logic, mapping to new schema
           const localRoast = generateWeeklyRoast(logs);
@@ -69,25 +62,22 @@ export function useAIInsights() {
           const localDNA = calculateFlagDNA(logs);
           
           setInsights({
-            personalizedRecommendations: {
-              biggestRedFlag: localRoast.realityCheck,
-              biggestGreenFlag: localRoast.oneWin,
-              improvementAction: localRoast.oneFix
-            },
-            weeklyReport: {
-              improvementSummary: localRoast.roast,
-              biggestWin: localRoast.oneWin,
-              nextGoal: localRoast.oneFix
-            },
+            weeklySummary: localRoast.roast,
+            biggestWin: localRoast.oneWin,
+            improvementArea: localRoast.realityCheck,
+            recommendation: localRoast.oneFix,
+            challenge: localForecast.suggestedChallenge || "Keep logging daily",
+            encouragement: "Stay consistent!",
             flagDNA: {
               primaryTrait: localDNA.primaryTrait,
               identityExplanation: localDNA.description
             },
+            weeklyRoast: localRoast.roast,
             forecast: {
               prediction: localForecast.prediction,
               opportunity: localForecast.opportunity
             }
-          } as any);
+          });
           setError(err);
           setIsLoading(false);
         }
@@ -103,16 +93,12 @@ export function useAIInsights() {
     if (!user) return;
     setIsLoading(true);
     try {
-      if (import.meta.env.DEV) {
-        throw new Error("DEV MODE: Bypassing generateAIInsights to prevent CORS errors");
+      const result = await GeminiService.generateInsights(logs, profile);
+      if (result) {
+        setInsights(result);
       }
-      const generateAIInsights = httpsCallable<{ forceRefresh?: boolean }, any>(functions, 'generateAIInsights');
-      const result = await generateAIInsights({ forceRefresh: true });
-      setInsights(result.data);
     } catch (err: any) {
-      if (!import.meta.env.DEV) {
-        console.error(err);
-      }
+      console.warn(err);
     } finally {
       setIsLoading(false);
     }

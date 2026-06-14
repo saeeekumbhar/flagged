@@ -1,7 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { GoogleGenAI } from "@google/genai";
-import { defineSecret } from "firebase-functions/params";
 import { DailyLog, UserProfile } from "./types";
 import { calculateDailyScore, calculateFlagScore, calculateTrend } from "./utils/ScoreEngine";
 import { calculateDailyEmissions } from "./utils/CarbonService";
@@ -9,8 +8,6 @@ import { calculateDailyEmissions } from "./utils/CarbonService";
 admin.initializeApp();
 const db = admin.firestore();
 
-// Define Gemini API Key Secret
-const geminiApiKey = defineSecret("GEMINI_API_KEY");
 
 export const submitDailyLog = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
@@ -101,124 +98,6 @@ export const submitDailyLog = functions.https.onCall(async (data, context) => {
   } else {
     return { success: true, log: finalLog, updates: null };
   }
-});
-
-export const generateAIInsights = functions.runWith({ secrets: [geminiApiKey] }).https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User must be logged in.");
-  }
-  const uid = context.auth.uid;
-  const forceRefresh = data.forceRefresh || false;
-
-  const insightsRef = db.collection("users").doc(uid).collection("aiInsights").doc("latest");
-  const iSnap = await insightsRef.get();
-  
-  const now = Date.now();
-  const ONE_DAY = 24 * 60 * 60 * 1000;
-
-  let cachedData = iSnap.exists ? iSnap.data() : null;
-
-  // Check cache validity
-  let needsWeeklyUpdate = false;
-
-  if (!cachedData) {
-    needsWeeklyUpdate = true;
-  } else {
-    if (forceRefresh || !cachedData.generatedAt || (now - cachedData.generatedAt > ONE_DAY)) {
-      needsWeeklyUpdate = true;
-    }
-  }
-
-  if (!needsWeeklyUpdate && !forceRefresh) {
-    return cachedData;
-  }
-
-  // Fetch logs and profile for context
-  const logsSnap = await db.collection("users").doc(uid).collection("dailyLogs").get();
-  const logsList: DailyLog[] = [];
-  logsSnap.forEach(docSnap => logsList.push(docSnap.data() as DailyLog));
-  logsList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
-  const profRef = db.collection("users").doc(uid);
-  const pSnap = await profRef.get();
-  const profile = pSnap.data() as UserProfile;
-
-  // Summarize behavior for AI
-  const recentLogs = logsList.slice(0, 14); // Use last 14 days
-  let deliveries = 0, cabs = 0, acHeavy = 0, walks = 0, homeFood = 0;
-  
-  recentLogs.forEach(l => {
-    if (l.delivery === 'once' || l.delivery === 'multiple') deliveries++;
-    if (l.transport === 'cab' || l.transport === 'car') cabs++;
-    if (l.energyAC === '6+h' || l.energyAC === '2-6h') acHeavy++;
-    if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') walks++;
-    if (l.foodSource === 'home' || l.foodSource === 'mess' || l.food === 'home' || l.food === 'mess') homeFood++;
-  });
-
-  const prompt = `
-    You are the FLAGGED sustainability AI coach. Analyze the user's habits and generate insights.
-    User Profile: Score: ${profile.flagScore}, Streak: ${profile.streak} days.
-    Last 14 days summary:
-    - ${deliveries} food deliveries
-    - ${cabs} private cab rides
-    - ${acHeavy} days of heavy AC usage
-    - ${walks} days using green transport (walk/cycle/bus)
-    - ${homeFood} days eating home/mess food instead of ordering out
-    
-    Generate a JSON response EXACTLY in this format, with NO markdown formatting, just raw JSON:
-    {
-      "weeklySummary": "1-2 sentences summarizing their performance compared to ideal",
-      "biggestWin": "Short specific good habit",
-      "improvementArea": "Short specific bad habit",
-      "recommendation": "One highly specific, easy action to improve",
-      "challenge": "A short actionable task to overcome a weak area",
-      "encouragement": "A short, positive encouragement sentence",
-      "flagDNA": {
-        "primaryTrait": "A catchy 2-3 word title (e.g. Eco Explorer, Thrift Legend, Cab Addict)",
-        "identityExplanation": "Why they got this identity based on their actual logs."
-      },
-      "weeklyRoast": "A funny, slightly sarcastic roast about their worst green habit this week.",
-      "forecast": {
-        "prediction": "A prediction of how next week will go.",
-        "opportunity": "An opportunity to save emissions next week."
-      }
-    }
-  `;
-
-  let newInsights: any = {};
-
-  try {
-    const ai = new GoogleGenAI({ apiKey: geminiApiKey.value() });
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json"
-      }
-    });
-
-    const aiOutput = response.text;
-    if (aiOutput) {
-       newInsights = JSON.parse(aiOutput);
-    }
-  } catch (error) {
-    console.error("Gemini AI generation failed:", error);
-    if (!cachedData) {
-       throw new functions.https.HttpsError("internal", "AI Generation Failed and no cache exists.");
-    }
-    return cachedData; // fallback to cache silently
-  }
-
-  const updatedData = {
-    ...cachedData,
-    ...newInsights,
-    updatedAt: now,
-    generatedAt: now
-  };
-
-  await insightsRef.set(updatedData, { merge: true });
-
-  return updatedData;
 });
 
 export const awardManualXP = functions.https.onCall(async (data, context) => {
