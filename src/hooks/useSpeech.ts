@@ -21,16 +21,16 @@ export function useSpeech() {
     // Try to find a good English Female voice (soft & sweet)
     const voices = window.speechSynthesis.getVoices();
     
-    // Prioritize natural female voices across different OS
+    // Prioritize natural neural voices (Cloud-based) across different OS
     const preferredVoices = [
-      'Microsoft Zira', // Windows US Female
-      'Microsoft Hazel', // Windows UK Female
+      'Microsoft Jenny Online (Natural)', // Edge Neural Female
+      'Microsoft Aria Online (Natural)', // Edge Neural Female
+      'Google US English', // Chrome US Female (often cloud-backed)
       'Google UK English Female', // Chrome UK Female
-      'Google US English', // Chrome US Female (usually female)
-      'Samantha', // Mac US Female
+      'Samantha', // Mac US Female (high quality)
       'Victoria', // Mac US Female
-      'Karen', // Mac Australian Female
-      'Moira', // Mac Irish Female
+      'Microsoft Zira', // Windows US Female (offline fallback)
+      'Microsoft Hazel', // Windows UK Female (offline fallback)
     ];
 
     let selectedVoice = null;
