@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSettings, TextSize, ThemeMode, MotionMode } from '../../hooks';
 import { SoundService } from '../../services/SoundService';
+import { PrivacyPolicyScreen } from './PrivacyPolicyScreen';
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -10,6 +11,7 @@ interface SettingsScreenProps {
 export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { settings, updateSetting } = useSettings();
   const [permissionStatus, setPermissionStatus] = useState<string>('');
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   const requestNotificationPermission = async () => {
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
@@ -206,7 +208,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
             <button 
               onClick={() => {
                 if (settings.buttonSounds) SoundService.playBoop();
-                alert("Privacy Policy coming soon!");
+                setShowPrivacyPolicy(true);
               }}
               className="w-full p-4 border-b border-[#E5D7C4] flex items-center justify-between text-left active:bg-[#F4F1EC] transition-colors"
             >
@@ -260,6 +262,12 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </div>
 
       </div>
+
+      <AnimatePresence>
+        {showPrivacyPolicy && (
+          <PrivacyPolicyScreen onBack={() => setShowPrivacyPolicy(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
