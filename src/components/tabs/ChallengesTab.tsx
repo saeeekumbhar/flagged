@@ -74,7 +74,7 @@ export function ChallengesTab({ profile, onAwardXP, showToastMsg, updateProfile 
                       className="bg-white/20 hover:bg-white/30 border border-white/40 text-white text-[11px] font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-sm transition-colors backdrop-blur-md"
                     >
                       Complete Mission
-                    </button>
+                    </motion.button>
                   )}
                   {isCompleted && (
                     <div className="text-[11px] font-bold uppercase tracking-wider text-[#CFBB99] drop-shadow-sm">
