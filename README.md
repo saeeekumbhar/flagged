@@ -1,7 +1,10 @@
 <div align="center">
 
 # 🌱 FLAGGED
-**Small choices. Measurable impact.**
+
+<a href="https://github.com/saeeekumbhar/flagged">
+  <img src="https://readme-typing-svg.demolab.com?font=Outfit&weight=600&size=22&pause=1500&color=889063&center=true&vCenter=true&width=500&lines=Small+choices.+Measurable+impact.;Understand.+Track.+Reduce.;Gamify+your+sustainability+journey." alt="Typing SVG" />
+</a>
 
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
