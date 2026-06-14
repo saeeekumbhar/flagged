@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌱 FLAGGED
+# FLAGGED
 
 <br />
 
