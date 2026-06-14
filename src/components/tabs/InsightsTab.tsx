@@ -11,7 +11,7 @@ interface InsightsTabProps {
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
   const { speak, stop, isPlaying, isSupported } = useSpeech();
-  const roast = insights?.weeklyRoast;
+  const forecast = insights?.forecast;
 
   let walks = 0;
   let homeFood = 0;
@@ -55,6 +55,21 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
       {/* Header */}
       <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Insights</h2>
 
+      {/* Daily Forecast Card */}
+      {!isLoading && forecast && (
+        <motion.div 
+          className="premium-glass rounded-[24px] p-4 flex items-start gap-3 relative overflow-hidden"
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+          <div className="text-3xl drop-shadow-md shrink-0 mt-0.5">🔮</div>
+          <div className="flex-1 relative z-10">
+            <h4 className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1 drop-shadow-sm">Forecast</h4>
+            <p className="text-[14px] font-bold text-white leading-tight mb-1.5 drop-shadow-md">{forecast.prediction}</p>
+            <p className="text-[12px] text-[#E4EDE0] leading-tight font-medium drop-shadow-sm">{forecast.opportunity}</p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Weekly Report Card */}
       {isLoading ? (
         <motion.div className="premium-glass rounded-[32px] p-6 flex flex-col items-center justify-center text-center gap-3 min-h-[160px]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
@@ -94,27 +109,6 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
         <div className="premium-glass rounded-[32px] p-6 text-center text-[#4C3D19] font-bold">
           Log some check-ins to receive your first weekly report!
         </div>
-      )}
-
-      {/* Forecast Card */}
-      {insights?.weeklyForecast && (
-        <motion.div className="bg-gradient-to-br from-[#1A2315] to-[#354024] rounded-[32px] p-6 shadow-lg relative overflow-hidden" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <div className="flex items-start gap-4 relative z-10">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-xl/50 flex items-center justify-center text-3xl shadow-inner border border-white/20 shrink-0">
-              🔮
-            </div>
-            <div className="flex-1">
-              <h4 className="text-[11px] font-bold text-[#CFBB99] uppercase tracking-wider mb-1">AI Forecast</h4>
-              <p className="text-[14px] font-medium text-white/90 leading-snug mb-3">
-                {insights.weeklyForecast.likelyWeakArea}
-              </p>
-              <div className="bg-black/20 rounded-xl p-3 border border-white/10">
-                <div className="text-[10px] uppercase font-bold text-[#BEE0BE] mb-1">Suggested Challenge</div>
-                <div className="text-xs font-semibold text-white leading-snug">{insights.weeklyForecast.suggestedChallenge}</div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       )}
 
       {/* Personalized Recommendations */}
