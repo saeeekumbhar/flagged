@@ -69,31 +69,68 @@ export const SoundService = {
       const ctx = getAudioContext();
       if (ambientOscillator) return; // already playing
 
-      ambientOscillator = ctx.createOscillator();
-      ambientGain = ctx.createGain();
+      // We use a node graph to create a beautiful, soft ambient pad
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0, ctx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 5); // Gentle fade in
+      masterGain.connect(ctx.destination);
 
-      ambientOscillator.type = 'sine';
-      ambientOscillator.frequency.value = 110; // Low A drone
+      // Create a soft lowpass filter for warmth
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 350; 
+      filter.connect(masterGain);
 
-      // Add a slow LFO to the gain to make it "breathe"
-      const lfo = ctx.createOscillator();
-      lfo.type = 'sine';
-      lfo.frequency.value = 0.1; // Very slow
-      const lfoGain = ctx.createGain();
-      lfoGain.gain.value = 0.05;
+      // Slow LFO to make the filter "breathe" (foresty/galactic feel)
+      const filterLfo = ctx.createOscillator();
+      filterLfo.type = 'sine';
+      filterLfo.frequency.value = 0.05; // 20 second cycle
+      const filterLfoGain = ctx.createGain();
+      filterLfoGain.gain.value = 150; 
+      filterLfo.connect(filterLfoGain);
+      filterLfoGain.connect(filter.frequency);
+      filterLfo.start();
 
-      lfo.connect(lfoGain);
-      lfoGain.connect(ambientGain.gain);
+      // Frequencies for a soothing, spacey chord (Cmaj9: C3, E3, G3, B3)
+      const freqs = [130.81, 164.81, 196.00, 246.94];
+      const oscs: OscillatorNode[] = [];
+      
+      freqs.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'triangle'; // Softer tone
+        osc.frequency.value = freq + (Math.random() * 0.4 - 0.2); // Slight detune
+        
+        // Panner to spread the chord
+        const panner = ctx.createStereoPanner();
+        panner.pan.value = (i % 2 === 0 ? 1 : -1) * (Math.random() * 0.5 + 0.2);
 
-      // Master gain for ambient
-      ambientGain.gain.setValueAtTime(0.01, ctx.currentTime);
-      ambientGain.gain.linearRampToValueAtTime(0.03, ctx.currentTime + 2); // fade in
+        // Individual LFO for volume shimmer
+        const lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.1 + Math.random() * 0.1;
+        const lfoGain = ctx.createGain();
+        lfoGain.gain.value = 0.4;
+        lfo.connect(lfoGain);
+        
+        const voiceGain = ctx.createGain();
+        voiceGain.gain.value = 0.5;
+        lfoGain.connect(voiceGain.gain);
 
-      ambientOscillator.connect(ambientGain);
-      ambientGain.connect(ctx.destination);
+        osc.connect(voiceGain);
+        voiceGain.connect(panner);
+        panner.connect(filter);
+        
+        osc.start();
+        lfo.start();
+        oscs.push(osc);
+      });
 
-      ambientOscillator.start();
-      lfo.start();
+      // Store references to stop later
+      ambientOscillator = oscs[0]; 
+      ambientGain = masterGain;
+      (window as any).__ambientOscs = oscs;
+      (window as any).__ambientLfo = filterLfo;
+
     } catch (e) {
       console.warn("Ambient sound failed", e);
     }
@@ -101,11 +138,22 @@ export const SoundService = {
 
   stopAmbient: () => {
     try {
-      if (ambientOscillator && ambientGain && audioCtx) {
-        ambientGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1); // fade out
-        ambientOscillator.stop(audioCtx.currentTime + 1);
-        ambientOscillator = null;
-        ambientGain = null;
+      if (ambientGain && audioCtx) {
+        // Fade out
+        ambientGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 3);
+        
+        setTimeout(() => {
+          if ((window as any).__ambientOscs) {
+            (window as any).__ambientOscs.forEach((osc: any) => {
+              try { osc.stop(); } catch(e){}
+            });
+          }
+          if ((window as any).__ambientLfo) {
+             try { (window as any).__ambientLfo.stop(); } catch(e){}
+          }
+          ambientOscillator = null;
+          ambientGain = null;
+        }, 3100);
       }
     } catch (e) {
       console.warn("Stop ambient failed", e);

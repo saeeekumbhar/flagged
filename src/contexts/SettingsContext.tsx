@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   textSize: 'default',
   theme: 'system',
   motion: 'normal',
-  ambientMusic: false,
+  ambientMusic: true,
   buttonSounds: true,
   achievementSounds: true,
   dailyReminder: false,
