@@ -9,7 +9,6 @@
 [![Firebase](https://img.shields.io/badge/Firebase-12.14-FFCA28?logo=firebase&logoColor=white)](https://firebase.google.com/)
 [![Gemini](https://img.shields.io/badge/Google_Gemini-AI-8E75B2?logo=google&logoColor=white)](https://ai.google.dev/)
 
-<img width="800" alt="FLAGGED Banner Placeholder" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 
 *A next-generation behavior change platform designed to make sustainability an engaging, daily habit.*
 
@@ -46,7 +45,7 @@ Our application is meticulously aligned with the core problem statement: *"Desig
 
 ## 📸 App Preview
 
-*(Replace these placeholders by adding actual images to `docs/images/`)*
+
 
 <div align="center">
   <img src="docs/images/dashboard.png" width="250" alt="Dashboard View" />
