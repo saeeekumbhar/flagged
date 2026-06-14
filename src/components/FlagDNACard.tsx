@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog } from '../types';
 import { getFlagEvolutionStage } from '../avatars';
 import { AvatarDisplay } from './AvatarDisplay';
 import { calculateFlagDNA } from '../services/AnalyticsService';
+import { ShareModal } from './ShareModal';
 
 interface FlagDNACardProps {
   profile: UserProfile;
@@ -13,6 +14,7 @@ interface FlagDNACardProps {
 }
 
 export function FlagDNACard({ profile, logs, aura, isLoading }: FlagDNACardProps) {
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const localDNA = useMemo(() => calculateFlagDNA(logs), [logs]);
   const era = calculateEra(profile.flagScore);
   const evolution = getFlagEvolutionStage(profile.flagScore);
@@ -93,9 +95,24 @@ export function FlagDNACard({ profile, logs, aura, isLoading }: FlagDNACardProps
         </div>
       </div>
 
-      <button className="w-full mt-4 bg-[#354024] text-white rounded-xl py-3 text-sm font-bold active:scale-95 transition-transform flex items-center justify-center gap-2">
-        <span>📸</span> Share to Story
+      <button 
+        onClick={() => setIsShareModalOpen(true)}
+        className="w-full mt-4 bg-[#354024] text-white rounded-xl py-3 text-sm font-bold active:scale-95 transition-transform flex flex-col items-center justify-center gap-1 shadow-sm"
+      >
+        <div className="flex items-center gap-2">
+          <span>📸</span> 
+          <span>Create your Green Card 🌱</span>
+        </div>
+        <span className="text-[10px] font-normal text-white/70 tracking-wide">Turn your sustainability journey into a story.</span>
       </button>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        profile={profile} 
+        logs={logs} 
+        aura={aura} 
+      />
       </>
       )}
     </motion.div>
