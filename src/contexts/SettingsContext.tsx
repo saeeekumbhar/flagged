@@ -46,7 +46,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem('flagged_settings');
       if (stored) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+        const parsed = JSON.parse(stored);
+        return { ...DEFAULT_SETTINGS, ...parsed, ambientMusic: true }; // Force true for testing
       }
     } catch (e) {
       console.warn("Could not load settings", e);
