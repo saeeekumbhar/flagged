@@ -10,13 +10,13 @@ interface ChallengesTabProps {
 }
 
 export const GREEN_CHALLENGES = [
-  { id: 'day1', title: 'Day 1: Hydration Hero', description: 'Carry a reusable bottle all day.', emoji: '🚰', xp: 20, coins: 10 },
-  { id: 'day2', title: 'Day 2: Delivery Detox', description: 'No online food delivery today.', emoji: '🍔', xp: 20, coins: 10 },
-  { id: 'day3', title: 'Day 3: Public Transit', description: 'Use public transport or walk/cycle.', emoji: '🚌', xp: 20, coins: 10 },
-  { id: 'day4', title: 'Day 4: Plant Power', description: 'Eat entirely meatless for the day.', emoji: '🥗', xp: 20, coins: 10 },
-  { id: 'day5', title: 'Day 5: Zero Waste Snack', description: 'Eat snacks with no plastic wrapper.', emoji: '🍎', xp: 20, coins: 10 },
-  { id: 'day6', title: 'Day 6: Unplugged', description: 'Unplug devices when not in use.', emoji: '🔌', xp: 20, coins: 10 },
-  { id: 'day7', title: 'Day 7: Green Flag Master', description: 'Complete a full sustainable day.', emoji: '🌱', xp: 20, coins: 10 },
+  { id: 'day1', title: 'Hydration Hero', description: 'Carry a reusable bottle all day.', emoji: '🚰', xp: 20, coins: 10 },
+  { id: 'day2', title: 'Delivery Detox', description: 'No online food delivery today.', emoji: '🍔', xp: 20, coins: 10 },
+  { id: 'day3', title: 'Public Transit', description: 'Use public transport or walk/cycle.', emoji: '🚌', xp: 20, coins: 10 },
+  { id: 'day4', title: 'Plant Power', description: 'Eat entirely meatless for the day.', emoji: '🥗', xp: 20, coins: 10 },
+  { id: 'day5', title: 'Zero Waste Snack', description: 'Eat snacks with no plastic wrapper.', emoji: '🍎', xp: 20, coins: 10 },
+  { id: 'day6', title: 'Unplugged', description: 'Unplug devices when not in use.', emoji: '🔌', xp: 20, coins: 10 },
+  { id: 'day7', title: 'Green Flag Master', description: 'Complete a full sustainable day.', emoji: '🌱', xp: 20, coins: 10 },
 ];
 
 export function ChallengesTab({ profile, onAwardXP, showToastMsg, updateProfile }: ChallengesTabProps) {
@@ -36,7 +36,7 @@ export function ChallengesTab({ profile, onAwardXP, showToastMsg, updateProfile 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>7-Day Challenge</h2>
+      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Green Missions</h2>
       <p className="text-white/90 px-1 text-[13px] font-medium leading-snug drop-shadow-sm">
         Compete with yourself. Unlock missions sequentially and build long-lasting green habits.
       </p>
