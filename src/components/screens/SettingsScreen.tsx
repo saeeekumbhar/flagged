@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings, TextSize, ThemeMode, MotionMode } from '../../hooks';
 import { SoundService } from '../../services/SoundService';
+import { NotificationService } from '../../services/NotificationService';
+import { FirebaseService } from '../../services/FirebaseService';
 import { PrivacyPolicyScreen } from './PrivacyPolicyScreen';
 
 interface SettingsScreenProps {
@@ -14,37 +16,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   const requestNotificationPermission = async () => {
-    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
-    if (!vapidKey) {
-      setPermissionStatus('missing_config');
-      return false;
-    }
-
-    if (!('Notification' in window)) {
-      setPermissionStatus('Not supported');
-      return false;
-    }
-    const perm = await Notification.requestPermission();
+    const perm = await NotificationService.requestPermission();
     setPermissionStatus(perm);
-    if (perm === 'granted') {
-      try {
-        const { messaging, auth, db } = await import('../../firebase');
-        if (messaging && auth.currentUser) {
-          const { getToken } = await import('firebase/messaging');
-          const { doc, setDoc } = await import('firebase/firestore');
-          // In production, configure vapidKey inside getToken()
-          const token = await getToken(messaging, { vapidKey });
-          if (token) {
-            await setDoc(doc(db, 'users', auth.currentUser.uid), {
-              fcmToken: token,
-              fcmTokenUpdatedAt: new Date().toISOString()
-            }, { merge: true });
-          }
-        }
-      } catch (e) {
-        console.warn('FCM token generation failed', e);
-      }
-    }
     return perm === 'granted';
   };
 
@@ -54,10 +27,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     
     if (settings.buttonSounds) SoundService.playBoop();
 
-    if (key === 'ambientMusic') {
-      if (newValue) SoundService.startAmbient();
-      else SoundService.stopAmbient();
-    }
+    if (settings.buttonSounds) SoundService.playBoop();
   };
 
   const handleSelect = (key: keyof typeof settings, value: string) => {
@@ -137,15 +107,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         <section>
           <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Sound & Experience</h2>
           <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-[#1A2315]">Ambient Music</div>
-                <div className="text-xs text-[#889063]">Calm background audio</div>
-              </div>
-              <button onClick={() => handleToggle('ambientMusic')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.ambientMusic ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
-                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.ambientMusic ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
-            </div>
+
             <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
               <div className="font-semibold text-[#1A2315]">Button Sounds</div>
               <button onClick={() => handleToggle('buttonSounds')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.buttonSounds ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
@@ -221,11 +183,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
                 const confirm = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
                 if (confirm) {
                   try {
-                    const { auth } = await import('../../firebase');
-                    if (auth.currentUser) {
-                      await auth.currentUser.delete();
-                      alert("Account deleted successfully.");
-                    }
+                    await FirebaseService.deleteAccount();
+                    alert("Account deleted successfully.");
                   } catch (e) {
                     console.error("Account deletion failed", e);
                     alert("Failed to delete account. You may need to sign in again first.");

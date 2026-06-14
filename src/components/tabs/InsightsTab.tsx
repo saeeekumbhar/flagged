@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
 import { useAIInsights, useSpeech } from '../../hooks';
@@ -13,32 +13,35 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
   const { speak, stop, playingId, isSupported } = useSpeech();
   
-  // Calculate local stats for the visual bar chart
-  let walks = 0;
-  let homeFood = 0;
-  let deliveries = 0;
-  let cabs = 0;
-  
-  const currentMonth = new Date().getMonth();
-  Object.values(logs).forEach(log => {
-    const logMonth = new Date(log.date).getMonth();
-    if (logMonth === currentMonth) {
-      if (log.transport === 'walk' || log.transport === 'cycle' || log.transport === 'bus') walks++;
-      if (log.transport === 'cab' || log.transport === 'car') cabs++;
-      if (log.foodSource) {
-        if (log.foodSource === 'home' || log.foodSource === 'mess') homeFood++;
-      } else if (log.food === 'home' || log.food === 'mess') {
-        homeFood++;
+  const { greenTransportPct, goodFoodPct } = useMemo(() => {
+    let walks = 0;
+    let homeFood = 0;
+    let deliveries = 0;
+    let cabs = 0;
+    
+    const currentMonth = new Date().getMonth();
+    Object.values(logs).forEach(log => {
+      const logMonth = new Date(log.date).getMonth();
+      if (logMonth === currentMonth) {
+        if (log.transport === 'walk' || log.transport === 'cycle' || log.transport === 'bus') walks++;
+        if (log.transport === 'cab' || log.transport === 'car') cabs++;
+        if (log.foodSource) {
+          if (log.foodSource === 'home' || log.foodSource === 'mess') homeFood++;
+        } else if (log.food === 'home' || log.food === 'mess') {
+          homeFood++;
+        }
+        if (log.delivery === 'once' || log.delivery === 'multiple') deliveries++;
       }
-      if (log.delivery === 'once' || log.delivery === 'multiple') deliveries++;
-    }
-  });
+    });
 
-  const totalTransport = walks + cabs;
-  const greenTransportPct = totalTransport > 0 ? (walks / totalTransport) * 100 : 0;
+    const totalTransport = walks + cabs;
+    const greenTransportPct = totalTransport > 0 ? (walks / totalTransport) * 100 : 0;
 
-  const totalMeals = homeFood + deliveries;
-  const goodFoodPct = totalMeals > 0 ? (homeFood / totalMeals) * 100 : 0;
+    const totalMeals = homeFood + deliveries;
+    const goodFoodPct = totalMeals > 0 ? (homeFood / totalMeals) * 100 : 0;
+    
+    return { greenTransportPct, goodFoodPct };
+  }, [logs]);
 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative z-10 pointer-events-auto">

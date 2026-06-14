@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { GeminiService } from '../utils/GeminiService';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateFlagDNA, generateWeeklyRoast, generateFlagForecast } from '../services/AnalyticsService';
@@ -34,9 +34,28 @@ export function useAIInsights() {
       setIsLoading(true);
       setError(null);
       try {
+        const CACHE_KEY = `flagged_ai_insights_${user.uid}`;
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          try {
+            const { data, timestamp } = JSON.parse(cached);
+            // 24 hours = 24 * 60 * 60 * 1000 = 86400000 ms
+            if (Date.now() - timestamp < 86400000) {
+              if (isMounted) {
+                setInsights(data);
+                setIsLoading(false);
+              }
+              return;
+            }
+          } catch (e) {
+            console.warn("Invalid cache for insights", e);
+          }
+        }
+
         const result = await GeminiService.generateInsights(logs, profile);
         
         if (result) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ data: result, timestamp: Date.now() }));
           if (isMounted) {
             setInsights(result);
             setIsLoading(false);
@@ -77,6 +96,7 @@ export function useAIInsights() {
     try {
       const result = await GeminiService.generateInsights(logs, profile);
       if (result) {
+        localStorage.setItem(`flagged_ai_insights_${user.uid}`, JSON.stringify({ data: result, timestamp: Date.now() }));
         setInsights(result);
       }
     } catch (err: any) {

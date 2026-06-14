@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog, NavState } from '../../types';
 
@@ -18,11 +18,13 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
   const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sunday
   const startOffset = (firstDayOfWeek + 6) % 7; // Monday = 0
   
-  const days = Array.from({ length: daysInMonth }, (_, i) => {
-    const d = i + 1;
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    return { day: d, dateStr, log: logs[dateStr] };
-  });
+  const days = useMemo(() => {
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const d = i + 1;
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      return { day: d, dateStr, log: logs[dateStr] };
+    });
+  }, [daysInMonth, year, month, logs]);
 
   const blanks = Array.from({ length: startOffset });
   
@@ -31,10 +33,12 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
 
   const realToday = new Date();
   
-  const recentLogs = Object.values(logs)
-    .filter(l => l.transport || l.food || l.foodSource || l.foodDiet || l.delivery || l.energyLaptop || l.energyAC || l.shopping)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5); // Just show the 5 most recent
+  const recentLogs = useMemo(() => {
+    return Object.values(logs)
+      .filter(l => l.transport || l.food || l.foodSource || l.foodDiet || l.delivery || l.energyLaptop || l.energyAC || l.shopping)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5); // Just show the 5 most recent
+  }, [logs]);
 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">

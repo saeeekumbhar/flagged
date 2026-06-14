@@ -26,34 +26,13 @@ export interface UserProfile {
 
 export type Era = 'Red Flag Era' | 'Glow Up Era' | 'Green Flag Era';
 
-export interface ActivityDefinition {
-  id: string;
-  label: string;
-  emoji: string;
-  carbonImpact: 'Very Low' | 'Low' | 'Medium' | 'High';
-  carbonValue: number;
-  flagImpact: 'Strong Positive' | 'Positive' | 'Negative' | 'Strong Negative';
-  flagValue: number;
-}
 
-/**
- * @deprecated Legacy activity object, use structured DailyLog fields instead.
- */
-export interface LoggedActivity {
-  activityId: string;
-  count: number;
-}
 
 export interface DailyLog {
   date: string; // ISO string 'YYYY-MM-DD'
   
-  // Legacy
-  /** @deprecated Do not use or write. Use structured fields instead. */
-  activities?: LoggedActivity[];
-
   // New Structured Fields
   transport?: 'walk' | 'cycle' | 'bus' | 'metro' | 'auto' | 'car' | 'cab' | 'none';
-  /** @deprecated use foodSource and foodDiet instead */
   food?: 'mess' | 'home' | 'veg' | 'mixed' | 'nonveg' | 'none';
   foodSource?: 'mess' | 'home' | 'outside' | 'none';
   foodDiet?: 'veg' | 'mixed' | 'nonveg' | 'none';
@@ -64,8 +43,6 @@ export interface DailyLog {
   reflection?: 'rough' | 'mixed' | 'green';
 
   dailyScore?: number; // 0-100 Daily Sustainability Score
-  /** @deprecated legacy cumulative impact delta, use dailyScore instead. */
-  totalFlagImpact?: number;
   totalCarbonEstimate: number;
   notes: string;
 }

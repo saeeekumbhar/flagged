@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
+import { StorageService } from '../services/StorageService';
+import { FirebaseService } from '../services/FirebaseService';
 
 export type TextSize = 'small' | 'default' | 'large' | 'xlarge';
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -43,14 +45,9 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(() => {
-    try {
-      const stored = localStorage.getItem('flagged_settings');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return { ...DEFAULT_SETTINGS, ...parsed, ambientMusic: true }; // Force true for testing
-      }
-    } catch (e) {
-      console.warn("Could not load settings", e);
+    const stored = StorageService.getSettings();
+    if (stored) {
+      return { ...DEFAULT_SETTINGS, ...stored, ambientMusic: true }; // Force true for testing
     }
     return DEFAULT_SETTINGS;
   });
@@ -60,23 +57,22 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // Save settings on change
   useEffect(() => {
-    localStorage.setItem('flagged_settings', JSON.stringify(settings));
+    StorageService.saveSettings(settings);
 
     // Sync notification preferences to Firestore if logged in
     const syncPreferences = async () => {
       try {
-        const { auth, db } = await import('../firebase');
-        const { doc, setDoc } = await import('firebase/firestore');
-        const user = auth.currentUser;
-        if (user) {
-          await setDoc(doc(db, 'users', user.uid), {
+        const uid = FirebaseService.getCurrentUserId();
+        if (uid) {
+          await FirebaseService.saveProfile(uid, {
+            // @ts-ignore : Extending UserProfile if we want to save these
             notificationPreferences: {
               dailyReminder: settings.dailyReminder,
               weeklyReport: settings.weeklyReport,
-              achievements: settings.achievementSounds, // mapping for achievements
+              achievements: settings.achievementSounds,
               reminderTime: settings.reminderTime
             }
-          }, { merge: true });
+          });
         }
       } catch (e) {
         console.warn('Failed to sync notification preferences', e);
@@ -148,12 +144,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [settings.motion]);
 
-  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+  const updateSetting = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }));
-  };
+  }, []);
+
+  const value = useMemo(() => ({ settings, updateSetting, isDarkMode, isReducedMotion }), [settings, updateSetting, isDarkMode, isReducedMotion]);
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSetting, isDarkMode, isReducedMotion }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );

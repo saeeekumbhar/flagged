@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { auth, provider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { FirebaseService } from '../services/FirebaseService';
 
 export function Splash() {
   const [view, setView] = useState<'splash' | 'auth'>('splash');
@@ -10,7 +9,7 @@ export function Splash() {
   const handleSignIn = async () => {
     try {
       setErrorMsg(null);
-      await signInWithPopup(auth, provider);
+      await FirebaseService.signInWithGoogle();
       // Handled by App.tsx observer
     } catch (error: any) {
       console.error('Login failed', error);

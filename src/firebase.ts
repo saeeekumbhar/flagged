@@ -6,12 +6,12 @@ import { getMessaging, isSupported as isMessagingSupported } from "firebase/mess
 import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCoUBvwt9OATx1zxVUKSukCOl1szdkMQWs",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "flagged-6cc81.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "flagged-6cc81",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "flagged-6cc81.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "435661819450",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:435661819450:web:bde2c536f456972ea5ef03"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

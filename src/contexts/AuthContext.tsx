@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { User } from 'firebase/auth';
+import { FirebaseService } from '../services/FirebaseService';
 
 interface AuthContextType {
   user: User | null;
@@ -14,7 +14,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = FirebaseService.onAuthStateChanged((u) => {
       setUser(u);
       // We do not set isAuthLoading to false here immediately if u exists, 
       // because we want the ProfileContext and LogsContext to finish loading their data first.
@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // We expose a setter for isAuthLoading so the data contexts can clear the loading state once synced.
-  const value = { user, isAuthLoading, setIsAuthLoading };
+  const value = useMemo(() => ({ user, isAuthLoading, setIsAuthLoading }), [user, isAuthLoading]);
 
   return <AuthContext.Provider value={value as any}>{children}</AuthContext.Provider>;
 };

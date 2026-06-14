@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
@@ -15,33 +15,40 @@ interface HomeTabProps {
 
 export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) {
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
-  const era = calculateEra(profile.flagScore);
-  const flagEvolution = getFlagEvolutionStage(profile.flagScore);
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const { era, flagEvolution, todayStr } = useMemo(() => {
+    const today = new Date();
+    return {
+      era: calculateEra(profile.flagScore),
+      flagEvolution: getFlagEvolutionStage(profile.flagScore),
+      todayStr: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    };
+  }, [profile.flagScore]);
 
-  let greenToday = 0;
-  let redToday = 0;
-  if (logs[todayStr]) {
-    const l = logs[todayStr];
-    if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') greenToday++;
-    if (l.transport === 'car' || l.transport === 'cab') redToday++;
-    if (l.foodSource || l.foodDiet) {
-      if (l.foodSource === 'home' || l.foodSource === 'mess') greenToday++;
-      if (l.foodSource === 'outside') redToday++;
-      if (l.foodDiet === 'veg') greenToday++;
-      if (l.foodDiet === 'nonveg') redToday++;
-    } else {
-      if (l.food === 'home' || l.food === 'mess' || l.food === 'veg') greenToday++;
-      if (l.food === 'nonveg' || l.food === 'mixed') redToday++;
+  const { greenToday, redToday } = useMemo(() => {
+    let green = 0;
+    let red = 0;
+    if (logs[todayStr]) {
+      const l = logs[todayStr];
+      if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') green++;
+      if (l.transport === 'car' || l.transport === 'cab') red++;
+      if (l.foodSource || l.foodDiet) {
+        if (l.foodSource === 'home' || l.foodSource === 'mess') green++;
+        if (l.foodSource === 'outside') red++;
+        if (l.foodDiet === 'veg') green++;
+        if (l.foodDiet === 'nonveg') red++;
+      } else {
+        if (l.food === 'home' || l.food === 'mess' || l.food === 'veg') green++;
+        if (l.food === 'nonveg' || l.food === 'mixed') red++;
+      }
+      if (l.energyAC === 'none') green++;
+      if (l.energyAC === '6+h' || l.energyAC === '2-6h') red++;
+      if (l.shopping === 'no') green++;
+      if (l.shopping === 'large' || l.shopping === 'medium') red++;
+      if (l.delivery === 'no') green++;
+      if (l.delivery === 'multiple' || l.delivery === 'once') red++;
     }
-    if (l.energyAC === 'none') greenToday++;
-    if (l.energyAC === '6+h' || l.energyAC === '2-6h') redToday++;
-    if (l.shopping === 'no') greenToday++;
-    if (l.shopping === 'large' || l.shopping === 'medium') redToday++;
-    if (l.delivery === 'no') greenToday++;
-    if (l.delivery === 'multiple' || l.delivery === 'once') redToday++;
-  }
+    return { greenToday: green, redToday: red };
+  }, [logs, todayStr]);
 
   const handleStreakClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,26 +61,31 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
     }
   };
 
-  const currentMonth = new Date().getMonth();
-  let hasPublicTransport = false;
-  let hasHomeFood = false;
-
-  Object.values(logs).forEach(log => {
-    const logMonth = new Date(log.date).getMonth();
-    if (logMonth === currentMonth) {
-      if (log.transport === 'bus' || log.transport === 'metro') hasPublicTransport = true;
-      if (log.foodSource) {
-        if (log.foodSource === 'home' || log.foodSource === 'mess') hasHomeFood = true;
-      } else if (log.food === 'home' || log.food === 'mess') {
-        hasHomeFood = true;
+  const { hasPublicTransport, hasHomeFood } = useMemo(() => {
+    const currentMonth = new Date().getMonth();
+    let pub = false;
+    let home = false;
+    Object.values(logs).forEach(log => {
+      const logMonth = new Date(log.date).getMonth();
+      if (logMonth === currentMonth) {
+        if (log.transport === 'bus' || log.transport === 'metro') pub = true;
+        if (log.foodSource) {
+          if (log.foodSource === 'home' || log.foodSource === 'mess') home = true;
+        } else if (log.food === 'home' || log.food === 'mess') {
+          home = true;
+        }
       }
-    }
-  });
+    });
+    return { hasPublicTransport: pub, hasHomeFood: home };
+  }, [logs]);
 
-  const accessories: string[] = [];
-  if (profile.bestStreak >= 7) accessories.push('🔥');
-  if (hasPublicTransport) accessories.push('🚲');
-  if (hasHomeFood) accessories.push('🍃');
+  const accessories = useMemo(() => {
+    const acc: string[] = [];
+    if (profile.bestStreak >= 7) acc.push('🔥');
+    if (hasPublicTransport) acc.push('🚲');
+    if (hasHomeFood) acc.push('🍃');
+    return acc;
+  }, [profile.bestStreak, hasPublicTransport, hasHomeFood]);
 
   return (
     <div className="h-full max-w-[420px] mx-auto px-4 pt-4 pb-4 flex flex-col justify-between relative z-10 pointer-events-auto">

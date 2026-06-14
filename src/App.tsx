@@ -1,259 +1,28 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { NavState, DailyLog } from './types';
-import { Splash } from './components/Splash';
-import { Onboarding } from './components/Onboarding';
-import { Confetti } from './components/Confetti';
-import { BottomNav } from './components/BottomNav';
-import { HomeTab } from './components/tabs/HomeTab';
-import { JourneyTab } from './components/tabs/JourneyTab';
-import { InsightsTab } from './components/tabs/InsightsTab';
-import { ChallengesTab } from './components/tabs/ChallengesTab';
-import { ProfileTab } from './components/tabs/ProfileTab';
-import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
-import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
-import { useAuth, useProfile, useLogs } from './hooks';
+import React from 'react';
+import { AppShell } from './components/AppShell';
+import { GlobalSoundListener } from './components/GlobalAudio';
+import { useAuth } from './hooks';
 
 export function App() {
-  const { user, isAuthLoading } = useAuth();
-  const { profile, updateProfile, completeOnboarding, isProfileLoading } = useProfile();
-  const { logs, addLog, isLogsLoading } = useLogs();
+  const { user } = useAuth();
   
-  const [navState, setNavState] = useState<NavState>({ type: 'tab', tab: 'home' });
-  const [toast, setToast] = useState<{msg: string, type?: 'green'|'darkGreen'} | null>(null);
-  const [isShaking, setIsShaking] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  useEffect(() => {
-    if (!user) {
-      setNavState({ type: 'tab', tab: 'home' });
-    }
-  }, [user]);
-
-  const handleLogSave = async (log: Partial<DailyLog>) => {
-    const result = await addLog(log);
-    
-    if (result && result.updates) {
-      updateProfile(result.updates);
-      
-      const { logAnalyticsEvent } = await import('./firebase');
-      logAnalyticsEvent('daily_log_created', { score: result.log.dailyScore });
-      
-      if (result.log.dailyScore && result.log.dailyScore >= 50) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
-      }
-    }
-
-    if (navState.type === 'day_details') {
-      setNavState({ type: 'tab', tab: 'home' });
-    }
-  };
-
-  const handleAvatarChange = (avatarId: string) => {
-    if (profile) updateProfile({ avatarId });
-  };
-
-  const handleAwardXP = async (xpAmount: number, coinsAmount: number, reason: string) => {
-    // Map the reason to the allowed action types on the backend
-    let actionType = '';
-    if (reason === 'Streak bonus!') actionType = 'streak_bonus';
-    else if (reason === 'Challenge done!') actionType = 'challenge_completed';
-    else actionType = reason; // Fallback
-
-    try {
-      const { functions } = await import('./firebase');
-      const { httpsCallable } = await import('firebase/functions');
-      const awardManualXP = httpsCallable<{actionType: string}, any>(functions, 'awardManualXP');
-      
-      const result = await awardManualXP({ actionType });
-      if (result.data?.updates) {
-        updateProfile(result.data.updates);
-        
-        const { logAnalyticsEvent } = await import('./firebase');
-        logAnalyticsEvent('achievement_unlocked', { reason: actionType });
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
-      }
-    } catch (e) {
-      console.error('Failed to award manual XP', e);
-    }
-  };
-
-  const handleNavChange = async (newState: NavState) => {
-    setNavState(newState);
-    if (newState.type === 'tab' && newState.tab === 'insights') {
-      const { logAnalyticsEvent } = await import('./firebase');
-      logAnalyticsEvent('insight_opened');
-    }
-  };
-
-  const showToastMsg = (msg: string, type?: 'green'|'darkGreen') => {
-    setToast({msg, type});
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const isSplashOrOnboarding = !user || (!profile || !profile.completedOnboarding);
-  
-  if (isAuthLoading || (user && (isProfileLoading || isLogsLoading))) {
-    return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
-        <div className="w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[url('/bg-green.png')] bg-cover bg-center bg-no-repeat sm:rounded-[40px] sm:border-[8px] sm:border-white/20 sm:shadow-[0_0_40px_rgba(0,0,0,0.2)] flex items-center justify-center">
-          <div className="bg-white/20 backdrop-blur-md text-[#354024] font-bold text-xl px-8 py-4 rounded-3xl shadow-xl">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
       <GlobalSoundListener />
-      <GlobalAmbientMusic user={user} />
-      <div 
-        className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[url('/bg-green.png')] bg-cover bg-center bg-no-repeat sm:rounded-[40px] sm:border-[8px] sm:border-white/20 sm:shadow-[0_0_40px_rgba(0,0,0,0.2)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
-        style={{ contain: 'paint' }}
-      >
-        {!user ? (
-          <Splash />
-        ) : isSplashOrOnboarding ? (
-          <Onboarding onComplete={completeOnboarding} />
-        ) : (
-          <>
-            {/* Toast */}
-            <AnimatePresence>
-              {toast && (
-                <div className="absolute top-6 inset-x-0 z-[100] flex justify-center pointer-events-none px-4">
-                  <motion.div 
-                    initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-                    className={`${toast.type === 'darkGreen' ? 'bg-[#889063]' : 'bg-[#889063]'} text-white px-6 py-2.5 rounded-full shadow-lg text-sm font-bold text-center w-max max-w-full`}
-                  >
-                    {toast.msg}
-                  </motion.div>
-                </div>
-              )}
-            </AnimatePresence>
-
-            {/* Current Tab Render */}
-            <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
-              {navState.type === 'tab' && (
-                <>
-                  {navState.tab === 'home' && profile && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onNavigate={handleNavChange} showToastMsg={showToastMsg} />}
-                  {navState.tab === 'journey' && profile && <JourneyTab profile={profile} logs={logs} onNavigate={handleNavChange} />}
-                  {navState.tab === 'insights' && profile && <InsightsTab profile={profile} logs={logs} />}
-                  {navState.tab === 'challenges' && profile && <ChallengesTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} updateProfile={updateProfile} />}
-                  {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} />}
-                </>
-              )}
-            </div>
-
-            {/* Bottom Navigation */}
-            <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(tab) => handleNavChange({ type: 'tab', tab })} />
-
-            {/* Detail Screens */}
-            <AnimatePresence>
-              {navState.type === 'day_details' && profile && (
-                <DayDetailsScreen
-                  key="day_details"
-                  profile={profile}
-                  date={navState.date}
-                  existingLog={logs[navState.date]}
-                  onSave={handleLogSave}
-                  onCancel={() => handleNavChange({ type: 'tab', tab: 'journey' })}
-                />
-              )}
-              {navState.type === 'badge_details' && profile && (
-                <BadgeDetailsScreen
-                  key="badge_details"
-                  badgeId={navState.badgeId}
-                  profile={profile}
-                  logs={logs}
-                  onBack={() => handleNavChange({ type: 'tab', tab: 'profile' })}
-                />
-              )}
-              {navState.type === 'settings' && (
-                <SettingsScreen
-                  key="settings"
-                  onBack={() => handleNavChange({ type: 'tab', tab: 'profile' })}
-                />
-              )}
-            </AnimatePresence>
-
-            {showConfetti && <Confetti duration={1500} />}
-          </>
-        )}
-      </div>
+      <AppShell />
     </div>
   );
 }
 
-import { SettingsProvider, useSettings } from './contexts/SettingsContext';
-import { SoundService } from './services/SoundService';
-import { SettingsScreen } from './components/screens/SettingsScreen';
+import { SettingsProvider } from './contexts/SettingsContext';
+import { AppProviders } from './contexts/AppProviders';
 
 export default function AppWrapper() {
   return (
     <SettingsProvider>
-      <App />
+      <AppProviders>
+        <App />
+      </AppProviders>
     </SettingsProvider>
   );
 }
-
-function GlobalSoundListener() {
-  const { settings } = useSettings();
-  
-  React.useEffect(() => {
-    const handleGlobalClick = (e: MouseEvent) => {
-      if (!settings.buttonSounds) return;
-      
-      const target = e.target as HTMLElement;
-      // Check if clicking a button, a element, or anything with role="button"
-      const isClickable = target.closest('button') || target.closest('a') || target.closest('[role="button"]');
-      
-      if (isClickable) {
-        // Prevent double playing if we already played in SettingsScreen explicitly, 
-        // but for simplicity, we just play boop on any global button tap.
-        SoundService.playBoop();
-      }
-    };
-    
-    document.body.addEventListener('click', handleGlobalClick);
-    return () => document.body.removeEventListener('click', handleGlobalClick);
-  }, [settings.buttonSounds]);
-  
-  return null;
-}
-
-function GlobalAmbientMusic({ user }: { user: any }) {
-  const { settings } = useSettings();
-  
-  React.useEffect(() => {
-    // Attempt to start immediately
-    if (settings.ambientMusic && user) {
-      SoundService.startAmbient();
-    } else {
-      SoundService.stopAmbient();
-    }
-
-    // Browsers block audio until the first interaction. 
-    // Listen for the first touch/click to resume the AudioContext if suspended.
-    const unlockAudio = () => {
-      SoundService.resumeContext();
-    };
-
-    document.addEventListener('click', unlockAudio, { once: true });
-    document.addEventListener('touchstart', unlockAudio, { once: true });
-
-    return () => {
-      SoundService.stopAmbient();
-      document.removeEventListener('click', unlockAudio);
-      document.removeEventListener('touchstart', unlockAudio);
-    };
-  }, [settings.ambientMusic, user]);
-
-  return null;
-}
-

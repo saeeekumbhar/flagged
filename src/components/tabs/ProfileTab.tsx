@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
 import { AvatarDisplay } from '../AvatarDisplay';
 import { calculateGlowUp } from '../../services/AnalyticsService';
 import { FlagDNACard } from '../FlagDNACard';
-import { auth, db } from '../../firebase';
-import { signOut } from 'firebase/auth';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { FirebaseService } from '../../services/FirebaseService';
 import { useAIInsights } from '../../hooks';
 
 interface ProfileTabProps {
@@ -27,36 +25,39 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
   const { insights, isLoading } = useAIInsights();
   const aura = insights?.aura;
 
-  const era = calculateEra(profile.flagScore);
-  const flagEvolution = getFlagEvolutionStage(profile.flagScore);
-  const glowUp = calculateGlowUp(logs, profile);
+  const era = useMemo(() => calculateEra(profile.flagScore), [profile.flagScore]);
+  const flagEvolution = useMemo(() => getFlagEvolutionStage(profile.flagScore), [profile.flagScore]);
+  const glowUp = useMemo(() => calculateGlowUp(logs, profile), [logs, profile]);
 
-  const logValues = Object.values(logs).filter(l => l.dailyScore !== undefined).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  let bestDay = { score: 0, date: 'N/A' };
-  let worstDay = { score: 100, date: 'N/A' };
-  let trend = 'Neutral ➖';
+  const { bestDay, worstDay, trend } = useMemo(() => {
+    const logValues = Object.values(logs).filter(l => l.dailyScore !== undefined).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    let best = { score: 0, date: 'N/A' };
+    let worst = { score: 100, date: 'N/A' };
+    let t = 'Neutral ➖';
 
-  if (logValues.length > 0) {
-    logValues.forEach(log => {
-      if (log.dailyScore! >= bestDay.score) bestDay = { score: log.dailyScore!, date: log.date };
-      if (log.dailyScore! <= worstDay.score) worstDay = { score: log.dailyScore!, date: log.date };
-    });
+    if (logValues.length > 0) {
+      logValues.forEach(log => {
+        if (log.dailyScore! >= best.score) best = { score: log.dailyScore!, date: log.date };
+        if (log.dailyScore! <= worst.score) worst = { score: log.dailyScore!, date: log.date };
+      });
 
-    if (logValues.length >= 2) {
-      const firstHalf = logValues.slice(0, Math.floor(logValues.length / 2));
-      const secondHalf = logValues.slice(Math.floor(logValues.length / 2));
-      const avg1 = firstHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / firstHalf.length;
-      const avg2 = secondHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / secondHalf.length;
-      if (avg2 > avg1 + 5) trend = 'Improving 📈';
-      else if (avg2 < avg1 - 5) trend = 'Declining 📉';
+      if (logValues.length >= 2) {
+        const firstHalf = logValues.slice(0, Math.floor(logValues.length / 2));
+        const secondHalf = logValues.slice(Math.floor(logValues.length / 2));
+        const avg1 = firstHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / firstHalf.length;
+        const avg2 = secondHalf.reduce((sum, l) => sum + l.dailyScore!, 0) / secondHalf.length;
+        if (avg2 > avg1 + 5) t = 'Improving 📈';
+        else if (avg2 < avg1 - 5) t = 'Declining 📉';
+      }
     }
-  }
+    return { bestDay: best, worstDay: worst, trend: t };
+  }, [logs]);
   
   const formatShortDate = (dStr: string) => dStr === 'N/A' ? 'N/A' : new Date(dStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      await FirebaseService.signOutUser();
     } catch (e) {
       console.error(e);
     }
@@ -66,9 +67,7 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
     if (window.confirm("Are you sure you want to reset your profile? This will delete your current onboarding data so you can start over.")) {
       try {
         localStorage.clear();
-        if (auth.currentUser) {
-           await deleteDoc(doc(db, 'users', auth.currentUser.uid));
-        }
+        await FirebaseService.deleteAccount();
         window.location.reload();
       } catch (e) {
         console.error(e);

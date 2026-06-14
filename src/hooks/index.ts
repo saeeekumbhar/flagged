@@ -4,3 +4,5 @@ export { useProfile } from '../contexts/ProfileContext';
 export { useAIInsights } from './useAIInsights';
 export { useSettings } from '../contexts/SettingsContext';
 export { useSpeech } from './useSpeech';
+export { useToast } from '../contexts/ToastContext';
+export { useNavigation } from '../contexts/NavigationContext';

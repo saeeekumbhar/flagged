@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { UserProfile } from '../types';
 import { useAuth } from './AuthContext';
 import { useLogs } from './LogsContext';
@@ -65,7 +65,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [isProfileLoading, isLogsLoading, setIsAuthLoading]);
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     setProfile(prev => prev ? { ...prev, ...updates } : null);
     if (user) {
       try {
@@ -74,9 +74,9 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.warn("Update profile rejected by security rules:", e);
       }
     }
-  };
+  }, [user]);
 
-  const completeOnboarding = async (onboardingData: Partial<UserProfile>) => {
+  const completeOnboarding = useCallback(async (onboardingData: Partial<UserProfile>) => {
     if (!user) return;
     const newProfile: UserProfile = {
       uid: user.uid,
@@ -100,10 +100,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     setProfile(newProfile);
     await FirebaseService.saveProfile(user.uid, newProfile);
-  };
+  }, [user]);
+
+  const value = useMemo(() => ({ profile, updateProfile, completeOnboarding, isProfileLoading, setProfile }), [profile, updateProfile, completeOnboarding, isProfileLoading]);
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, completeOnboarding, isProfileLoading, setProfile }}>
+    <ProfileContext.Provider value={value}>
       {children}
     </ProfileContext.Provider>
   );
