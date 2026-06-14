@@ -112,7 +112,6 @@ export function App() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50/50 sm:p-8 font-sans">
       <GlobalSoundListener />
-      <GlobalAmbientMusic user={user} />
       <div 
         className={`w-full h-[100dvh] sm:h-[844px] sm:max-w-[390px] bg-[url('/bg-green.png')] bg-cover bg-center bg-no-repeat sm:rounded-[40px] sm:border-[8px] sm:border-white/20 sm:shadow-[0_0_40px_rgba(0,0,0,0.2)] relative overflow-hidden ring-1 ring-black/5 ${isShaking ? 'shake-anim' : ''}`}
         style={{ contain: 'paint' }}
@@ -227,32 +226,3 @@ function GlobalSoundListener() {
   return null;
 }
 
-function GlobalAmbientMusic({ user }: { user: any }) {
-  const { settings } = useSettings();
-  
-  React.useEffect(() => {
-    // Attempt to start immediately
-    if (settings.ambientMusic && user) {
-      SoundService.startAmbient();
-    } else {
-      SoundService.stopAmbient();
-    }
-
-    // Browsers block audio until the first interaction. 
-    // Listen for the first touch/click to resume the AudioContext if suspended.
-    const unlockAudio = () => {
-      SoundService.resumeContext();
-    };
-
-    document.addEventListener('click', unlockAudio, { once: true });
-    document.addEventListener('touchstart', unlockAudio, { once: true });
-
-    return () => {
-      SoundService.stopAmbient();
-      document.removeEventListener('click', unlockAudio);
-      document.removeEventListener('touchstart', unlockAudio);
-    };
-  }, [settings.ambientMusic, user]);
-
-  return null;
-}

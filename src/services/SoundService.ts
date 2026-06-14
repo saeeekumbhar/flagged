@@ -65,63 +65,11 @@ export const SoundService = {
   },
 
   startAmbient: () => {
-    try {
-      const ctx = getAudioContext();
-      if (ambientOscillator) return; // already playing
-
-      // Use as a flag to know it's playing
-      ambientOscillator = ctx.createOscillator(); 
-
-      const playChime = () => {
-        if (!ambientOscillator) return; // stopped
-        
-        // C Major Pentatonic frequencies (soothing, never dissonant)
-        // C5, D5, E5, G5, A5, C6
-        const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
-        const freq = scale[Math.floor(Math.random() * scale.length)];
-        
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const panner = ctx.createStereoPanner();
-        
-        osc.type = 'sine'; // Pure, sweet tone
-        osc.frequency.value = freq;
-        
-        panner.pan.value = (Math.random() * 2) - 1; // Random left/right panning
-        
-        // Soft attack, very long gentle release
-        gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.5); // Increased volume significantly to 30%
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 5);
-        
-        osc.connect(gain);
-        gain.connect(panner);
-        panner.connect(ctx.destination);
-        
-        osc.start();
-        osc.stop(ctx.currentTime + 5.1);
-        
-        // Schedule next chime randomly between 1.5 and 4 seconds
-        (window as any).__ambientTimer = setTimeout(playChime, 1500 + Math.random() * 2500);
-      };
-
-      // Start the loop
-      playChime();
-
-    } catch (e) {
-      console.warn("Ambient sound failed", e);
-    }
+    // Ambient sound removed as per user request
   },
 
   stopAmbient: () => {
-    try {
-      ambientOscillator = null;
-      if ((window as any).__ambientTimer) {
-         clearTimeout((window as any).__ambientTimer);
-      }
-    } catch (e) {
-      console.warn("Stop ambient failed", e);
-    }
+    // Ambient sound removed as per user request
   },
 
   resumeContext: () => {

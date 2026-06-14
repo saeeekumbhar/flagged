@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   textSize: 'default',
   theme: 'system',
   motion: 'normal',
-  ambientMusic: true,
+  ambientMusic: false,
   buttonSounds: true,
   achievementSounds: true,
   dailyReminder: false,
@@ -46,8 +46,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem('flagged_settings');
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return { ...DEFAULT_SETTINGS, ...parsed, ambientMusic: true }; // Force true for testing
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
       }
     } catch (e) {
       console.warn("Could not load settings", e);
