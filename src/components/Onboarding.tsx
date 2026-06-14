@@ -192,7 +192,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               </motion.h2>
               <motion.p className="text-white/90 text-lg font-medium px-4 drop-shadow-sm"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-                Let's start building your Green Flag journey.
+                Let's see how your everyday choices shape your impact.
               </motion.p>
             </div>
 
