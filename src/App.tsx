@@ -12,7 +12,7 @@ import { BottomNav } from './components/BottomNav';
 import { HomeTab } from './components/tabs/HomeTab';
 import { JourneyTab } from './components/tabs/JourneyTab';
 import { InsightsTab } from './components/tabs/InsightsTab';
-import { CommunityTab } from './components/tabs/CommunityTab';
+import { ChallengesTab } from './components/tabs/ChallengesTab';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { DayDetailsScreen } from './components/screens/DayDetailsScreen';
 import { BadgeDetailsScreen } from './components/screens/BadgeDetailsScreen';
@@ -143,7 +143,7 @@ export function App() {
                   {navState.tab === 'home' && profile && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onNavigate={handleNavChange} showToastMsg={showToastMsg} />}
                   {navState.tab === 'journey' && profile && <JourneyTab profile={profile} logs={logs} onNavigate={handleNavChange} />}
                   {navState.tab === 'insights' && profile && <InsightsTab profile={profile} logs={logs} />}
-                  {navState.tab === 'community' && profile && <CommunityTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} />}
+                  {navState.tab === 'challenges' && profile && <ChallengesTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} updateProfile={updateProfile} />}
                   {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} />}
                 </>
               )}

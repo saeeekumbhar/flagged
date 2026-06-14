@@ -21,6 +21,7 @@ export interface UserProfile {
   xp: number;
   level: number;
   coins: number;
+  completedChallenges?: string[];
 }
 
 export type Era = 'Red Flag Era' | 'Glow Up Era' | 'Green Flag Era';
@@ -75,7 +76,7 @@ export const calculateEra = (score: number): Era => {
   return 'Green Flag Era';
 };
 
-export type TabType = 'home' | 'journey' | 'insights' | 'community' | 'profile';
+export type TabType = 'home' | 'journey' | 'insights' | 'challenges' | 'profile';
 
 export type NavState = 
   | { type: 'tab'; tab: TabType }

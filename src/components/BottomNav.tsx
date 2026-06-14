@@ -1,7 +1,7 @@
 import React from 'react';
 import { TabType } from '../types';
 import { NavBar } from './ui/tubelight-navbar';
-import { Home, Map, Lightbulb, Globe, User } from 'lucide-react';
+import { Home, Map, Lightbulb, Target, User } from 'lucide-react';
 
 interface BottomNavProps {
   activeTab: TabType;
@@ -13,7 +13,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { name: 'Home', id: 'home', icon: Home },
     { name: 'Journey', id: 'journey', icon: Map },
     { name: 'Insights', id: 'insights', icon: Lightbulb },
-    { name: 'Community', id: 'community', icon: Globe },
+    { name: 'Challenges', id: 'challenges', icon: Target },
     { name: 'Profile', id: 'profile', icon: User }
   ];
 
