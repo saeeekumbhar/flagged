@@ -45,6 +45,15 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-1 mb-2">
         <h2 className="text-display text-2xl font-bold text-white drop-shadow-md" style={{ color: '#FFFFFF' }}>Insights</h2>
+        
+        {isSupported && insights && insights.vibeCheck && !isLoading && (
+          <button 
+            onClick={() => playingId === 'vibe' ? stop() : speak(`${insights.vibeCheck}. Your main quest: ${insights.mainQuest}.`, 'vibe')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all shadow-sm active:scale-95 ${playingId === 'vibe' ? 'bg-white text-[#354024] border-white' : 'bg-black/20 border-white/20 text-white/90 hover:bg-black/30'}`}
+          >
+            <span>{playingId === 'vibe' ? '⏹ Stop Voice' : '🔊 Play Voice'}</span>
+          </button>
+        )}
       </div>
 
       {isLoading ? (
@@ -67,16 +76,6 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
                 <span className="text-2xl drop-shadow-sm">✨</span>
                 <h3 className="text-[15px] font-bold text-[#1A2315] uppercase tracking-wider">The Vibe Check</h3>
               </div>
-              
-              {/* Voice Button ONLY on top card */}
-              {isSupported && (
-                <button 
-                  onClick={() => playingId === 'vibe' ? stop() : speak(`${insights.vibeCheck}. Your main quest: ${insights.mainQuest}.`, 'vibe')}
-                  className={`flex items-center justify-center w-10 h-10 rounded-full shadow-sm transition-all active:scale-95 ${playingId === 'vibe' ? 'bg-[#1A2315] text-[#E4EDE0]' : 'bg-[#E4EDE0] text-[#1A2315] border border-[#CFBB99]'}`}
-                >
-                  {playingId === 'vibe' ? '⏹️' : '🔊'}
-                </button>
-              )}
             </div>
 
             <p className="text-[16px] font-semibold text-[#1A2315] leading-snug mb-5 relative z-10">
