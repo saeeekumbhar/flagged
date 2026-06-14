@@ -11,7 +11,7 @@ interface InsightsTabProps {
 export function InsightsTab({ profile, logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
   const { speak, stop, playingId, isSupported } = useSpeech();
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
 
   const handleVoice = (id: string, text: string) => {
     if (playingId === id) {
@@ -40,7 +40,19 @@ export function InsightsTab({ profile, logs }: InsightsTabProps) {
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative z-10 pointer-events-auto">
       
       {/* Header */}
-      <h2 className="text-display text-2xl font-bold text-white drop-shadow-md px-1" style={{ color: '#FFFFFF' }}>Insights</h2>
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-display text-2xl font-bold text-white drop-shadow-md" style={{ color: '#FFFFFF' }}>Insights</h2>
+        
+        {/* Quick Voice Toggle */}
+        {isSupported && (
+          <button 
+            onClick={() => updateSettings({ voiceInsights: !settings.voiceInsights })}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all ${settings.voiceInsights ? 'bg-[#889063] border-[#889063] text-white shadow-sm' : 'bg-black/20 border-white/20 text-white/70 hover:bg-black/30'}`}
+          >
+            <span>{settings.voiceInsights ? '🔊 Voice ON' : '🔇 Voice OFF'}</span>
+          </button>
+        )}
+      </div>
 
       {isLoading ? (
         <motion.div className="premium-glass rounded-[32px] p-8 flex flex-col items-center justify-center text-center gap-4 min-h-[200px]" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
