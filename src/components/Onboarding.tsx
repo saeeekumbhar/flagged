@@ -97,7 +97,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q1':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">What’s your college living arrangement?</h2>
             <div className="flex flex-col gap-4">
               <ChoiceBtn emoji="🏠" label="I commute from home (Day Scholar)" selected={answers.q1 === 'Day Scholar'} onClick={() => selectAnswer('q1', 'Day Scholar')} />
@@ -109,7 +109,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q2':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24 h-full pb-10">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">How do you usually travel to campus?</h2>
             <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar">
               <ChoiceBtn emoji="🚶" label="Walk / Cycle" selected={answers.q2 === 'Walk/Cycle'} onClick={() => selectAnswer('q2', 'Walk/Cycle')} />
@@ -122,7 +122,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q3':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24 h-full pb-10">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">How do you usually eat during college days?</h2>
             <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar">
               <ChoiceBtn emoji="🍱" label="Mess food" selected={answers.q3 === 'Mess'} onClick={() => selectAnswer('q3', 'Mess')} />
@@ -136,7 +136,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q4':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">How often do you order online food or products?</h2>
             <div className="flex flex-col gap-3">
               <ChoiceBtn label="Never" selected={answers.q4 === 'Never'} onClick={() => selectAnswer('q4', 'Never')} />
@@ -149,7 +149,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q5':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">Your daily screen/laptop usage?</h2>
             <div className="flex flex-col gap-3">
               <ChoiceBtn label="< 2 hours" selected={answers.q5 === '<2h'} onClick={() => selectAnswer('q5', '<2h')} />
@@ -162,7 +162,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
       case 'q6':
         return (
-          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto mt-24">
+          <div className="flex flex-col gap-8 w-full max-w-[390px] mx-auto">
             <h2 className="text-[28px] leading-tight font-bold text-white drop-shadow-md px-2">Your sustainability goal?</h2>
             <div className="flex flex-col gap-3">
               <ChoiceBtn emoji="🌱" label="Learn my impact" selected={answers.q6 === 'Learn'} onClick={() => selectAnswer('q6', 'Learn')} />
