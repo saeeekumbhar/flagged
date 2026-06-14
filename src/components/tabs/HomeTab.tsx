@@ -197,6 +197,8 @@ export function HomeTab({ profile, logs, onAwardXP, onNavigate }: HomeTabProps) 
         {logs[todayStr] ? (
           <motion.button 
             whileTap={{ scale: 0.96 }}
+            animate={{ boxShadow: ['0 0 0px rgba(255,255,255,0)', '0 0 24px rgba(255,255,255,0.25)', '0 0 0px rgba(255,255,255,0)'] }}
+            transition={{ boxShadow: { repeat: Infinity, duration: 3, ease: "easeInOut" } }}
             onClick={() => onNavigate({ type: 'day_details', date: todayStr })}
             className="w-full premium-glass rounded-full py-3.5 px-6 transition-transform flex items-center justify-between group"
           >
