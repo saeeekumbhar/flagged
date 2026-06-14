@@ -107,6 +107,15 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         <section>
           <h2 className="text-sm font-bold text-[#4C3D19] uppercase tracking-wider mb-3 px-1">Sound & Experience</h2>
           <div className="bg-white rounded-[24px] border border-[#CFBB99] overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-[#1A2315]">Ambient Music</div>
+                <div className="text-xs text-[#889063]">Calm background audio (Coming soon)</div>
+              </div>
+              <button onClick={() => handleToggle('ambientMusic')} className={`w-12 h-6 rounded-full transition-colors relative ${settings.ambientMusic ? 'bg-[#889063]' : 'bg-[#CFBB99]'}`}>
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${settings.ambientMusic ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
 
             <div className="p-4 border-b border-[#E5D7C4] flex items-center justify-between">
               <div className="font-semibold text-[#1A2315]">Button Sounds</div>
