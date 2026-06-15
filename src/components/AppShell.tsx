@@ -111,7 +111,7 @@ export function AppShell() {
                 {navState.tab === 'journey' && profile && <JourneyTab profile={profile} logs={logs} onNavigate={handleNavChange} />}
                 {navState.tab === 'insights' && profile && <InsightsTab profile={profile} logs={logs} />}
                 {navState.tab === 'challenges' && profile && <ChallengesTab profile={profile} onAwardXP={handleAwardXP} showToastMsg={showToastMsg} updateProfile={updateProfile} />}
-                {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} />}
+                {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} updateProfile={updateProfile} showToastMsg={showToastMsg} />}
               </>
             )}
           </div>

@@ -13,6 +13,8 @@ interface ProfileTabProps {
   logs: Record<string, DailyLog>;
   onNavigate: (state: NavState) => void;
   onAvatarChange?: (avatarId: string) => void;
+  updateProfile?: (updates: Partial<UserProfile>) => void;
+  showToastMsg?: (msg: string, type?: 'green'|'darkGreen') => void;
 }
 
 const BADGES = [
@@ -21,7 +23,7 @@ const BADGES = [
   { id: 'b3', emoji: '💧', label: 'Mindful Energy', desc: 'Unplugged 7 times' },
 ];
 
-export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
+export function ProfileTab({ profile, logs, onNavigate, updateProfile, showToastMsg }: ProfileTabProps) {
   const { insights, isLoading } = useAIInsights();
   const aura = insights?.aura;
 
@@ -74,6 +76,23 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       }
     }
   };
+
+  const isBadgeUnlocked = (badgeId: string) => {
+    if (badgeId === 'b1') return Object.keys(logs).length > 0;
+    if (badgeId === 'b2') return Object.values(logs).filter(l => ['walk', 'cycle', 'bus', 'metro'].includes(l.transport || '')).length >= 5;
+    if (badgeId === 'b3') return Object.values(logs).filter(l => l.energyAC === 'none').length >= 7;
+    return false;
+  };
+  
+  const handleSpendCoins = (amount: number, item: string) => {
+    if (profile.coins >= amount && updateProfile && showToastMsg) {
+      updateProfile({ coins: profile.coins - amount });
+      showToastMsg(`Successfully redeemed ${item}!`, 'green');
+    } else if (showToastMsg) {
+      showToastMsg('Not enough pts!', 'darkGreen');
+    }
+  };
+
 
   return (
     <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-6 relative z-10 pointer-events-auto">
@@ -189,10 +208,12 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
       <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <h3 className="text-sm font-bold text-[#1A2315] mb-4">Badges</h3>
         <div className="flex gap-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          {BADGES.map((badge) => (
+          {BADGES.map((badge) => {
+            const unlocked = isBadgeUnlocked(badge.id);
+            return (
             <div 
               key={badge.id} 
-              className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform"
+              className={`flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform ${unlocked ? '' : 'opacity-40 grayscale'}`}
               onClick={() => onNavigate({ type: 'badge_details', badgeId: badge.id })}
             >
               <div className="w-14 h-14 rounded-[20px] flex items-center justify-center text-2xl shadow-sm bg-white/40 border border-white/60">
@@ -200,7 +221,47 @@ export function ProfileTab({ profile, logs, onNavigate }: ProfileTabProps) {
               </div>
               <span className="text-[10px] font-bold text-[#1A2315] uppercase text-center leading-tight max-w-[56px]">{badge.label}</span>
             </div>
-          ))}
+          )})}
+        </div>
+      </motion.div>
+
+      {/* Eco Rewards */}
+      <motion.div className="premium-glass rounded-[32px] p-5" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-sm font-bold text-[#1A2315]">Eco Rewards</h3>
+          <span className="text-xs font-bold bg-[#889063] text-white px-3 py-1 rounded-full">{profile.coins} pts</span>
+        </div>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between p-3 rounded-[20px] bg-white/40 border border-white/60">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🌳</span>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-[#1A2315]">Plant a Real Tree</span>
+                <span className="text-[10px] text-[#4C3D19]">Via EcoAPI</span>
+              </div>
+            </div>
+            <button 
+              onClick={() => handleSpendCoins(500, 'Real Tree')}
+              className="bg-[#354024] text-white text-[10px] font-bold px-4 py-2 rounded-full hover:bg-[#4C3D19] transition-colors active:scale-95"
+            >
+              500 pts
+            </button>
+          </div>
+          <div className="flex items-center justify-between p-3 rounded-[20px] bg-white/40 border border-white/60">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">☕</span>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-[#1A2315]">10% Off Vegan Cafe</span>
+                <span className="text-[10px] text-[#4C3D19]">Local Partner</span>
+              </div>
+            </div>
+            <button 
+              onClick={() => handleSpendCoins(100, 'Cafe Discount')}
+              className="bg-[#354024] text-white text-[10px] font-bold px-4 py-2 rounded-full hover:bg-[#4C3D19] transition-colors active:scale-95"
+            >
+              100 pts
+            </button>
+          </div>
         </div>
       </motion.div>
 
