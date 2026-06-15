@@ -11,7 +11,7 @@ interface NavItem {
 interface NavBarProps {
   items: NavItem[]
   activeTab: string
-  onTabChange: (id: any) => void
+  onTabChange: (id: string) => void
   className?: string
 }
 

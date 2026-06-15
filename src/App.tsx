@@ -13,13 +13,16 @@ export function App() {
 
 import { SettingsProvider } from './contexts/SettingsContext';
 import { AppProviders } from './contexts/AppProviders';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function AppWrapper() {
   return (
-    <SettingsProvider>
-      <AppProviders>
-        <App />
-      </AppProviders>
-    </SettingsProvider>
+    <ErrorBoundary>
+      <SettingsProvider>
+        <AppProviders>
+          <App />
+        </AppProviders>
+      </SettingsProvider>
+    </ErrorBoundary>
   );
 }

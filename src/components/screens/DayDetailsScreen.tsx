@@ -23,13 +23,13 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
   const handleSave = () => {
     const logData: Partial<DailyLog> = {
       date,
-      transport: transport as any,
-      foodSource: foodSource as any,
-      foodDiet: foodDiet as any,
-      delivery: delivery as any,
-      energyLaptop: energyLaptop as any,
-      energyAC: energyAC as any,
-      shopping: shopping as any,
+      transport: transport as DailyLog['transport'],
+      foodSource: foodSource as DailyLog['foodSource'],
+      foodDiet: foodDiet as DailyLog['foodDiet'],
+      delivery: delivery as DailyLog['delivery'],
+      energyLaptop: energyLaptop as DailyLog['energyLaptop'],
+      energyAC: energyAC as DailyLog['energyAC'],
+      shopping: shopping as DailyLog['shopping'],
       notes: existingLog?.notes || ''
     };
 
