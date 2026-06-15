@@ -103,7 +103,7 @@ export function AppShell() {
             )}
           </AnimatePresence>
 
-          <div className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
+          <main className="absolute inset-0 bottom-16 overflow-y-auto no-scrollbar pb-6">
             {navState.type === 'tab' && (
               <>
                 {navState.tab === 'home' && profile && <HomeTab profile={profile} logs={logs} onAwardXP={handleAwardXP} onNavigate={handleNavChange} showToastMsg={showToastMsg} />}
@@ -113,7 +113,7 @@ export function AppShell() {
                 {navState.tab === 'profile' && profile && <ProfileTab profile={profile} logs={logs} onNavigate={handleNavChange} onAvatarChange={handleAvatarChange} updateProfile={updateProfile} showToastMsg={showToastMsg} />}
               </>
             )}
-          </div>
+          </main>
 
           <BottomNav activeTab={navState.type === 'tab' ? navState.tab : 'home'} onTabChange={(tab) => handleNavChange({ type: 'tab', tab })} />
 

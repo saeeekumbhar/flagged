@@ -41,6 +41,9 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
   return (
     <motion.div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
       initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className="fixed inset-0 z-50 bg-[#F4F1EC] flex flex-col pointer-events-auto overflow-y-auto"
     >
@@ -48,7 +51,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         <button aria-label="Go Back" onClick={() => { if(settings.buttonSounds) SoundService.playBoop(); onBack(); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 border border-[#CFBB99] text-[#4C3D19] active:scale-95 transition-transform">
            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
-        <h1 className="text-xl font-bold text-[#1A2315] font-display">Settings</h1>
+        <h1 id="settings-title" className="text-xl font-bold text-[#1A2315] font-display">Settings</h1>
       </div>
 
       <div className="p-4 flex flex-col gap-6 pb-24">

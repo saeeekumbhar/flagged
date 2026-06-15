@@ -44,7 +44,7 @@ export function InsightsTab({ logs }: InsightsTabProps) {
   }, [logs]);
 
   return (
-    <div className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative z-10 pointer-events-auto">
+    <div aria-live="polite" className="pb-24 max-w-[420px] mx-auto px-4 pt-6 flex flex-col gap-5 relative z-10 pointer-events-auto">
       
       {/* Header */}
       <div className="flex items-center justify-between px-1 mb-2">

@@ -47,7 +47,7 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
     return (
       <button
         onClick={() => onChange(isSelected ? '' : value)}
-        className={`px-4 py-3 rounded-[16px] text-sm font-bold transition-all border ${
+        className={`px-4 py-3 rounded-[16px] text-sm font-bold transition-all border focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none ${
           isSelected 
             ? 'bg-white border-white text-[#1A2315] shadow-[0_0_15px_rgba(255,255,255,0.6)] scale-[1.02]' 
             : 'bg-white/5 border-white/20 text-white/80 hover:bg-white/10 active:scale-95'
@@ -60,6 +60,9 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
 
   return (
     <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="day-details-title"
       className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[40px] overflow-y-auto no-scrollbar pointer-events-auto"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
@@ -72,7 +75,7 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
         <div className="flex items-center justify-between mb-6 mt-4">
           <button
             onClick={onCancel}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/20 text-white hover:bg-white/20 active:scale-95 transition-all shadow-lg"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/20 text-white hover:bg-white/20 active:scale-95 transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
           >
             ←
           </button>
@@ -80,7 +83,7 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
             <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-0.5">
               Daily Check-In
             </p>
-            <h2 className="text-xl font-bold text-white drop-shadow-md">
+            <h2 id="day-details-title" className="text-xl font-bold text-white drop-shadow-md">
               {displayDate}
             </h2>
           </div>
@@ -165,7 +168,7 @@ export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDet
           <button
             onClick={handleSave}
             disabled={!transport && !foodSource && !foodDiet && !delivery && !energyAC && !shopping}
-            className="w-full py-4 bg-white/20 backdrop-blur-md border border-white/40 text-white rounded-[20px] font-bold text-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/30 active:scale-[0.98] transition-all disabled:opacity-30 disabled:shadow-none"
+            className="w-full py-4 bg-white/20 backdrop-blur-md border border-white/40 text-white rounded-[20px] font-bold text-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/30 active:scale-[0.98] transition-all disabled:opacity-30 disabled:shadow-none focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
           >
             Complete Check-In
           </button>
