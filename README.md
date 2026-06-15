@@ -65,7 +65,8 @@ graph TD
     A[User Interface] --> B(React Contexts / Hooks)
     B --> C{Service Layer}
     C -->|Auth & Data| D[Firebase / Firestore]
-    C -->|Generative AI| E[Gemini API]
+    C -->|Sanitized Logs| I[Insight Engine]
+    I -->|Secure Prompt| E[Gemini API]
     C -->|Calculations| F[Score & Carbon Engines]
     
     classDef ui fill:#4C3D19,stroke:#CFBB99,stroke-width:2px,color:#fff;
@@ -73,9 +74,19 @@ graph TD
     classDef external fill:#1A2315,stroke:#4C3D19,stroke-width:2px,color:#fff;
     
     class A ui;
-    class B,C,F logic;
+    class B,C,F,I logic;
     class D,E external;
 ```
+
+---
+
+### 🧪 Quality Assurance & Testing
+
+FLAGGED is built with a highly-testable architecture designed to separate pure math/logic from side-effect-heavy UI components or API calls.
+
+- **`InsightEngine` Extraction:** AI prompt summarization logic is explicitly extracted from `GeminiService` into a pure utility, allowing for 100% test coverage without firing live API calls.
+- **Edge Case Coverage:** The `Vitest` test suite comprehensively covers empty states (`{}` logs), missing/corrupt data schemas, legacy fallback handling, and out-of-bounds calculations for all core engines (`ScoreEngine`, `CarbonEngine`, `InsightEngine`).
+- **Strict Typing:** Configured to strictly pass `tsc --noEmit` with explicitly declared data interfaces across all gamification states to prevent runtime regressions.
 
 ---
 
