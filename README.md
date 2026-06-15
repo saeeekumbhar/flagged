@@ -115,5 +115,5 @@ My approach focuses on reducing cognitive load by turning passive data entry int
   <strong>Developed by Saee Kumbhar</strong>
   <br />
   <br />
-  <img src="https://media.tenor.com/6_2D4zW1lIQAAAAi/earth-pixel.gif" width="80" alt="Spinning Earth" />
+  <img src="docs/images/earth.svg" width="80" alt="Spinning Earth" />
 </div>
