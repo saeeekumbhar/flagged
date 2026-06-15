@@ -196,7 +196,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
                     alert("Account deleted successfully.");
                   } catch (e) {
                     console.error("Account deletion failed", e);
-                    alert("Failed to delete account. You may need to sign in again first.");
+                    alert("Failed to delete account. Please try again or ensure you have completed the re-authentication popup.");
                   }
                 }
               }}

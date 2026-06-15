@@ -21,7 +21,21 @@ export const FirebaseService = {
 
   deleteAccount: async () => {
     if (auth.currentUser) {
-      await deleteUser(auth.currentUser);
+      try {
+        await deleteUser(auth.currentUser);
+      } catch (error: any) {
+        if (error.code === 'auth/requires-recent-login') {
+          // Re-authenticate the user
+          const { reauthenticateWithPopup, GoogleAuthProvider } = await import('firebase/auth');
+          const provider = new GoogleAuthProvider();
+          provider.setCustomParameters({ prompt: 'select_account' });
+          await reauthenticateWithPopup(auth.currentUser, provider);
+          // Try deleting again after successful re-authentication
+          await deleteUser(auth.currentUser);
+        } else {
+          throw error;
+        }
+      }
     }
   },
 
