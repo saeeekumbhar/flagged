@@ -1,7 +1,6 @@
 // A simple synthesizer using Web Audio API to avoid external assets.
 
 let audioCtx: AudioContext | null = null;
-let ambientAudio: HTMLAudioElement | null = null;
 
 function getAudioContext() {
   if (!audioCtx) {
@@ -64,62 +63,16 @@ export const SoundService = {
   },
 
   startAmbient: () => {
-    try {
-      if (!ambientAudio) {
-        ambientAudio = new Audio('/forest-ambient.mp3');
-        ambientAudio.loop = true;
-        ambientAudio.volume = 0;
-      }
-      
-      ambientAudio.play().then(() => {
-        // Fade in
-        let vol = 0;
-        const fade = setInterval(() => {
-          if (vol < 0.4) {
-            vol += 0.05;
-            if (ambientAudio) ambientAudio.volume = Math.min(vol, 0.4);
-          } else {
-            clearInterval(fade);
-          }
-        }, 200);
-      }).catch(e => {
-        console.warn("Autoplay blocked for forest ambient", e);
-      });
-    } catch (e) {
-      console.warn("Ambient sound failed", e);
-    }
+    console.log("Ambient music disabled to save repository size.");
   },
 
   stopAmbient: () => {
-    try {
-      if (ambientAudio) {
-        // Fade out
-        let vol = ambientAudio.volume;
-        const fade = setInterval(() => {
-          if (vol > 0.05) {
-            vol -= 0.05;
-            if (ambientAudio) ambientAudio.volume = Math.max(vol, 0);
-          } else {
-            clearInterval(fade);
-            if (ambientAudio) {
-               ambientAudio.pause();
-               ambientAudio.volume = 0;
-            }
-          }
-        }, 100);
-      }
-    } catch (e) {
-      console.warn("Stop ambient failed", e);
-    }
+    // Stubbed
   },
 
   resumeContext: () => {
     if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume().catch(e => console.warn('Failed to resume audio context', e));
-    }
-    // Also try to play the ambient audio if it was blocked
-    if (ambientAudio && ambientAudio.paused && ambientAudio.volume > 0) {
-      ambientAudio.play().catch(e => console.warn('Failed to resume forest ambient', e));
     }
   }
 };
