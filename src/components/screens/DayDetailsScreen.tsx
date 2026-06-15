@@ -11,7 +11,7 @@ interface DayDetailsScreenProps {
   onCancel: () => void;
 }
 
-export function DayDetailsScreen({ date, existingLog, profile, onSave, onCancel }: DayDetailsScreenProps) {
+export function DayDetailsScreen({ date, existingLog, onSave, onCancel }: DayDetailsScreenProps) {
   const [transport, setTransport] = useState(existingLog?.transport || '');
   const [foodSource, setFoodSource] = useState(existingLog?.foodSource || '');
   const [foodDiet, setFoodDiet] = useState(existingLog?.foodDiet || '');

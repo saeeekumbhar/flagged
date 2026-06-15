@@ -17,7 +17,6 @@ const DayDetailsScreen = React.lazy(() => import('./screens/DayDetailsScreen').t
 const BadgeDetailsScreen = React.lazy(() => import('./screens/BadgeDetailsScreen').then(m => ({ default: m.BadgeDetailsScreen })));
 const SettingsScreen = React.lazy(() => import('./screens/SettingsScreen').then(m => ({ default: m.SettingsScreen })));
 const Confetti = React.lazy(() => import('./Confetti').then(m => ({ default: m.Confetti })));
-import { XP_REWARDS } from '../constants';
 
 export function AppShell() {
   const { user, isAuthLoading } = useAuth();
@@ -26,7 +25,7 @@ export function AppShell() {
   const { navState, handleNavChange } = useNavigation();
   const { toast, showToastMsg } = useToast();
   
-  const [isShaking, setIsShaking] = useState(false);
+  const [isShaking] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const handleLogSave = async (log: Partial<DailyLog>) => {
@@ -48,7 +47,7 @@ export function AppShell() {
     if (profile) updateProfile({ avatarId });
   };
 
-  const handleAwardXP = async (xpAmount: number, coinsAmount: number, reason: string) => {
+  const handleAwardXP = async (_xpAmount: number, _coinsAmount: number, reason: string) => {
     let actionType = '';
     if (reason === 'Streak bonus!') actionType = 'streak_bonus';
     else if (reason === 'Challenge done!') actionType = 'challenge_completed';

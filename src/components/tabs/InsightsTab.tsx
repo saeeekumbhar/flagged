@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import { UserProfile, DailyLog } from '../../types';
 import { useAIInsights, useSpeech } from '../../hooks';
@@ -9,7 +9,7 @@ interface InsightsTabProps {
   profile: UserProfile;
 }
 
-export function InsightsTab({ profile, logs }: InsightsTabProps) {
+export function InsightsTab({ logs }: InsightsTabProps) {
   const { insights, isLoading } = useAIInsights();
   const { speak, stop, playingId, isSupported } = useSpeech();
   

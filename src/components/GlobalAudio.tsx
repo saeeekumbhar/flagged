@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSettings } from '../hooks';
 import { SoundService } from '../services/SoundService';
 import { User } from 'firebase/auth';

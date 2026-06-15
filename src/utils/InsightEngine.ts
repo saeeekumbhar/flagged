@@ -1,3 +1,12 @@
+/**
+ * @module InsightEngine
+ * @description
+ * A pure, highly testable utility that scrubs and structures data before it is sent to the Gemini API.
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. Data Anonymization: Parses through logs and removes all personal notes or unnecessary fields.
+ * 2. Activity Aggregation: Distills 14 days of sequential data into pure numerical integers to prevent AI hallucinations.
+ */
 import { DailyLog } from '../types';
 
 export interface InsightSummary {

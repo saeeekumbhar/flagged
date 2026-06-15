@@ -4,7 +4,7 @@ import { useSettings } from '../../hooks';
 
 type TextSize = 'small' | 'default' | 'large' | 'xlarge';
 type ThemeMode = 'light' | 'dark' | 'system';
-type MotionMode = 'normal' | 'reduced';
+
 import { SoundService } from '../../services/SoundService';
 import { NotificationService } from '../../services/NotificationService';
 import { FirebaseService } from '../../services/FirebaseService';

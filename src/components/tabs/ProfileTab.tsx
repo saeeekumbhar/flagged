@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
-import { UserProfile, calculateEra, DailyLog, NavState } from '../../types';
+import { UserProfile, DailyLog, NavState } from '../../types';
 import { getFlagEvolutionStage } from '../../avatars';
-import { AvatarDisplay } from '../AvatarDisplay';
 import { calculateGlowUp } from '../../services/AnalyticsService';
 import { FlagDNACard } from '../FlagDNACard';
 import { FirebaseService } from '../../services/FirebaseService';
@@ -27,7 +26,6 @@ export function ProfileTab({ profile, logs, onNavigate, updateProfile, showToast
   const { insights, isLoading } = useAIInsights();
   const aura = insights?.aura;
 
-  const era = useMemo(() => calculateEra(profile.flagScore), [profile.flagScore]);
   const flagEvolution = useMemo(() => getFlagEvolutionStage(profile.flagScore), [profile.flagScore]);
   const glowUp = useMemo(() => calculateGlowUp(logs, profile), [logs, profile]);
 
@@ -63,18 +61,6 @@ export function ProfileTab({ profile, logs, onNavigate, updateProfile, showToast
       await FirebaseService.signOutUser();
     } catch (e) {
       console.error(e);
-    }
-  };
-
-  const handleReset = async () => {
-    if (window.confirm("Are you sure you want to reset your profile? This will delete your current onboarding data so you can start over.")) {
-      try {
-        localStorage.clear();
-        await FirebaseService.deleteAccount();
-        window.location.reload();
-      } catch (e) {
-        console.error(e);
-      }
     }
   };
 

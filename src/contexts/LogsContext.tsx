@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import { DailyLog, UserProfile } from '../types';
+import { DailyLog } from '../types';
 import { useAuth } from './AuthContext';
 import { FirebaseService } from '../services/FirebaseService';
 

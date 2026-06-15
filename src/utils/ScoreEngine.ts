@@ -12,7 +12,7 @@
  * This file is purely functional and has zero side-effects or external dependencies,
  * making it 100% unit-testable. It powers the entire Gamification loop of FLAGGED.
  */
-import { DailyLog, UserProfile } from '../types';
+import { DailyLog } from '../types';
 import {
   TRANSPORT_SCORES,
   FOOD_SOURCE_SCORES,

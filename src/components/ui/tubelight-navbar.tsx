@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react"
-import { motion } from "motion/react"
+import React from "react"
 import { LucideIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
 
@@ -17,17 +16,6 @@ interface NavBarProps {
 }
 
 export function NavBar({ items, activeTab, onTabChange, className }: NavBarProps) {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
 
   return (
     <div className={cn("absolute bottom-0 left-0 right-0 h-16 premium-glass border-t border-white/60 flex justify-around items-center px-2 pb-1 z-50 shadow-[0_-8px_32px_rgba(0,0,0,0.05)] rounded-t-[32px]", className)}>

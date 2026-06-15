@@ -1,3 +1,12 @@
+/**
+ * @module CarbonService
+ * @description
+ * Responsible for quantifying the user's daily habits into an estimated carbon footprint (kg CO2e).
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. calculateDailyEmissions: Maps qualitative inputs (e.g., 'car', 'veg') to quantitative CO2 equivalents.
+ * 2. Fallback Handling: Safely defaults missing values or unrecognized schemas to zero.
+ */
 import { DailyLog } from '../types';
 import {
   TRANSPORT_EMISSIONS,
