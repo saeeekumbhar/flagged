@@ -12,6 +12,7 @@ import { ChallengesTab } from './tabs/ChallengesTab';
 import { ProfileTab } from './tabs/ProfileTab';
 import { useAuth, useProfile, useLogs, useNavigation, useToast } from '../hooks';
 import { FirebaseService } from '../services/FirebaseService';
+import { AppConfig } from '../constants/config';
 
 const DayDetailsScreen = React.lazy(() => import('./screens/DayDetailsScreen').then(m => ({ default: m.DayDetailsScreen })));
 const BadgeDetailsScreen = React.lazy(() => import('./screens/BadgeDetailsScreen').then(m => ({ default: m.BadgeDetailsScreen })));
@@ -33,9 +34,9 @@ export function AppShell() {
     if (result && result.updates) {
       updateProfile(result.updates);
       FirebaseService.logAnalyticsEvent('daily_log_created', { score: result.log.dailyScore });
-      if (result.log.dailyScore && result.log.dailyScore >= 50) {
+      if (result.log.dailyScore && result.log.dailyScore >= AppConfig.CONFETTI_SCORE_THRESHOLD) {
         setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
+        setTimeout(() => setShowConfetti(false), AppConfig.CONFETTI_DURATION_MS);
       }
     }
     if (navState.type === 'day_details') {
@@ -59,7 +60,7 @@ export function AppShell() {
         updateProfile(result.updates);
         FirebaseService.logAnalyticsEvent('achievement_unlocked', { reason: actionType });
         setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
+        setTimeout(() => setShowConfetti(false), AppConfig.CONFETTI_DURATION_MS);
       }
     } catch (e) {
       showToastMsg('Failed to award manual XP', 'darkGreen');
@@ -149,7 +150,7 @@ export function AppShell() {
 
           {showConfetti && (
             <React.Suspense fallback={null}>
-              <Confetti duration={1500} />
+              <Confetti duration={AppConfig.CONFETTI_DURATION_MS} />
             </React.Suspense>
           )}
         </>

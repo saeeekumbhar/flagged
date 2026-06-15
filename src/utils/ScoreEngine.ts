@@ -13,6 +13,7 @@
  * making it 100% unit-testable. It powers the entire Gamification loop of FLAGGED.
  */
 import { DailyLog } from '../types';
+import { AppConfig } from '../constants/config';
 import {
   TRANSPORT_SCORES,
   FOOD_SOURCE_SCORES,
@@ -105,7 +106,7 @@ export const calculateFlagScore = (logs: Record<string, DailyLog>): number => {
     logDate.setHours(0,0,0,0);
     const dayScore = log.dailyScore !== undefined ? log.dailyScore : calculateDailyScore(log);
     
-    const daysDiff = Math.floor((today.getTime() - logDate.getTime()) / (1000 * 3600 * 24));
+    const daysDiff = Math.floor((today.getTime() - logDate.getTime()) / AppConfig.MS_IN_DAY);
     
     if (daysDiff <= 7) {
       recent7Sum += dayScore;
@@ -154,7 +155,7 @@ export const calculateTrend = (logs: Record<string, DailyLog>): { streak: number
   for (const dateStr of dates) {
     const logDate = new Date(dateStr);
     if (lastLoggedDate) {
-      const daysDiff = Math.floor((logDate.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
+      const daysDiff = Math.floor((logDate.getTime() - lastLoggedDate.getTime()) / AppConfig.MS_IN_DAY);
       if (daysDiff > 1 && streak > 0) {
         if (streak > bestStreak) bestStreak = streak;
         streak = 0;
@@ -167,7 +168,7 @@ export const calculateTrend = (logs: Record<string, DailyLog>): { streak: number
 
   if (lastLoggedDate) {
     const d1 = new Date(todayStr);
-    const daysDiff = Math.floor((d1.getTime() - lastLoggedDate.getTime()) / (1000 * 3600 * 24));
+    const daysDiff = Math.floor((d1.getTime() - lastLoggedDate.getTime()) / AppConfig.MS_IN_DAY);
     if (daysDiff > 1 && streak > 0) {
        if (streak > bestStreak) bestStreak = streak;
        streak = 0;

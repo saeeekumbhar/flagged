@@ -9,6 +9,8 @@
  */
 import { DailyLog } from '../types';
 
+import { AppConfig } from '../constants/config';
+
 export interface InsightSummary {
   deliveries: number;
   cabs: number;
@@ -40,8 +42,8 @@ export class InsightEngine {
       .filter(l => l && l.date) // Ensure log and date exist
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       
-    // Use last 14 days
-    const recentLogs = logsList.slice(0, 14); 
+    // Use recent days from config
+    const recentLogs = logsList.slice(0, AppConfig.DAYS_FOR_INSIGHT); 
     
     recentLogs.forEach(l => {
       if (l.delivery === 'once' || l.delivery === 'multiple') summary.deliveries++;
