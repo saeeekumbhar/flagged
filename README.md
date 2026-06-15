@@ -49,9 +49,11 @@ FLAGGED is a specialized platform for Carbon Footprint Awareness and Behavioral 
 ### 📸 App Preview
 
 <div align="center">
-  <img src="docs/images/dashboard.png" width="250" alt="Dashboard View" />
-  <img src="docs/images/insights.png" width="250" alt="AI Insights View" />
-  <img src="docs/images/onboarding.png" width="250" alt="Onboarding Flow" />
+  <img src="docs/images/home.png" width="180" alt="Home Dashboard" />
+  <img src="docs/images/journey.png" width="180" alt="Journey Calendar" />
+  <img src="docs/images/insights.png" width="180" alt="AI Insights" />
+  <img src="docs/images/challenges.png" width="180" alt="Green Missions" />
+  <img src="docs/images/profile.png" width="180" alt="Profile & Aura" />
 </div>
 
 ---
