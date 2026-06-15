@@ -59,6 +59,7 @@ export function ProfileTab({ profile, logs, onNavigate, updateProfile, showToast
 
   const handleSignOut = async () => {
     try {
+      onNavigate({ type: 'tab', tab: 'home' });
       await FirebaseService.signOutUser();
     } catch (e) {
       console.error(e);

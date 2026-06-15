@@ -194,6 +194,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
                   try {
                     await FirebaseService.deleteAccount();
                     alert("Account deleted successfully.");
+                    window.location.reload();
                   } catch (e) {
                     console.error("Account deletion failed", e);
                     alert("Failed to delete account. Please try again or ensure you have completed the re-authentication popup.");
