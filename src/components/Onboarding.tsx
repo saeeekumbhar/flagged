@@ -50,7 +50,6 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   const handleFinish = () => {
     onComplete({
-      userType: (answers.q1 === 'Day Scholar' ? 'day_scholar' : 'hostelier') as any,
       completedOnboarding: true
     });
   };

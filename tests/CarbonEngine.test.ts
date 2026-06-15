@@ -14,7 +14,7 @@ describe('CarbonEngine', () => {
   });
 
   it('calculates correct emission for diet + source', () => {
-    const emissions = calculateDailyEmissions({ foodSource: 'local', foodDiet: 'vegan' });
+    const emissions = calculateDailyEmissions({ foodSource: 'home', foodDiet: 'veg' });
     expect(emissions).toBeGreaterThanOrEqual(0);
   });
 
@@ -22,19 +22,19 @@ describe('CarbonEngine', () => {
     const emptyEmissions = calculateDailyEmissions({});
     const fullEmissions = calculateDailyEmissions({ 
       transport: 'car', 
-      foodSource: 'imported',
-      foodDiet: 'meat',
-      delivery: 'express',
-      energyLaptop: '8+',
-      energyAC: '8+'
+      foodSource: 'outside',
+      foodDiet: 'nonveg',
+      delivery: 'multiple',
+      energyLaptop: '8+h',
+      energyAC: '6+h'
     });
     
     expect(fullEmissions).toBeGreaterThan(emptyEmissions);
   });
 
   it('fallback to legacy food calculations works correctly', () => {
-    const modernEmissions = calculateDailyEmissions({ foodSource: 'local', foodDiet: 'vegan' });
-    const legacyEmissions = calculateDailyEmissions({ food: 'plant_based' }); // Assuming plant_based exists
+    const modernEmissions = calculateDailyEmissions({ foodSource: 'home', foodDiet: 'veg' });
+    const legacyEmissions = calculateDailyEmissions({ food: 'veg' }); // Assuming veg exists
     
     // As long as they return valid numbers and don't throw an error, fallback is proven safe
     expect(typeof modernEmissions).toBe('number');

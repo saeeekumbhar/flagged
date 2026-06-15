@@ -21,7 +21,7 @@ describe('ScoreEngine', () => {
 
   it('calculateFlagScore processes single log correctly', () => {
     const logs = {
-      '2024-01-01': { date: '2024-01-01', transport: 'walk', dailyScore: 95 }
+      '2024-01-01': { date: '2024-01-01', transport: 'walk' as any, dailyScore: 95, totalCarbonEstimate: 0, notes: '' }
     };
     const score = calculateFlagScore(logs);
     expect(score).toBe(95);
@@ -43,9 +43,9 @@ describe('ScoreEngine', () => {
     const d3 = `${twoDaysAgo.getFullYear()}-${String(twoDaysAgo.getMonth() + 1).padStart(2, '0')}-${String(twoDaysAgo.getDate()).padStart(2, '0')}`;
 
     const logs = {
-      [d1]: { date: d1 },
-      [d2]: { date: d2 },
-      [d3]: { date: d3 }
+      [d1]: { date: d1, totalCarbonEstimate: 0, notes: '' },
+      [d2]: { date: d2, totalCarbonEstimate: 0, notes: '' },
+      [d3]: { date: d3, totalCarbonEstimate: 0, notes: '' }
     };
 
     const { streak, bestStreak } = calculateTrend(logs);
@@ -63,9 +63,9 @@ describe('ScoreEngine', () => {
     const d4 = `${fourDaysAgo.getFullYear()}-${String(fourDaysAgo.getMonth() + 1).padStart(2, '0')}-${String(fourDaysAgo.getDate()).padStart(2, '0')}`;
 
     const logs = {
-      [d1]: { date: d1 },
-      [d3]: { date: d3 },
-      [d4]: { date: d4 }
+      [d1]: { date: d1, totalCarbonEstimate: 0, notes: '' },
+      [d3]: { date: d3, totalCarbonEstimate: 0, notes: '' },
+      [d4]: { date: d4, totalCarbonEstimate: 0, notes: '' }
     };
 
     const { streak, bestStreak } = calculateTrend(logs);

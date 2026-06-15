@@ -82,7 +82,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       uid: user.uid,
       email: user.email,
       name: user.displayName || 'Eco Explorer',
-      userType: onboardingData.userType || 'day_scholar',
       commuteMethod: onboardingData.commuteMethod || null,
       foodPreferences: onboardingData.foodPreferences || null,
       acPreference: onboardingData.acPreference || null,
