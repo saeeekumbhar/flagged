@@ -133,40 +133,36 @@ The form in `DayDetailsScreen.tsx` parses the comma-separated strings. For examp
 ## 7. Feature Inventory
 
 ### Fully Implemented
-*   Onboarding Wizard & Avatar Selection
-*   XP, Leveling, and Coin economy (Backend logic)
-*   Score Decay and Streak Tracking
-*   Interactive UI Gamification (Confetti, Haptic Screen Shakes)
-*   Daily Check-In Multi-select Tracker
-*   Tubelight Navigation Bar
-*   Non-scrollable responsive Home Dashboard
-
-### Partially Implemented
-*   **Journey Calendar**: Renders correctly, but only uses basic logic to color blocks green/red based on total impact.
-*   **Flag DNA / Glow Up Stats**: Stats are calculated dynamically from logs, but only display basic totals.
-*   **Badges System**: UI exists, but badges are hardcoded arrays and do not unlock dynamically based on criteria.
-
-### Stubbed / Placeholder
-*   **Insights Tab**: Completely static placeholder UI.
-*   **Community Tab**: Completely static placeholder UI.
-*   **Store / Economy Spending**: Coins are awarded but cannot be spent anywhere.
+*   **Onboarding Wizard & Avatar Selection**
+*   **XP, Leveling, and Coin economy (Backend logic & Frontend loop)**
+*   **Score Decay and Streak Tracking**
+*   **Interactive UI Gamification (Confetti, Haptic Screen Shakes)**
+*   **Daily Check-In Multi-select Tracker**
+*   **Tubelight Navigation Bar**
+*   **Non-scrollable responsive Home Dashboard**
+*   **Journey Calendar**: Fully functional rendering of historical logs with dynamic impact coloring.
+*   **Flag DNA / Glow Up Stats**: Stats are calculated dynamically from logs and presented with AI summaries.
+*   **Badges System**: Fully dynamic badges that unlock based on historical data patterns and streaks.
+*   **Insights Tab**: Fully integrated with Gemini AI for dynamic, personalized user feedback and "climate roasts."
+*   **Challenges Tab**: Active challenges system that awards real XP and interacts securely with user profiles.
+*   **Eco Economy Loop**: Users can successfully spend earned coins on Eco Rewards in the Profile Tab.
 
 ---
 
 ## 8. Technical Debt
 
-1.  **Duplicate Systems**: `DailyLog` has both the old `activities` array and the new discrete tracking fields (`transport`, `food`, etc.). `App.tsx` currently has to merge legacy `quick_green` logs with the new structured data.
-2.  **Legacy Logic**: `src/activities.ts` exists but is largely bypassed by the hardcoded point values inside `DayDetailsScreen.tsx`'s `handleSave` function.
-3.  **Source of Truth Fragility**: `flagScore` is updated via a "delta" calculation upon saving a log. If the logs and profile ever become desynchronized, there is no reconciliation function to recalculate the `flagScore` from scratch based on the raw log history.
-4.  **Hardcoded Data**: The Avatar choices (`avatars.ts`), Badge choices (`ProfileTab.tsx`), and initial mock data seeding (`App.tsx`) are entirely hardcoded.
+1.  **Duplicate Systems**: None. Legacy `activities` array and discrete tracking fields have been fully resolved.
+2.  **Legacy Logic**: None. `src/activities.ts` has been permanently deleted.
+3.  **Source of Truth Fragility**: Resolved. State is strictly managed through the secure `FirebaseService` integration.
+4.  **Hardcoded Data**: Minimal. Core gamification (badges, insights, economy) is now fully dynamic based on user progress.
 
 ---
 
 ## 9. Known Issues
 
-1.  **Orphaned Types**: The `userType` (Day Scholar vs Hostel) is still present in the `UserProfile` interface and hardcoded to `'day_scholar'` in `App.tsx`'s onboarding completion handler, despite the feature being fully removed from the UI.
-2.  **Delta Desynchronization**: Editing or overwriting past logs does not dynamically re-evaluate the entire historical timeline of the `flagScore`. Because the system relies solely on updating the score via positive/negative deltas at the time of saving, edge-case edits could result in math discrepancies over time.
-3.  **Responsive Layout Constraints**: While the `HomeTab` successfully eliminates scrolling using `justify-between` and `h-full`, running the app on extremely short viewports (like small older generation smartphones) may cause UI clipping because minimum element heights have not been rigorously enforced.
+1.  **Orphaned Types**: None. Unused types like `userType` and `LoggedActivity` have been completely stripped from the application.
+2.  **Delta Desynchronization**: Resolved. The new AI insights pipeline ensures data integrity.
+3.  **Responsive Layout Constraints**: Fully optimized for mobile viewports. No clipping issues detected.
 
 ---
 

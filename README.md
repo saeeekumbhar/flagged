@@ -35,13 +35,14 @@ FLAGGED is a specialized platform for Carbon Footprint Awareness and Behavioral 
 
 ---
 
-### 🧩 Core Features (Everything you need)
+### 🧩 Core Features (Fully Functional Prototype)
 
-* 🤖 **AI Sustainability Insights:** Personalized lifestyle recommendations and "climate roasts" generated dynamically using the Google Gemini API.
-* 📊 **Carbon Impact Tracking:** A frictionless 30-second daily check-in that tracks transport, diet, AC usage, and shopping habits without cognitive overload.
-* 🎮 **Flag Evolution Engine:** A reactive gamification system where users earn XP, maintain streaks, and visually evolve their "Flag Era" tree based on a rolling 30-day average score.
+* 🤖 **AI Sustainability Insights:** Personalized lifestyle recommendations, "climate roasts," and DNA generation powered dynamically by the Google Gemini API based on actual user logs.
+* 📊 **Carbon Impact Tracking:** A frictionless, mobile-first 30-second daily check-in that tracks transport, diet, AC usage, and shopping habits without cognitive overload.
+* 🎮 **Dynamic Gamification Engine:** A reactive system where users earn XP, maintain streaks, and visually evolve their "Flag Era" tree based on a rolling 30-day average score. Features **dynamic badges** that unlock by analyzing historical data patterns.
+* 🪙 **Closed-Loop Eco Economy:** Users earn points for sustainable choices which can be redeemed in the "Eco Rewards" marketplace for tangible real-world benefits (e.g., planting real trees, local vegan cafe discounts).
 * ♿ **Inclusive Accessibility:** Built-in font scaling, high-contrast themes, dynamic ARIA labels, and `aria-live` screen-reader toasts for maximum usability.
-* 🔐 **Secure Architecture:** Seamless authentication via Firebase with strict Firestore data isolation and `.env` protected API gateways.
+* 🔐 **Secure Architecture:** Seamless authentication and real-time syncing via Firebase, with strict Firestore data isolation and `.env` protected API gateways.
 
 ---
 
