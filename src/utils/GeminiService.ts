@@ -1,3 +1,16 @@
+/**
+ * @module GeminiService
+ * @description
+ * Handles the secure integration with the Google Gemini AI API to generate "Gen-Z" personalized insights.
+ * 
+ * AI DATA FLOW & SECURITY ARCHITECTURE:
+ * 1. Data Ingestion: Accepts raw NoSQL logs from Firestore.
+ * 2. Sanitization (InsightEngine): Raw logs are NOT sent to the AI. Instead, they are passed to the 
+ *    pure `InsightEngine` which scrubs personal notes and reduces 14 days of logs into 5 anonymous, aggregate integers (e.g., deliveries=3, walks=5).
+ * 3. Prompt Engineering: The sanitized integers are injected into a highly specific system prompt requesting a strict JSON response.
+ * 4. API Request: The prompt is sent to `gemini-2.5-flash` using a secure API key injected at build time via Vite (`import.meta.env`).
+ * 5. Parsing & Return: The raw string response is parsed into a strictly typed JSON object containing the `vibeCheck` and `mainQuest` UI elements.
+ */
 import { GoogleGenAI } from '@google/genai';
 import { DailyLog, UserProfile } from '../types';
 import { InsightEngine } from './InsightEngine';

@@ -1,3 +1,17 @@
+/**
+ * @module ScoreEngine
+ * @description
+ * Pure utility module responsible for all mathematical gamification logic.
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. calculateDailyScore: Converts raw carbon estimates and categorical behaviors into a 0-100 score.
+ * 2. calculateFlagScore: Aggregates historical daily scores into a rolling average (Flag Score) to represent long-term habits.
+ * 3. calculateTrend: Analyzes chronological logs to compute current and historical best streaks.
+ * 
+ * ARCHITECTURE:
+ * This file is purely functional and has zero side-effects or external dependencies,
+ * making it 100% unit-testable. It powers the entire Gamification loop of FLAGGED.
+ */
 import { DailyLog, UserProfile } from '../types';
 import {
   TRANSPORT_SCORES,

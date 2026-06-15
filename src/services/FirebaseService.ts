@@ -1,3 +1,21 @@
+/**
+ * @module FirebaseService
+ * @description
+ * Primary data access layer for all Google Firebase and Cloud Firestore operations.
+ * 
+ * NO-SQL DATABASE STRUCTURE (FIRESTORE):
+ * The database is strictly architected into isolated, user-specific subcollections to guarantee security 
+ * via Firebase Security Rules. 
+ * 
+ * /users/{uid} (Document: UserProfile)
+ *   -> Stores static user data, gamification state (coins, xp, streak), and preferences.
+ * 
+ * /users/{uid}/logs/{date_string} (Document: DailyLog)
+ *   -> Subcollection storing daily event logs. Indexed by ISO date string (YYYY-MM-DD) for fast time-series queries.
+ * 
+ * /users/{uid}/settings/preferences (Document: Settings)
+ *   -> Separate subcollection to handle push notification tokens and theme preferences without bloating the main profile.
+ */
 import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { signInWithPopup, GoogleAuthProvider, signOut, deleteUser, onAuthStateChanged, User } from 'firebase/auth';
