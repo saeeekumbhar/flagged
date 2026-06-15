@@ -53,8 +53,8 @@ export function JourneyTab({ logs, profile, onNavigate }: JourneyTabProps) {
             {currentDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
           </h3>
           <div className="flex gap-2">
-            <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'<'}</button>
-            <button onClick={handleNextMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'>'}</button>
+            <button aria-label="Previous Month" onClick={handlePrevMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'<'}</button>
+            <button aria-label="Next Month" onClick={handleNextMonth} className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform bg-black/5">{'>'}</button>
           </div>
         </div>
         

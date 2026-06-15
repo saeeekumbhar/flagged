@@ -45,7 +45,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       className="fixed inset-0 z-50 bg-[#F4F1EC] flex flex-col pointer-events-auto overflow-y-auto"
     >
       <div className="sticky top-0 z-10 bg-[#F4F1EC]/90 backdrop-blur-md px-4 py-4 flex items-center gap-3 border-b border-[#CFBB99]">
-        <button onClick={() => { if(settings.buttonSounds) SoundService.playBoop(); onBack(); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 border border-[#CFBB99] text-[#4C3D19] active:scale-95 transition-transform">
+        <button aria-label="Go Back" onClick={() => { if(settings.buttonSounds) SoundService.playBoop(); onBack(); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 border border-[#CFBB99] text-[#4C3D19] active:scale-95 transition-transform">
            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
         </button>
         <h1 className="text-xl font-bold text-[#1A2315] font-display">Settings</h1>

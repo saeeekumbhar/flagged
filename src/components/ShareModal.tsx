@@ -105,7 +105,7 @@ export function ShareModal({ isOpen, onClose, profile, logs, aura }: ShareModalP
           >
             <div className="flex justify-between items-center mb-4 px-2">
               <h3 className="font-display font-bold text-[#1A2315] text-xl">Your FLAGGED Journey</h3>
-              <button onClick={onClose} className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform">
+              <button aria-label="Close Modal" onClick={onClose} className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-[#1A2315] active:scale-95 transition-transform">
                 ✕
               </button>
             </div>
