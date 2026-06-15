@@ -29,9 +29,11 @@
 
 ---
 
-### 🌍 Vertical: GreenTech / SustainabilityTech
+### 🌍 Vertical: GreenTech / SustainabilityTech (Gen-Z Focused)
 
-FLAGGED is a specialized platform for Carbon Footprint Awareness and Behavioral Change. It is designed specifically for students and young professionals who find traditional carbon calculators abstract, tedious, and disconnected from their daily reality.
+FLAGGED is a specialized platform for Carbon Footprint Awareness and Behavioral Change, built specifically for **college students and Gen-Z**. 
+
+Traditional carbon calculators are abstract, tedious, and disconnected from daily reality. FLAGGED changes the narrative by using Gen-Z internet culture to track sustainability. Instead of just tracking raw carbon emissions, you track your **"Green Flags"** (sustainable choices like walking, carpooling, or eating vegan) and **"Red Flags"** (high-impact choices like constant food deliveries or heavy AC usage). Are you a "Walking Green Flag," or are your food deliveries making your aura "kinda mid"?
 
 ---
 
