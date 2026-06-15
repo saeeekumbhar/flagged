@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { DailyLog, UserProfile } from '../types';
+import { InsightEngine } from './InsightEngine';
 
 export class GeminiService {
   static async generateInsights(logs: Record<string, DailyLog>, profile: UserProfile) {
@@ -12,18 +13,9 @@ export class GeminiService {
 
     const ai = new GoogleGenAI({ apiKey });
 
-    // Summarize behavior for AI
-    const logsList = Object.values(logs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    const recentLogs = logsList.slice(0, 14); // Use last 14 days
-    let deliveries = 0, cabs = 0, acHeavy = 0, walks = 0, homeFood = 0;
-    
-    recentLogs.forEach(l => {
-      if (l.delivery === 'once' || l.delivery === 'multiple') deliveries++;
-      if (l.transport === 'cab' || l.transport === 'car') cabs++;
-      if (l.energyAC === '6+h' || l.energyAC === '2-6h') acHeavy++;
-      if (l.transport === 'walk' || l.transport === 'cycle' || l.transport === 'bus') walks++;
-      if (l.foodSource === 'home' || l.foodSource === 'mess' || l.food === 'home' || l.food === 'mess') homeFood++;
-    });
+    // Summarize behavior for AI using the highly-testable InsightEngine
+    const summary = InsightEngine.summarizeLogsForInsights(logs);
+    const { deliveries, cabs, acHeavy, walks, homeFood } = summary;
 
     const prompt = `
       You are the FLAGGED sustainability AI coach. You MUST speak like a chronically online Gen Z bestie. Use slang like "W", "L", "cooked", "serving", "no cap", "slay", "era", "aura", etc. Keep sentences extremely short and punchy. Be slightly sarcastic but encouraging.
